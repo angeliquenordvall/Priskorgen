@@ -1,12 +1,7 @@
-<!DOCTYPE html>
-<html lang="sv">
+<!DOCTYPE html><html lang="sv">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-  <title>Priskorgen</title>
-
-  <style>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">  <title>Priskorgen</title>  <style>
     * {
       box-sizing: border-box;
     }
@@ -232,94 +227,85 @@
         padding: 15px;
       }
     }
-  </style>
-</head>
+  </style></head><body>  <div class="container"><h1>🛒 Priskorgen</h1>
 
-<body>
+<p class="subtitle">
+  Hitta billigaste sättet att handla din korg.
+</p>
 
-  <div class="container">
+<div class="box">
 
-    <h1>🛒 Priskorgen</h1>
+  <label for="postcode">📍 Postnummer</label>
 
-    <p class="subtitle">
-      Hitta billigaste sättet att handla din korg.
-    </p>
+  <input
+    id="postcode"
+    type="text"
+    value="89132"
+    maxlength="5"
+    inputmode="numeric"
+  >
 
-    <div class="box">
+  <br><br>
 
-      <label for="postcode">📍 Postnummer</label>
+  <label for="shoppingList">🛍️ Din inköpslista</label>
 
-      <input
-        id="postcode"
-        type="text"
-        value="89132"
-        maxlength="5"
-        inputmode="numeric"
-      >
-
-      <br><br>
-
-      <label for="shoppingList">🛍️ Din inköpslista</label>
-
-      <textarea
-        id="shoppingList"
-        placeholder="Skriv en vara per rad, till exempel:
+  <textarea
+    id="shoppingList"
+    placeholder="Skriv en vara per rad, till exempel:
 
 Mjölk
 Bananer
 Kaffe
 Smör
 Bröd"
-      ></textarea>
+></textarea>
 
-      <button id="compareButton">
-        🔎 Jämför min korg
-      </button>
+  <button id="compareButton">
+    🔎 Jämför min korg
+  </button>
 
-      <div id="message"></div>
+  <div id="message"></div>
 
-    </div>
+</div>
 
-    <div id="results" class="hidden">
+<div id="results" class="hidden">
 
-      <div id="summary"></div>
+  <div id="summary"></div>
 
-      <div class="box">
-        <h2>✨ Billigast möjligt</h2>
-        <div id="cheapestResults"></div>
-      </div>
-
-      <div class="box">
-        <h2>🏪 En butik</h2>
-        <div id="oneStoreResults"></div>
-      </div>
-
-      <div class="box">
-        <h2>🚗 Smartast</h2>
-
-        <div class="smart">
-          <div class="smart-title">
-            Smartaste alternativet
-          </div>
-
-          <div id="smartResults">
-            Vi räknar på pris och antal butiker.
-          </div>
-        </div>
-      </div>
-
-    </div>
-
-    <div class="attribution">
-      Prisdata från
-      <a href="https://primat.nu" target="_blank" rel="noopener">
-        primat.nu
-      </a>
-    </div>
-
+  <div class="box">
+    <h2>✨ Billigast möjligt</h2>
+    <div id="cheapestResults"></div>
   </div>
 
-  <script>
+  <div class="box">
+    <h2>🏪 En butik</h2>
+    <div id="oneStoreResults"></div>
+  </div>
+
+  <div class="box">
+    <h2>🚗 Smartast</h2>
+
+    <div class="smart">
+      <div class="smart-title">
+        Smartaste alternativet
+      </div>
+
+      <div id="smartResults">
+        Vi räknar på pris och antal butiker.
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<div class="attribution">
+  Prisdata från
+  <a href="https://primat.nu" target="_blank" rel="noopener">
+    primat.nu
+  </a>
+</div>
+
+  </div>  <script>
 
     const compareButton = document.getElementById("compareButton");
     const postcodeInput = document.getElementById("postcode");
@@ -373,11 +359,6 @@ Bröd"
 
     /*
      * NORMALISERING
-     *
-     * Gör att exempelvis:
-     * "Bananer" -> "banan"
-     * "Mjölken" -> "mjölk"
-     * "Smöret" -> "smör"
      */
 
     function normalizeText(text) {
@@ -419,14 +400,18 @@ Bröd"
 
 
     /*
-     * VIKTIGA ORD SOM SKA PRIORITERAS.
+     * ORD SOM ÄR TYDLIGA TECKEN PÅ FEL PRODUKT.
      *
-     * Detta gör att "smör" inte lika lätt
-     * matchar "smördeg".
+     * Viktigt:
+     * Vi använder hela ord här, inte bara "contains".
+     * Det gör exempelvis att "brödpinnar" kan stoppas
+     * utan att vanliga brödprodukter stoppas.
      */
 
     const excludedWords = {
+
       mjolk: [
+        "baby",
         "babys",
         "babysemp",
         "ersattning",
@@ -451,14 +436,20 @@ Bröd"
         "kaffefilter",
         "kaffemugg",
         "kaffemaskin",
-        "kaffekvarn"
+        "kaffekvarn",
+        "kaffeservis"
       ],
 
       brod: [
         "knackebrod",
         "skorpor",
         "brodmix",
-        "brodpudding"
+        "brodpudding",
+        "brodpinnar",
+        "french",
+        "twists",
+        "breadsticks",
+        "grissini"
       ]
     };
 
@@ -487,6 +478,15 @@ Bröd"
     }
 
 
+    function getProductWords(product) {
+
+      return productText(product)
+        .split(" ")
+        .filter(Boolean)
+        .map(singularizeWord);
+    }
+
+
     function categoryText(product) {
 
       return normalizeText(
@@ -496,10 +496,27 @@ Bröd"
 
 
     /*
-     * SPECIALFALL
+     * Kontrollerar om ett ord faktiskt finns
+     * som ett eget ord i produkten.
      *
-     * Vissa vanliga sökningar behöver extra
-     * vägledning för att undvika uppenbara fel.
+     * "bröd" finns i "bröd limpa"
+     * men inte i "brödpinnar".
+     */
+
+    function hasWholeWord(product, word) {
+
+      if (!word) {
+        return false;
+      }
+
+      const words = getProductWords(product);
+
+      return words.includes(word);
+    }
+
+
+    /*
+     * SPECIALFALL
      */
 
     function getConcept(item) {
@@ -545,13 +562,23 @@ Bröd"
 
 
     /*
+     * Kontrollerar hårda felord.
+     */
+
+    function containsExcludedWord(product, exclusions) {
+
+      const words = getProductWords(product);
+
+      return exclusions.some(excluded => {
+
+        return words.includes(excluded);
+
+      });
+    }
+
+
+    /*
      * MATCHNING
-     *
-     * Högre poäng = bättre sannolik match.
-     *
-     * Exakt produktnamn väger tungt.
-     * Kategori hjälper.
-     * Uppenbara felprodukter straffas hårt.
      */
 
     function scoreProduct(item, product) {
@@ -584,21 +611,24 @@ Bröd"
       const combined =
         productText(product);
 
+      const productWords =
+        getProductWords(product);
+
 
       let score = 0;
 
 
       /*
-       * Exakt namnträff
+       * EXAKT NAMN
        */
 
       if (name === query) {
-        score += 100;
+        score += 150;
       }
 
 
       /*
-       * Exakt sökord i produktnamnet
+       * EXAKT SÖKORD SOM EGET ORD
        */
 
       for (const word of queryWords) {
@@ -607,17 +637,17 @@ Bröd"
           continue;
         }
 
-        const singularNameWords =
-          name
-            .split(" ")
-            .map(singularizeWord);
-
-        if (singularNameWords.includes(word)) {
-          score += 35;
+        if (productWords.includes(word)) {
+          score += 40;
         }
 
-        if (category.includes(word)) {
-          score += 15;
+        if (
+          normalizeText(category)
+            .split(" ")
+            .map(singularizeWord)
+            .includes(word)
+        ) {
+          score += 20;
         }
 
         if (brand === word) {
@@ -627,11 +657,14 @@ Bröd"
 
 
       /*
-       * Hela sökningen finns i namnet.
+       * HELA SÖKNINGEN I NAMNET.
+       *
+       * Används fortfarande, men med lägre
+       * betydelse än riktiga ordträffar.
        */
 
       if (name.includes(query)) {
-        score += 25;
+        score += 15;
       }
 
 
@@ -640,7 +673,7 @@ Bröd"
        */
 
       if (name.startsWith(query)) {
-        score += 15;
+        score += 10;
       }
 
 
@@ -652,21 +685,29 @@ Bröd"
         getConcept(item);
 
 
+      /*
+       * MJÖLK
+       */
+
       if (concept === "mjolk") {
 
+        const hasMilkWord =
+          hasWholeWord(product, "mjolk");
+
         if (
-          name.includes("mjolk") &&
-          !name.includes("ersattning") &&
-          !name.includes("babys") &&
-          !name.includes("dryck")
+          hasMilkWord &&
+          !containsExcludedWord(
+            product,
+            excludedWords.mjolk
+          )
         ) {
-          score += 80;
+          score += 100;
         }
 
         if (
           category.includes("mjolk")
         ) {
-          score += 30;
+          score += 35;
         }
 
         if (
@@ -674,77 +715,55 @@ Bröd"
           name.includes("mellanmjolk") ||
           name.includes("lattemjolk")
         ) {
-          score += 20;
-        }
-
-      }
-
-
-      if (concept === "smor") {
-
-        if (
-          name.includes("smor") &&
-          !name.includes("smordeg") &&
-          !name.includes("margarin")
-        ) {
-          score += 80;
-        }
-
-        if (
-          category.includes("smor")
-        ) {
-          score += 30;
-        }
-
-      }
-
-
-      if (concept === "banan") {
-
-        if (name.includes("banan")) {
-          score += 70;
-        }
-
-        if (
-          category.includes("frukt") ||
-          category.includes("banan")
-        ) {
           score += 25;
         }
 
       }
 
 
-      if (concept === "kaffe") {
+      /*
+       * SMÖR
+       */
+
+      if (concept === "smor") {
+
+        const hasButterWord =
+          hasWholeWord(product, "smor");
 
         if (
-          name.includes("kaffe") &&
-          !name.includes("filter") &&
-          !name.includes("mugg") &&
-          !name.includes("maskin")
+          hasButterWord &&
+          !containsExcludedWord(
+            product,
+            excludedWords.smor
+          )
         ) {
-          score += 70;
+          score += 110;
         }
 
         if (
-          category.includes("kaffe")
+          category.includes("smor")
         ) {
-          score += 30;
+          score += 40;
         }
 
       }
 
 
-      if (concept === "brod") {
+      /*
+       * BANAN
+       */
+
+      if (concept === "banan") {
 
         if (
-          name.includes("brod")
+          hasWholeWord(product, "banan")
         ) {
-          score += 50;
+          score += 100;
         }
 
         if (
-          category.includes("brod")
+          category.includes("frukt") ||
+          category.includes("banan")
         ) {
           score += 30;
         }
@@ -753,40 +772,142 @@ Bröd"
 
 
       /*
-       * GENERELLA UPPENBARA FELMATCHNINGAR
+       * KAFFE
+       *
+       * Kaffe kan vara malet eller bönor.
+       * Båda är därför tillåtna.
+       */
+
+      if (concept === "kaffe") {
+
+        const hasCoffeeWord =
+          hasWholeWord(product, "kaffe");
+
+        if (
+          hasCoffeeWord &&
+          !containsExcludedWord(
+            product,
+            excludedWords.kaffe
+          )
+        ) {
+          score += 100;
+        }
+
+        if (
+          category.includes("kaffe")
+        ) {
+          score += 40;
+        }
+
+        if (
+          name.includes("bryggkaffe") ||
+          name.includes("kaffebonor") ||
+          name.includes("kaffebon") ||
+          name.includes("mellanrost") ||
+          name.includes("morkrost") ||
+          name.includes("ljusrost")
+        ) {
+          score += 20;
+        }
+
+      }
+
+
+      /*
+       * BRÖD
+       *
+       * Här är vi betydligt striktare.
+       * "Brödpinnar" får inte vinna bara för
+       * att ordet "bröd" råkar finnas i namnet.
+       */
+
+      if (concept === "brod") {
+
+        const hasBreadWord =
+          hasWholeWord(product, "brod");
+
+        const excluded =
+          containsExcludedWord(
+            product,
+            excludedWords.brod
+          );
+
+        if (
+          hasBreadWord &&
+          !excluded
+        ) {
+          score += 110;
+        }
+
+        if (
+          category.includes("brod") &&
+          !excluded
+        ) {
+          score += 40;
+        }
+
+        if (excluded) {
+          score -= 300;
+        }
+
+      }
+
+
+      /*
+       * GENERELLA EXKLUDERINGAR
        */
 
       const exclusions =
         excludedWords[concept] || [];
 
 
-      for (const excluded of exclusions) {
+      if (
+        containsExcludedWord(
+          product,
+          exclusions
+        )
+      ) {
+        score -= 250;
+      }
 
-        if (combined.includes(excluded)) {
-          score -= 150;
+
+      /*
+       * ENSAMT SÖKORD:
+       *
+       * Om användaren skrev "bröd" och produkten
+       * inte ens innehåller bröd som eget ord,
+       * ska den normalt inte få vinna.
+       */
+
+      if (
+        queryWords.length === 1
+      ) {
+
+        const word =
+          queryWords[0];
+
+        const exactWord =
+          productWords.includes(word);
+
+        const categoryMatch =
+          category
+            .split(" ")
+            .map(singularizeWord)
+            .includes(word);
+
+
+        if (
+          !exactWord &&
+          !categoryMatch
+        ) {
+          score -= 100;
         }
 
       }
 
 
       /*
-       * Om produkten verkar vara något helt annat
-       * än sökningen, ge ett kraftigt avdrag.
-       */
-
-      if (
-        queryWords.length === 1 &&
-        !name.includes(queryWords[0]) &&
-        !category.includes(queryWords[0])
-      ) {
-        score -= 40;
-      }
-
-
-      /*
-       * Storleken ska inte styra huvudmatchningen,
-       * men en extremt liten förpackning ska inte
-       * automatiskt vinna bara för att priset är lågt.
+       * EXTREMT LITEN FÖRPACKNING
        */
 
       if (
@@ -814,17 +935,24 @@ Bröd"
         "&postcode=" +
         encodeURIComponent(postcode);
 
-      const response = await fetch(url);
+      const response =
+        await fetch(url);
 
       if (!response.ok) {
+
         throw new Error(
           "Kunde inte hämta prisdata för " + query
         );
+
       }
 
-      const data = await response.json();
+      const data =
+        await response.json();
 
-      if (!data.products || !data.products.data) {
+      if (
+        !data.products ||
+        !data.products.data
+      ) {
         return [];
       }
 
@@ -833,12 +961,9 @@ Bröd"
 
 
     /*
-     * VÄLJ RÄTT PRODUKT
+     * VÄLJ BÄSTA PRODUKT
      *
-     * Viktigt:
-     * Vi väljer först produkt efter relevans.
-     * Pris används bara som liten utslagsfaktor
-     * mellan produkter som är ungefär lika relevanta.
+     * Pris får inte rädda en dålig match.
      */
 
     function chooseBestProduct(item, products) {
@@ -864,7 +989,10 @@ Bröd"
 
           return {
             product,
-            score: scoreProduct(item, product)
+            score: scoreProduct(
+              item,
+              product
+            )
           };
 
         });
@@ -884,14 +1012,36 @@ Bröd"
       });
 
 
-      return scored[0].product;
+      const winner =
+        scored[0];
+
+
+      /*
+       * Säkerhetsgräns.
+       *
+       * Om den bästa träffen ändå är för svag
+       * visar vi inte en påhittad matchning.
+       */
+
+      if (
+        !winner ||
+        winner.score < 25
+      ) {
+        return null;
+      }
+
+
+      return winner.product;
     }
 
 
     function createItemHtml(item, products) {
 
       const best =
-        chooseBestProduct(item, products);
+        chooseBestProduct(
+          item,
+          products
+        );
 
 
       if (!best) {
@@ -904,7 +1054,7 @@ Bröd"
             </div>
 
             <div class="empty">
-              Ingen passande pris hittades.
+              Ingen tillräckligt säker produktmatch hittades.
             </div>
 
           </div>
@@ -972,11 +1122,6 @@ Bröd"
 
 
       for (const result of allResults) {
-
-        /*
-         * Här använder vi endast den valda produkten
-         * för varje inköpsvara.
-         */
 
         const product =
           chooseBestProduct(
@@ -1318,7 +1463,5 @@ Bröd"
       }
     );
 
-  </script>
-
-</body>
+  </script></body>
 </html>
