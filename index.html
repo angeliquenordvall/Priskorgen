@@ -21,13 +21,11 @@ body {
 
 h1 {
   text-align: center;
-  margin-bottom: 8px;
 }
 
 .subtitle {
   text-align: center;
   color: #666;
-  margin-bottom: 20px;
 }
 
 textarea {
@@ -38,7 +36,6 @@ textarea {
   font-size: 18px;
   border: 1px solid #ccc;
   border-radius: 12px;
-  resize: vertical;
 }
 
 button {
@@ -51,7 +48,6 @@ button {
   color: white;
   font-size: 18px;
   font-weight: bold;
-  cursor: pointer;
 }
 
 .mode {
@@ -59,11 +55,7 @@ button {
   padding: 16px;
   margin-top: 15px;
   border-radius: 14px;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.08);
-}
-
-.mode h2 {
-  margin-top: 0;
+  box-shadow: 0 2px 8px rgba(0,0,0,.08);
 }
 
 .total {
@@ -75,7 +67,6 @@ button {
 .small {
   color: #666;
   font-size: 14px;
-  line-height: 1.5;
 }
 
 .store {
@@ -90,19 +81,6 @@ button {
   justify-content: space-between;
   padding: 7px 0;
   border-bottom: 1px solid #ddd;
-}
-
-.item:last-child {
-  border-bottom: none;
-}
-
-.good {
-  color: #16803c;
-  font-weight: bold;
-}
-
-.hidden {
-  display: none;
 }
 
 .error {
@@ -125,9 +103,7 @@ button {
 Skriv din inköpslista och jämför priser
 </div>
 
-<textarea id="shoppingList" placeholder="Skriv en vara per rad, t.ex.
-
-mjölk
+<textarea id="shoppingList" placeholder="mjölk
 ägg
 kaffe
 bananer
@@ -137,9 +113,9 @@ köttfärs"></textarea>
 🔎 Jämför min korg
 </button>
 
-<div id="error" class="error hidden"></div>
+<div id="error"></div>
 
-<div id="results" class="hidden">
+<div id="results">
 
 <div class="mode">
 <h2>🏪 En butik</h2>
@@ -163,521 +139,165 @@ köttfärs"></textarea>
 <script>
 
 const products = {
-
 "mjölk": {
 ICA:{price:19.95,member:17.95},
 Coop:{price:20.90,member:18.90},
 Willys:{price:17.95,member:17.95}
 },
-
 "ägg": {
 ICA:{price:32.95,member:29.95},
 Coop:{price:34.95,member:29.95},
 Willys:{price:31.95,member:31.95}
 },
-
 "kaffe": {
 ICA:{price:69.95,member:59.95},
 Coop:{price:74.95,member:59.95},
 Willys:{price:64.95,member:64.95}
 },
-
 "bananer": {
 ICA:{price:27.95,member:24.95},
 Coop:{price:29.90,member:25.90},
 Willys:{price:23.95,member:23.95}
 },
-
 "köttfärs": {
 ICA:{price:89.95,member:79.95},
 Coop:{price:94.95,member:79.95},
 Willys:{price:84.95,member:84.95}
 }
-
 };
 
 const stores = ["ICA","Coop","Willys"];
-
-
-/*
-TESTAVSTÅND
-
-Detta är bara tillfälliga värden.
-
-Senare ersätter vi detta med riktiga
-avstånd mellan användaren och butikerna.
-*/
-
-const distance = {
-
-ICA: 0.8,
-Coop: 1.2,
-Willys: 2.4
-
-};
-
-
-/*
-Ungefärlig kostnad för extra körning.
-
-Detta är också bara testvärden.
-
-Senare kan vi räkna detta automatiskt
-utifrån verklig rutt, bränsle och tid.
-*/
-
-const costPerKm = 5;
-
-
-/*
-Extra "besvärspoäng" för varje extra butik.
-
-Det gör att appen inte automatiskt
-väljer många butiker bara för några
-öres besparing.
-*/
-
-const extraStoreEffort = 8;
-
 
 function money(value) {
 return value.toFixed(2).replace(".",",") + " kr";
 }
 
-
-function normalize(text) {
-return text.toLowerCase().trim();
-}
-
-
 function compareBasket() {
 
 const input = document.getElementById("shoppingList").value;
 
-const error = document.getElementById("error");
-const results = document.getElementById("results");
-
-error.classList.add("hidden");
-results.classList.add("hidden");
-
 const items = input
 .split("\n")
-.map(normalize)
-.filter(item => item.length > 0);
+.map(x => x.toLowerCase().trim())
+.filter(x => x.length > 0);
 
-if(items.length === 0){
-
-error.textContent =
-"Skriv minst en vara i inköpslistan.";
-
-error.classList.remove("hidden");
-
+if(items.length === 0) {
+document.getElementById("error").innerHTML =
+"Skriv minst en vara.";
 return;
 }
-
-
-const unknown = items.filter(item => !products[item]);
-
-if(unknown.length > 0){
-
-error.innerHTML =
-"Jag hittar inte dessa testvaror ännu:<br><strong>" +
-unknown.join(", ") +
-"</strong>";
-
-error.classList.remove("hidden");
-
-}
-
 
 const knownItems = items.filter(item => products[item]);
 
-if(knownItems.length === 0){
+if(knownItems.length === 0) {
+document.getElementById("error").innerHTML =
+"Jag hittar inga av varorna ännu.";
 return;
 }
 
+document.getElementById("error").innerHTML = "";
 
 showOneStore(knownItems);
-
 showCheapest(knownItems);
-
 showSmart(knownItems);
 
-results.classList.remove("hidden");
-
 }
 
+function showOneStore(items) {
 
-function showOneStore(items){
-
-let bestStore = null;
+let bestStore = "";
 let bestTotal = Infinity;
 
-
 stores.forEach(store => {
 
 let total = 0;
 
 items.forEach(item => {
-
 total += products[item][store].member;
-
 });
 
-
-if(total < bestTotal){
-
+if(total < bestTotal) {
 bestTotal = total;
 bestStore = store;
-
 }
 
 });
 
-
-let html = "";
-
-html += "<div class='total'>" +
-money(bestTotal) +
-"</div>";
-
-html += "<div class='small'>" +
-"Billigast om allt köps i samma butik." +
-"</div>";
-
-
-html += "<div class='store'>" +
-"<strong>" + bestStore + "</strong>";
-
-
-items.forEach(item => {
-
-html +=
-"<div class='item'>" +
-"<span>" + item + "</span>" +
-"<span>" +
-money(products[item][bestStore].member) +
-"</span>" +
-"</div>";
-
-});
-
-
-html += "</div>";
-
-
-document.getElementById("oneStore").innerHTML = html;
+document.getElementById("oneStore").innerHTML =
+"<div class='total'>" + money(bestTotal) + "</div>" +
+"<div class='small'>Billigast om allt köps i samma butik.</div>" +
+"<div class='store'><strong>" + bestStore + "</strong></div>";
 
 }
 
-
-function showCheapest(items){
+function showCheapest(items) {
 
 let total = 0;
-
-let breakdown = {};
-
-stores.forEach(store => {
-breakdown[store] = [];
-});
-
-
-items.forEach(item){
-
-let cheapestStore = null;
-let cheapestPrice = Infinity;
-
-
-stores.forEach(store){
-
-const price =
-products[item][store].member;
-
-
-if(price < cheapestPrice){
-
-cheapestPrice = price;
-cheapestStore = store;
-
-}
-
-});
-
-
-total += cheapestPrice;
-
-
-breakdown[cheapestStore].push({
-item:item,
-price:cheapestPrice
-});
-
-});
-
-
 let html = "";
-
-html +=
-"<div class='total'>" +
-money(total) +
-"</div>";
-
-html +=
-"<div class='small'>" +
-"Absolut lägsta varupris. Det kan innebära flera butiker." +
-"</div>";
-
-
-stores.forEach(store => {
-
-if(breakdown[store].length === 0){
-return;
-}
-
-
-html +=
-"<div class='store'>" +
-"<strong>" + store + "</strong>";
-
-
-breakdown[store].forEach(x => {
-
-html +=
-"<div class='item'>" +
-"<span>" + x.item + "</span>" +
-"<span>" + money(x.price) + "</span>" +
-"</div>";
-
-});
-
-
-html += "</div>";
-
-});
-
-
-document.getElementById("cheapest").innerHTML = html;
-
-}
-
-
-/*
-SMARTAST
-
-Vi testar alla möjliga kombinationer
-av butiker.
-
-För varje kombination räknar vi:
-
-1. Pris på varorna
-2. Extra butiker
-3. Avstånd
-4. Besvär
-
-Sedan väljer vi den kombination
-som ger lägst totalkostnad.
-*/
-
-
-function showSmart(items){
-
-let best = null;
-
-
-/*
-Alla möjliga butikskombinationer.
-
-Med tre butiker finns:
-
-ICA
-Coop
-Willys
-ICA + Coop
-ICA + Willys
-Coop + Willys
-ICA + Coop + Willys
-*/
-
-
-for(let mask = 1; mask < (1 << stores.length); mask++){
-
-let selectedStores = [];
-
-
-for(let i = 0; i < stores.length; i++){
-
-if(mask & (1 << i)){
-selectedStores.push(stores[i]);
-}
-
-}
-
-
-let basketTotal = 0;
-
-
-/*
-Hitta billigaste priset på varje
-vara inom de valda butikerna.
-*/
 
 items.forEach(item => {
 
 let cheapest = Infinity;
+let store = "";
 
+stores.forEach(s => {
 
-selectedStores.forEach(store => {
+let price = products[item][s].member;
 
-const price =
-products[item][store].member;
-
-if(price < cheapest){
+if(price < cheapest) {
 cheapest = price;
+store = s;
 }
 
 });
 
-
-basketTotal += cheapest;
-
-});
-
-
-/*
-Räkna extra körning.
-
-Vi använder den längsta valda
-butikssträckan som enkel testmodell.
-
-Detta kommer senare ersättas
-av riktig ruttberäkning.
-*/
-
-let maxDistance = 0;
-
-selectedStores.forEach(store => {
-
-if(distance[store] > maxDistance){
-maxDistance = distance[store];
-}
-
-});
-
-
-/*
-Kostnad för extra körning.
-*/
-
-let travelCost =
-maxDistance * costPerKm;
-
-
-/*
-Kostnad för extra butiker.
-
-Första butiken är "gratis"
-eftersom du ändå måste handla någonstans.
-*/
-
-let storeEffort =
-(selectedStores.length - 1)
-* extraStoreEffort;
-
-
-/*
-Slutlig Smartast-poäng.
-*/
-
-let score =
-basketTotal +
-travelCost +
-storeEffort;
-
-
-/*
-Spara bästa alternativet.
-*/
-
-if(!best || score < best.score){
-
-best = {
-
-stores:selectedStores,
-basketTotal:basketTotal,
-travelCost:travelCost,
-storeEffort:storeEffort,
-score:score
-
-};
-
-}
-
-}
-
-
-/*
-Visa resultatet.
-*/
-
-let html = "";
+total += cheapest;
 
 html +=
+"<div class='item'>" +
+"<span>" + item + " (" + store + ")</span>" +
+"<span>" + money(cheapest) + "</span>" +
+"</div>";
+
+});
+
+document.getElementById("cheapest").innerHTML =
+"<div class='total'>" + money(total) + "</div>" +
+"<div class='small'>Lägsta möjliga pris per vara.</div>" +
+"<div class='store'>" + html + "</div>";
+
+}
+
+function showSmart(items) {
+
+let oneStoreTotal = Infinity;
+let oneStore = "";
+
+stores.forEach(store => {
+
+let total = 0;
+
+items.forEach(item => {
+total += products[item][store].member;
+});
+
+if(total < oneStoreTotal) {
+oneStoreTotal = total;
+oneStore = store;
+}
+
+});
+
+document.getElementById("smart").innerHTML =
 "<div class='total'>" +
-money(best.basketTotal) +
-"</div>";
-
-
-html +=
+money(oneStoreTotal) +
+"</div>" +
 "<div class='small'>" +
-"<strong>Smartast alternativ</strong><br>" +
-"Besöker " +
-best.stores.length +
-" butik" +
-(best.stores.length > 1 ? "er" : "") +
-".<br>" +
-"Beräknad rese-/besvärskostnad: " +
-money(best.travelCost + best.storeEffort) +
+"Just nu väljer Smartast det billigaste alternativet med en butik: " +
+"<strong>" + oneStore + "</strong>." +
+"<br><br>" +
+"Avståndsoptimeringen lägger vi till när vi kopplar riktiga butiker." +
 "</div>";
-
-
-html +=
-"<div class='store'>";
-
-
-html +=
-"<strong>🏪 " +
-best.stores.join(" + ") +
-"</strong>";
-
-
-html +=
-"<div style='margin-top:8px'>" +
-"Varor: " +
-money(best.basketTotal) +
-"</div>";
-
-
-if(best.stores.length > 1){
-
-html +=
-"<div class='good' style='margin-top:8px'>" +
-"Du får lägre pris genom att dela upp köpet." +
-"</div>";
-
-} else {
-
-html +=
-"<div class='small' style='margin-top:8px'>" +
-"En butik är mest praktiskt för den här korgen." +
-"</div>";
-
-}
-
-
-html += "</div>";
-
-
-document.getElementById("smart").innerHTML = html;
 
 }
 
