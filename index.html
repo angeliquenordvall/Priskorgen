@@ -276,28 +276,135 @@ let oneStore = "";
 stores.forEach(store => {
 
 let total = 0;
+function showSmart(items) {
 
-items.forEach(item => {
-total += products[item][store].member;
-});
+  let bestOneStoreTotal = Infinity;
+  let bestOneStore = "";
 
-if(total < oneStoreTotal) {
-oneStoreTotal = total;
-oneStore = store;
-}
+  stores.forEach(store => {
 
-});
+    let total = 0;
 
-document.getElementById("smart").innerHTML =
-"<div class='total'>" +
-money(oneStoreTotal) +
-"</div>" +
-"<div class='small'>" +
-"Just nu väljer Smartast det billigaste alternativet med en butik: " +
-"<strong>" + oneStore + "</strong>." +
-"<br><br>" +
-"Avståndsoptimeringen lägger vi till när vi kopplar riktiga butiker." +
-"</div>";
+    items.forEach(item => {
+      total += products[item][store].member;
+    });
+
+    if (total < bestOneStoreTotal) {
+      bestOneStoreTotal = total;
+      bestOneStore = store;
+    }
+
+  });
+
+
+  let bestSmartTotal = Infinity;
+  let bestSmartStores = [];
+
+
+  // Testar kombinationer av 1 eller 2 butiker
+  for (let i = 0; i < stores.length; i++) {
+
+    let selected = [stores[i]];
+
+    let total = 0;
+
+    items.forEach(item => {
+
+      let cheapest = products[item][stores[i]].member;
+
+      total += cheapest;
+
+    });
+
+    if (total < bestSmartTotal) {
+
+      bestSmartTotal = total;
+      bestSmartStores = selected;
+
+    }
+
+
+    for (let j = i + 1; j < stores.length; j++) {
+
+      selected = [stores[i], stores[j]];
+
+      total = 0;
+
+      items.forEach(item => {
+
+        let cheapest = Infinity;
+
+        selected.forEach(store => {
+
+          let price = products[item][store].member;
+
+          if (price < cheapest) {
+            cheapest = price;
+          }
+
+        });
+
+        total += cheapest;
+
+      });
+
+
+      // En extra butik måste ge minst 10 kr besparing
+      // för att Smartast ska välja två butiker.
+
+      if (
+        total + 10 < bestSmartTotal &&
+        total + 10 < bestOneStoreTotal
+      ) {
+
+        bestSmartTotal = total;
+        bestSmartStores = selected;
+
+      }
+
+    }
+
+  }
+
+
+  let saving =
+    bestOneStoreTotal - bestSmartTotal;
+
+
+  let html =
+    "<div class='total'>" +
+    money(bestSmartTotal) +
+    "</div>";
+
+
+  if (bestSmartStores.length === 1) {
+
+    html +=
+      "<div class='small'>" +
+      "<strong>En butik är smartast.</strong><br><br>" +
+      bestSmartStores[0] +
+      " ger det bästa priset utan att behöva åka till flera butiker." +
+      "</div>";
+
+  } else {
+
+    html +=
+      "<div class='small'>" +
+      "<strong>Två butiker är värda besväret.</strong><br><br>" +
+      "Butiker: " +
+      bestSmartStores.join(" + ") +
+      "<br>" +
+      "Du sparar cirka " +
+      money(saving) +
+      " jämfört med att handla allt i en butik." +
+      "<br><br>" +
+      "🚗 Eftersom besparingen är minst 10 kr kan den extra butiken vara värd en kort omväg." +
+      "</div>";
+
+  }
+
+
+  document.getElementById("smart").innerHTML = html;
 
 }
 
