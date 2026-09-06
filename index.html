@@ -371,6 +371,441 @@ Bröd"
     }
 
 
+    /*
+     * NORMALISERING
+     *
+     * Gör att exempelvis:
+     * "Bananer" -> "banan"
+     * "Mjölken" -> "mjölk"
+     * "Smöret" -> "smör"
+     */
+
+    function normalizeText(text) {
+
+      return String(text)
+        .toLowerCase()
+        .normalize("NFD")
+        .replace(/[\u0300-\u036f]/g, "")
+        .replace(/[^a-z0-9åäö\s]/gi, " ")
+        .replace(/\s+/g, " ")
+        .trim();
+    }
+
+
+    function singularizeWord(word) {
+
+      if (word.length > 5 && word.endsWith("or")) {
+        return word.slice(0, -2);
+      }
+
+      if (word.length > 5 && word.endsWith("ar")) {
+        return word.slice(0, -2);
+      }
+
+      if (word.length > 5 && word.endsWith("er")) {
+        return word.slice(0, -2);
+      }
+
+      if (word.length > 5 && word.endsWith("en")) {
+        return word.slice(0, -2);
+      }
+
+      if (word.length > 5 && word.endsWith("et")) {
+        return word.slice(0, -2);
+      }
+
+      return word;
+    }
+
+
+    /*
+     * VIKTIGA ORD SOM SKA PRIORITERAS.
+     *
+     * Detta gör att "smör" inte lika lätt
+     * matchar "smördeg".
+     */
+
+    const excludedWords = {
+      mjolk: [
+        "babys",
+        "babysemp",
+        "ersattning",
+        "mjolkersattning",
+        "havredryck",
+        "mandeldryck",
+        "sojadryck",
+        "kokosdryck",
+        "chokladmjolk",
+        "kaffemjolk"
+      ],
+
+      smor: [
+        "smordeg",
+        "smorgas",
+        "smorgasfett",
+        "smorj",
+        "margarin"
+      ],
+
+      kaffe: [
+        "kaffefilter",
+        "kaffemugg",
+        "kaffemaskin",
+        "kaffekvarn"
+      ],
+
+      brod: [
+        "knackebrod",
+        "skorpor",
+        "brodmix",
+        "brodpudding"
+      ]
+    };
+
+
+    function getSearchTerms(item) {
+
+      const normalized = normalizeText(item);
+
+      return normalized
+        .split(" ")
+        .filter(Boolean)
+        .map(singularizeWord);
+    }
+
+
+    function productText(product) {
+
+      return normalizeText(
+        [
+          product.name || "",
+          product.brand || "",
+          product.category || "",
+          product.package || ""
+        ].join(" ")
+      );
+    }
+
+
+    function categoryText(product) {
+
+      return normalizeText(
+        product.category || ""
+      );
+    }
+
+
+    /*
+     * SPECIALFALL
+     *
+     * Vissa vanliga sökningar behöver extra
+     * vägledning för att undvika uppenbara fel.
+     */
+
+    function getConcept(item) {
+
+      const text = normalizeText(item);
+
+      if (
+        text === "mjolk" ||
+        text === "mjolken"
+      ) {
+        return "mjolk";
+      }
+
+      if (
+        text === "smor" ||
+        text === "smoret"
+      ) {
+        return "smor";
+      }
+
+      if (
+        text === "kaffe"
+      ) {
+        return "kaffe";
+      }
+
+      if (
+        text === "brod" ||
+        text === "brodet"
+      ) {
+        return "brod";
+      }
+
+      if (
+        text === "banan" ||
+        text === "bananer"
+      ) {
+        return "banan";
+      }
+
+      return null;
+    }
+
+
+    /*
+     * MATCHNING
+     *
+     * Högre poäng = bättre sannolik match.
+     *
+     * Exakt produktnamn väger tungt.
+     * Kategori hjälper.
+     * Uppenbara felprodukter straffas hårt.
+     */
+
+    function scoreProduct(item, product) {
+
+      if (
+        !product ||
+        product.available === false ||
+        !product.prices ||
+        typeof product.prices.effective !== "number"
+      ) {
+        return -Infinity;
+      }
+
+
+      const query =
+        normalizeText(item);
+
+      const queryWords =
+        getSearchTerms(item);
+
+      const name =
+        normalizeText(product.name || "");
+
+      const category =
+        categoryText(product);
+
+      const brand =
+        normalizeText(product.brand || "");
+
+      const combined =
+        productText(product);
+
+
+      let score = 0;
+
+
+      /*
+       * Exakt namnträff
+       */
+
+      if (name === query) {
+        score += 100;
+      }
+
+
+      /*
+       * Exakt sökord i produktnamnet
+       */
+
+      for (const word of queryWords) {
+
+        if (!word) {
+          continue;
+        }
+
+        const singularNameWords =
+          name
+            .split(" ")
+            .map(singularizeWord);
+
+        if (singularNameWords.includes(word)) {
+          score += 35;
+        }
+
+        if (category.includes(word)) {
+          score += 15;
+        }
+
+        if (brand === word) {
+          score += 5;
+        }
+      }
+
+
+      /*
+       * Hela sökningen finns i namnet.
+       */
+
+      if (name.includes(query)) {
+        score += 25;
+      }
+
+
+      /*
+       * Produktnamnet börjar med sökningen.
+       */
+
+      if (name.startsWith(query)) {
+        score += 15;
+      }
+
+
+      /*
+       * SPECIALMATCHNING
+       */
+
+      const concept =
+        getConcept(item);
+
+
+      if (concept === "mjolk") {
+
+        if (
+          name.includes("mjolk") &&
+          !name.includes("ersattning") &&
+          !name.includes("babys") &&
+          !name.includes("dryck")
+        ) {
+          score += 80;
+        }
+
+        if (
+          category.includes("mjolk")
+        ) {
+          score += 30;
+        }
+
+        if (
+          name.includes("standardmjolk") ||
+          name.includes("mellanmjolk") ||
+          name.includes("lattemjolk")
+        ) {
+          score += 20;
+        }
+
+      }
+
+
+      if (concept === "smor") {
+
+        if (
+          name.includes("smor") &&
+          !name.includes("smordeg") &&
+          !name.includes("margarin")
+        ) {
+          score += 80;
+        }
+
+        if (
+          category.includes("smor")
+        ) {
+          score += 30;
+        }
+
+      }
+
+
+      if (concept === "banan") {
+
+        if (name.includes("banan")) {
+          score += 70;
+        }
+
+        if (
+          category.includes("frukt") ||
+          category.includes("banan")
+        ) {
+          score += 25;
+        }
+
+      }
+
+
+      if (concept === "kaffe") {
+
+        if (
+          name.includes("kaffe") &&
+          !name.includes("filter") &&
+          !name.includes("mugg") &&
+          !name.includes("maskin")
+        ) {
+          score += 70;
+        }
+
+        if (
+          category.includes("kaffe")
+        ) {
+          score += 30;
+        }
+
+      }
+
+
+      if (concept === "brod") {
+
+        if (
+          name.includes("brod")
+        ) {
+          score += 50;
+        }
+
+        if (
+          category.includes("brod")
+        ) {
+          score += 30;
+        }
+
+      }
+
+
+      /*
+       * GENERELLA UPPENBARA FELMATCHNINGAR
+       */
+
+      const exclusions =
+        excludedWords[concept] || [];
+
+
+      for (const excluded of exclusions) {
+
+        if (combined.includes(excluded)) {
+          score -= 150;
+        }
+
+      }
+
+
+      /*
+       * Om produkten verkar vara något helt annat
+       * än sökningen, ge ett kraftigt avdrag.
+       */
+
+      if (
+        queryWords.length === 1 &&
+        !name.includes(queryWords[0]) &&
+        !category.includes(queryWords[0])
+      ) {
+        score -= 40;
+      }
+
+
+      /*
+       * Storleken ska inte styra huvudmatchningen,
+       * men en extremt liten förpackning ska inte
+       * automatiskt vinna bara för att priset är lågt.
+       */
+
+      if (
+        product.amount &&
+        Number(product.amount) < 100 &&
+        (
+          concept === "mjolk" ||
+          concept === "smor" ||
+          concept === "brod"
+        )
+      ) {
+        score -= 20;
+      }
+
+
+      return score;
+    }
+
+
     async function getProducts(query, postcode) {
 
       const url =
@@ -397,44 +832,73 @@ Bröd"
     }
 
 
-    function chooseBestProduct(products) {
+    /*
+     * VÄLJ RÄTT PRODUKT
+     *
+     * Viktigt:
+     * Vi väljer först produkt efter relevans.
+     * Pris används bara som liten utslagsfaktor
+     * mellan produkter som är ungefär lika relevanta.
+     */
 
-      const valid = products.filter(product => {
+    function chooseBestProduct(item, products) {
 
-        return product &&
-          product.available !== false &&
-          product.prices &&
-          typeof product.prices.effective === "number";
+      const valid =
+        products.filter(product => {
 
-      });
+          return product &&
+            product.available !== false &&
+            product.prices &&
+            typeof product.prices.effective === "number";
+
+        });
+
 
       if (!valid.length) {
         return null;
       }
 
-      return valid.reduce((best, product) => {
 
-        if (!best) {
-          return product;
+      const scored =
+        valid.map(product => {
+
+          return {
+            product,
+            score: scoreProduct(item, product)
+          };
+
+        });
+
+
+      scored.sort((a, b) => {
+
+        if (b.score !== a.score) {
+          return b.score - a.score;
         }
 
-        return product.prices.effective <
-          best.prices.effective
-          ? product
-          : best;
+        return (
+          a.product.prices.effective -
+          b.product.prices.effective
+        );
 
-      }, null);
+      });
+
+
+      return scored[0].product;
     }
 
 
     function createItemHtml(item, products) {
 
-      const best = chooseBestProduct(products);
+      const best =
+        chooseBestProduct(item, products);
+
 
       if (!best) {
 
         return `
           <div class="item">
+
             <div class="item-name">
               ${escapeHtml(item)}
             </div>
@@ -442,13 +906,19 @@ Bröd"
             <div class="empty">
               Ingen passande pris hittades.
             </div>
+
           </div>
         `;
 
       }
 
-      const price = best.prices.effective;
-      const store = getStoreName(best);
+
+      const price =
+        best.prices.effective;
+
+      const store =
+        getStoreName(best);
+
 
       const packageText =
         best.package ||
@@ -457,6 +927,7 @@ Bröd"
             ? best.amount + " " + (best.unit || "")
             : ""
         );
+
 
       return `
         <div class="item">
@@ -499,40 +970,62 @@ Bröd"
 
       const totals = {};
 
+
       for (const result of allResults) {
 
-        for (const product of result.products) {
+        /*
+         * Här använder vi endast den valda produkten
+         * för varje inköpsvara.
+         */
 
-          if (
-            !product.prices ||
-            typeof product.prices.effective !== "number"
-          ) {
-            continue;
-          }
+        const product =
+          chooseBestProduct(
+            result.item,
+            result.products
+          );
 
-          const storeKey =
-            product.chain + ":" + product.store_id;
 
-          if (!totals[storeKey]) {
+        if (
+          !product ||
+          !product.prices ||
+          typeof product.prices.effective !== "number"
+        ) {
+          continue;
+        }
 
-            totals[storeKey] = {
-              chain: product.chain,
-              store_id: product.store_id,
-              name: getStoreName(product),
-              total: 0,
-              items: 0
-            };
 
-          }
+        const storeKey =
+          product.chain + ":" + product.store_id;
 
-          totals[storeKey].total +=
-            product.prices.effective;
 
-          totals[storeKey].items += 1;
+        if (!totals[storeKey]) {
+
+          totals[storeKey] = {
+
+            chain: product.chain,
+
+            store_id:
+              product.store_id,
+
+            name:
+              getStoreName(product),
+
+            total: 0,
+
+            items: 0
+
+          };
 
         }
 
+
+        totals[storeKey].total +=
+          product.prices.effective;
+
+        totals[storeKey].items += 1;
+
       }
+
 
       return Object.values(totals);
     }
@@ -540,7 +1033,9 @@ Bröd"
 
     function renderOneStore(allResults) {
 
-      const totals = calculateStoreTotals(allResults);
+      const totals =
+        calculateStoreTotals(allResults);
+
 
       if (!totals.length) {
 
@@ -551,9 +1046,15 @@ Bröd"
 
       }
 
-      totals.sort((a, b) => a.total - b.total);
 
-      const best = totals[0];
+      totals.sort(
+        (a, b) => a.total - b.total
+      );
+
+
+      const best =
+        totals[0];
+
 
       oneStoreResults.innerHTML = `
 
@@ -564,7 +1065,8 @@ Bröd"
           </div>
 
           <div class="item-meta">
-            Baserat på de produkter som kunde matchas.
+            ${best.items} av ${allResults.length}
+            varor kunde matchas i denna butik.
           </div>
 
           <div class="cheapest">
@@ -594,7 +1096,9 @@ Bröd"
 
     function renderSmart(allResults) {
 
-      const totals = calculateStoreTotals(allResults);
+      const totals =
+        calculateStoreTotals(allResults);
+
 
       if (!totals.length) {
 
@@ -605,9 +1109,15 @@ Bröd"
 
       }
 
-      totals.sort((a, b) => a.total - b.total);
 
-      const cheapest = totals[0];
+      totals.sort(
+        (a, b) => a.total - b.total
+      );
+
+
+      const cheapest =
+        totals[0];
+
 
       smartResults.innerHTML = `
 
@@ -632,146 +1142,181 @@ Bröd"
     }
 
 
-    compareButton.addEventListener("click", async function() {
+    compareButton.addEventListener(
+      "click",
+      async function() {
 
-      const postcode =
-        postcodeInput.value.trim();
-
-      const items =
-        shoppingList.value
-          .split("\n")
-          .map(item => item.trim())
-          .filter(item => item.length > 0);
+        const postcode =
+          postcodeInput.value.trim();
 
 
-      message.innerHTML = "";
-      results.classList.add("hidden");
-
-
-      if (!postcode) {
-
-        message.innerHTML =
-          '<div class="error">Skriv in ditt postnummer.</div>';
-
-        return;
-      }
-
-
-      if (!/^\d{5}$/.test(postcode)) {
-
-        message.innerHTML =
-          '<div class="error">Postnumret måste innehålla 5 siffror.</div>';
-
-        return;
-      }
-
-
-      if (!items.length) {
-
-        message.innerHTML =
-          '<div class="error">Skriv minst en vara i inköpslistan.</div>';
-
-        return;
-      }
-
-
-      compareButton.disabled = true;
-
-      compareButton.textContent =
-        "⏳ Jämför priser...";
-
-
-      message.innerHTML =
-        '<div class="loading">Hämtar aktuella priser...</div>';
-
-
-      try {
-
-        const allResults = [];
-
-        for (const item of items) {
-
-          const products =
-            await getProducts(item, postcode);
-
-          allResults.push({
-            item,
-            products
-          });
-
-        }
-
-
-        const matchedCount =
-          allResults.filter(
-            result => chooseBestProduct(result.products)
-          ).length;
-
-
-        summary.innerHTML = `
-
-          <div class="summary">
-
-            <div class="summary-title">
-              DIN KORG
-            </div>
-
-            <div class="summary-price">
-              ${matchedCount} av ${items.length}
-            </div>
-
-            <div>
-              varor kunde matchas mot prisdata
-            </div>
-
-          </div>
-
-        `;
-
-
-        cheapestResults.innerHTML =
-          allResults
-            .map(result =>
-              createItemHtml(
-                result.item,
-                result.products
-              )
-            )
-            .join("");
-
-
-        renderOneStore(allResults);
-
-        renderSmart(allResults);
+        const items =
+          shoppingList.value
+            .split("\n")
+            .map(item => item.trim())
+            .filter(item => item.length > 0);
 
 
         message.innerHTML = "";
 
-        results.classList.remove("hidden");
+        results.classList.add("hidden");
 
 
-      } catch (error) {
+        if (!postcode) {
 
-        console.error(error);
+          message.innerHTML =
+            '<div class="error">Skriv in ditt postnummer.</div>';
 
-        message.innerHTML = `
-          <div class="error">
-            Något gick fel när priserna skulle hämtas.
-            <br><br>
-            ${escapeHtml(error.message)}
-          </div>
-        `;
+          return;
+        }
 
-      } finally {
 
-        compareButton.disabled = false;
+        if (!/^\d{5}$/.test(postcode)) {
+
+          message.innerHTML =
+            '<div class="error">Postnumret måste innehålla 5 siffror.</div>';
+
+          return;
+        }
+
+
+        if (!items.length) {
+
+          message.innerHTML =
+            '<div class="error">Skriv minst en vara i inköpslistan.</div>';
+
+          return;
+        }
+
+
+        compareButton.disabled = true;
 
         compareButton.textContent =
-          "🔎 Jämför min korg";
+          "⏳ Jämför priser...";
+
+
+        message.innerHTML =
+          '<div class="loading">Hämtar aktuella priser...</div>';
+
+
+        try {
+
+          const allResults = [];
+
+
+          for (const item of items) {
+
+            const products =
+              await getProducts(
+                item,
+                postcode
+              );
+
+
+            allResults.push({
+
+              item,
+
+              products
+
+            });
+
+          }
+
+
+          const matchedCount =
+            allResults.filter(result => {
+
+              return chooseBestProduct(
+                result.item,
+                result.products
+              );
+
+            }).length;
+
+
+          summary.innerHTML = `
+
+            <div class="summary">
+
+              <div class="summary-title">
+                DIN KORG
+              </div>
+
+              <div class="summary-price">
+                ${matchedCount} av ${items.length}
+              </div>
+
+              <div>
+                varor kunde matchas mot prisdata
+              </div>
+
+            </div>
+
+          `;
+
+
+          cheapestResults.innerHTML =
+            allResults
+              .map(result => {
+
+                return createItemHtml(
+                  result.item,
+                  result.products
+                );
+
+              })
+              .join("");
+
+
+          renderOneStore(
+            allResults
+          );
+
+
+          renderSmart(
+            allResults
+          );
+
+
+          message.innerHTML = "";
+
+          results.classList.remove(
+            "hidden"
+          );
+
+
+        } catch (error) {
+
+          console.error(error);
+
+
+          message.innerHTML = `
+
+            <div class="error">
+
+              Något gick fel när priserna
+              skulle hämtas.
+
+              <br><br>
+
+              ${escapeHtml(error.message)}
+
+            </div>
+
+          `;
+
+        } finally {
+
+          compareButton.disabled = false;
+
+          compareButton.textContent =
+            "🔎 Jämför min korg";
+
+        }
 
       }
-
-    });
+    );
 
   </script>
 
