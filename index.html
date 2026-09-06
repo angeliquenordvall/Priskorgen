@@ -529,3 +529,159 @@ let cheapest = Infinity;
 selectedStores.forEach(store => {
 
 const price =
+products[item][store].member;
+
+if(price < cheapest){
+cheapest = price;
+}
+
+});
+
+
+basketTotal += cheapest;
+
+});
+
+
+/*
+Räkna extra körning.
+
+Vi använder den längsta valda
+butikssträckan som enkel testmodell.
+
+Detta kommer senare ersättas
+av riktig ruttberäkning.
+*/
+
+let maxDistance = 0;
+
+selectedStores.forEach(store => {
+
+if(distance[store] > maxDistance){
+maxDistance = distance[store];
+}
+
+});
+
+
+/*
+Kostnad för extra körning.
+*/
+
+let travelCost =
+maxDistance * costPerKm;
+
+
+/*
+Kostnad för extra butiker.
+
+Första butiken är "gratis"
+eftersom du ändå måste handla någonstans.
+*/
+
+let storeEffort =
+(selectedStores.length - 1)
+* extraStoreEffort;
+
+
+/*
+Slutlig Smartast-poäng.
+*/
+
+let score =
+basketTotal +
+travelCost +
+storeEffort;
+
+
+/*
+Spara bästa alternativet.
+*/
+
+if(!best || score < best.score){
+
+best = {
+
+stores:selectedStores,
+basketTotal:basketTotal,
+travelCost:travelCost,
+storeEffort:storeEffort,
+score:score
+
+};
+
+}
+
+}
+
+
+/*
+Visa resultatet.
+*/
+
+let html = "";
+
+html +=
+"<div class='total'>" +
+money(best.basketTotal) +
+"</div>";
+
+
+html +=
+"<div class='small'>" +
+"<strong>Smartast alternativ</strong><br>" +
+"Besöker " +
+best.stores.length +
+" butik" +
+(best.stores.length > 1 ? "er" : "") +
+".<br>" +
+"Beräknad rese-/besvärskostnad: " +
+money(best.travelCost + best.storeEffort) +
+"</div>";
+
+
+html +=
+"<div class='store'>";
+
+
+html +=
+"<strong>🏪 " +
+best.stores.join(" + ") +
+"</strong>";
+
+
+html +=
+"<div style='margin-top:8px'>" +
+"Varor: " +
+money(best.basketTotal) +
+"</div>";
+
+
+if(best.stores.length > 1){
+
+html +=
+"<div class='good' style='margin-top:8px'>" +
+"Du får lägre pris genom att dela upp köpet." +
+"</div>";
+
+} else {
+
+html +=
+"<div class='small' style='margin-top:8px'>" +
+"En butik är mest praktiskt för den här korgen." +
+"</div>";
+
+}
+
+
+html += "</div>";
+
+
+document.getElementById("smart").innerHTML = html;
+
+}
+
+</script>
+
+</body>
+</html>
