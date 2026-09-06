@@ -3,162 +3,112 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>PrisKorgen</title>
+<title>Matprisappen</title>
 
 <style>
-* {
-  box-sizing: border-box;
-}
-
 body {
-  margin: 0;
   font-family: Arial, sans-serif;
-  background: #f4f5f7;
-  color: #18202a;
+  margin: 0;
+  background: #f5f6f7;
+  color: #222;
 }
 
 .container {
   max-width: 700px;
   margin: auto;
-  padding: 18px;
+  padding: 20px;
 }
 
-.header {
-  background: white;
-  border-radius: 22px;
-  padding: 22px;
-  margin-bottom: 16px;
-  box-shadow: 0 4px 20px rgba(0,0,0,.06);
-}
-
-.logo {
-  font-size: 29px;
-  font-weight: 800;
+h1 {
+  text-align: center;
+  margin-bottom: 8px;
 }
 
 .subtitle {
-  color: #687384;
-  margin: 6px 0 20px;
+  text-align: center;
+  color: #666;
+  margin-bottom: 20px;
 }
 
 textarea {
   width: 100%;
-  min-height: 125px;
-  border: 1px solid #d7dce3;
-  border-radius: 15px;
-  padding: 14px;
-  font-size: 16px;
+  box-sizing: border-box;
+  min-height: 140px;
+  padding: 15px;
+  font-size: 18px;
+  border: 1px solid #ccc;
+  border-radius: 12px;
   resize: vertical;
 }
 
 button {
+  width: 100%;
+  margin-top: 12px;
+  padding: 16px;
   border: 0;
-  border-radius: 13px;
-  padding: 13px 15px;
-  font-size: 15px;
-  font-weight: 700;
+  border-radius: 12px;
+  background: #111;
+  color: white;
+  font-size: 18px;
+  font-weight: bold;
   cursor: pointer;
 }
 
-.main-button {
-  width: 100%;
-  margin-top: 12px;
-  background: #18202a;
-  color: white;
-}
-
-.card {
-  background: white;
-  border-radius: 18px;
-  padding: 18px;
-  margin-bottom: 14px;
-  box-shadow: 0 4px 18px rgba(0,0,0,.05);
-}
-
-.modes {
-  display: grid;
-  grid-template-columns: repeat(3,1fr);
-  gap: 8px;
-  margin-bottom: 15px;
+button:active {
+  transform: scale(0.99);
 }
 
 .mode {
-  background: #eef1f5;
-  text-align: center;
-  padding: 12px 7px;
+  background: white;
+  padding: 16px;
+  margin-top: 15px;
+  border-radius: 14px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.08);
 }
 
-.mode.active {
-  background: #18202a;
-  color: white;
+.mode h2 {
+  margin-top: 0;
 }
 
-.mode-title {
+.total {
+  font-size: 24px;
+  font-weight: bold;
+  margin: 10px 0;
+}
+
+.small {
+  color: #666;
   font-size: 14px;
-}
-
-.mode-price {
-  font-size: 22px;
-  font-weight: 800;
-  margin-top: 5px;
-}
-
-.saving {
-  background: #edf8f0;
-  border-radius: 11px;
-  padding: 10px;
-  margin-top: 10px;
-  color: #2d6840;
 }
 
 .store {
-  border: 1px solid #e0e3e8;
-  border-radius: 14px;
-  padding: 13px;
-  margin-top: 9px;
-}
-
-.store-name {
-  font-weight: 800;
-}
-
-.price {
-  font-size: 22px;
-  font-weight: 800;
-  margin-top: 4px;
-}
-
-.member {
-  color: #39734a;
-  font-size: 14px;
-  margin-top: 4px;
+  margin-top: 8px;
+  padding: 10px;
+  background: #f1f1f1;
+  border-radius: 8px;
 }
 
 .item {
   display: flex;
   justify-content: space-between;
-  padding: 10px 0;
-  border-bottom: 1px solid #eee;
+  padding: 7px 0;
+  border-bottom: 1px solid #ddd;
 }
 
-.small {
-  color: #687384;
-  font-size: 13px;
+.item:last-child {
+  border-bottom: none;
 }
 
-.tag {
-  display: inline-block;
-  background: #eef1f5;
-  border-radius: 999px;
-  padding: 5px 9px;
-  font-size: 12px;
-  margin-top: 6px;
+.error {
+  margin-top: 15px;
+  padding: 12px;
+  background: #ffe5e5;
+  color: #a00000;
+  border-radius: 10px;
 }
 
-@media(max-width:520px) {
-  .modes {
-    grid-template-columns: 1fr;
-  }
+.hidden {
+  display: none;
 }
 </style>
 </head>
@@ -167,76 +117,339 @@ button {
 
 <div class="container">
 
-<div class="header">
-
-<div class="logo">🛒 PrisKorgen</div>
+<h1>🛒 Matprisappen</h1>
 
 <div class="subtitle">
-Hitta det smartaste sättet att handla din korg.
+Skriv din inköpslista och jämför priser
 </div>
 
-<textarea id="shoppingList" placeholder="Skriv din inköpslista...
+<textarea id="shoppingList" placeholder="Skriv en vara per rad, t.ex.
 
-Exempel:
 mjölk
 ägg
 kaffe
 bananer
 köttfärs"></textarea>
 
-<button class="main-button" onclick="compareBasket()">
-Jämför min korg
+<button onclick="compareBasket()">
+  🔎 Jämför min korg
 </button>
 
+<div id="error" class="error hidden"></div>
+
+<div id="results" class="hidden">
+
+  <div class="mode">
+    <h2>🏪 En butik</h2>
+    <div id="oneStore"></div>
+  </div>
+
+  <div class="mode">
+    <h2>✨ Billigast möjligt</h2>
+    <div id="cheapest"></div>
+  </div>
+
+  <div class="mode">
+    <h2>🚗 Smartast</h2>
+    <div id="smart"></div>
+  </div>
+
 </div>
 
-<div id="results"></div>
-
 </div>
-
 
 <script>
 
-/* =========================
-   TESTDATA
-   ========================= */
-
 const products = {
 
-"mjölk": {
-ICA:{price:19.95,member:17.95},
-Coop:{price:20.90,member:18.90},
-Willys:{price:17.95,member:17.95}
-},
+  "mjölk": {
+    ICA: {price: 19.95, member: 17.95},
+    Coop: {price: 20.90, member: 18.90},
+    Willys: {price: 17.95, member: 17.95}
+  },
 
-"ägg": {
-ICA:{price:32.95,member:29.95},
-Coop:{price:34.95,member:29.95},
-Willys:{price:31.95,member:31.95}
-},
+  "ägg": {
+    ICA: {price: 32.95, member: 29.95},
+    Coop: {price: 34.95, member: 29.95},
+    Willys: {price: 31.95, member: 31.95}
+  },
 
-"kaffe": {
-ICA:{price:69.95,member:59.95},
-Coop:{price:74.95,member:59.95},
-Willys:{price:64.95,member:64.95}
-},
+  "kaffe": {
+    ICA: {price: 69.95, member: 59.95},
+    Coop: {price: 74.95, member: 59.95},
+    Willys: {price: 64.95, member: 64.95}
+  },
 
-"bananer": {
-ICA:{price:27.95,member:24.95},
-Coop:{price:29.90,member:25.90},
-Willys:{price:23.95,member:23.95}
-},
+  "bananer": {
+    ICA: {price: 27.95, member: 24.95},
+    Coop: {price: 29.90, member: 25.90},
+    Willys: {price: 23.95, member: 23.95}
+  },
 
-"köttfärs": {
-ICA:{price:89.95,member:79.95},
-Coop:{price:94.95,member:79.95},
-Willys:{price:84.95,member:84.95}
-}
+  "köttfärs": {
+    ICA: {price: 89.95, member: 79.95},
+    Coop: {price: 94.95, member: 79.95},
+    Willys: {price: 84.95, member: 84.95}
+  }
 
 };
 
-const stores = ["ICA","Coop","Willys"];
+const stores = ["ICA", "Coop", "Willys"];
 
+function money(value) {
+  return value.toFixed(2).replace(".", ",") + " kr";
+}
 
-/* =========================
-   HUVUDFUNK
+function normalize(text) {
+  return text
+    .toLowerCase()
+    .trim();
+}
+
+function compareBasket() {
+
+  const input = document.getElementById("shoppingList").value;
+
+  const error = document.getElementById("error");
+  const results = document.getElementById("results");
+
+  error.classList.add("hidden");
+  results.classList.add("hidden");
+
+  const items = input
+    .split("\n")
+    .map(normalize)
+    .filter(item => item.length > 0);
+
+  if (items.length === 0) {
+    error.textContent = "Skriv minst en vara i inköpslistan.";
+    error.classList.remove("hidden");
+    return;
+  }
+
+  const unknown = items.filter(item => !products[item]);
+
+  if (unknown.length > 0) {
+    error.innerHTML =
+      "Jag hittar inte dessa testvaror ännu:<br><strong>" +
+      unknown.join(", ") +
+      "</strong>";
+    error.classList.remove("hidden");
+  }
+
+  const knownItems = items.filter(item => products[item]);
+
+  if (knownItems.length === 0) {
+    return;
+  }
+
+  showOneStore(knownItems);
+  showCheapest(knownItems);
+  showSmart(knownItems);
+
+  results.classList.remove("hidden");
+}
+
+function showOneStore(items) {
+
+  let bestStore = null;
+  let bestTotal = Infinity;
+
+  stores.forEach(store => {
+
+    let total = 0;
+
+    items.forEach(item => {
+      total += products[item][store].member;
+    });
+
+    if (total < bestTotal) {
+      bestTotal = total;
+      bestStore = store;
+    }
+
+  });
+
+  let html = "";
+
+  html += "<div class='total'>" +
+    money(bestTotal) +
+    "</div>";
+
+  html += "<div class='small'>Billigaste alternativet om du handlar allt i samma butik.</div>";
+
+  html += "<div class='store'><strong>" +
+    bestStore +
+    "</strong><br>";
+
+  items.forEach(item => {
+
+    html += "<div class='item'>" +
+      "<span>" + item + "</span>" +
+      "<span>" + money(products[item][bestStore].member) + "</span>" +
+      "</div>";
+
+  });
+
+  html += "</div>";
+
+  document.getElementById("oneStore").innerHTML = html;
+}
+
+function showCheapest(items) {
+
+  let total = 0;
+  let breakdown = {};
+
+  stores.forEach(store => {
+    breakdown[store] = [];
+  });
+
+  items.forEach(item => {
+
+    let cheapestStore = null;
+    let cheapestPrice = Infinity;
+
+    stores.forEach(store => {
+
+      const price = products[item][store].member;
+
+      if (price < cheapestPrice) {
+        cheapestPrice = price;
+        cheapestStore = store;
+      }
+
+    });
+
+    total += cheapestPrice;
+
+    breakdown[cheapestStore].push({
+      item: item,
+      price: cheapestPrice
+    });
+
+  });
+
+  let html = "";
+
+  html += "<div class='total'>" +
+    money(total) +
+    "</div>";
+
+  html += "<div class='small'>Lägsta möjliga varupris, även om du behöver besöka flera butiker.</div>";
+
+  stores.forEach(store => {
+
+    if (breakdown[store].length === 0) return;
+
+    html += "<div class='store'><strong>" +
+      store +
+      "</strong>";
+
+    breakdown[store].forEach(x => {
+
+      html += "<div class='item'>" +
+        "<span>" + x.item + "</span>" +
+        "<span>" + money(x.price) + "</span>" +
+        "</div>";
+
+    });
+
+    html += "</div>";
+
+  });
+
+  document.getElementById("cheapest").innerHTML = html;
+}
+
+function showSmart(items) {
+
+  const extraStoreCost = 20;
+
+  let best = null;
+
+  stores.forEach(store1 => {
+
+    let total = 0;
+
+    items.forEach(item => {
+      total += products[item][store1].member;
+    });
+
+    const score = total;
+
+    if (!best || score < best.score) {
+      best = {
+        stores: [store1],
+        total: total,
+        score: score
+      };
+    }
+
+  });
+
+  for (let i = 0; i < stores.length; i++) {
+
+    for (let j = i + 1; j < stores.length; j++) {
+
+      const selected = [stores[i], stores[j]];
+
+      let total = 0;
+
+      items.forEach(item => {
+
+        let cheapest = Infinity;
+
+        selected.forEach(store => {
+          cheapest = Math.min(
+            cheapest,
+            products[item][store].member
+          );
+        });
+
+        total += cheapest;
+
+      });
+
+      const score = total + extraStoreCost;
+
+      if (score < best.score) {
+
+        best = {
+          stores: selected,
+          total: total,
+          score: score
+        };
+
+      }
+
+    }
+
+  }
+
+  let html = "";
+
+  html += "<div class='total'>" +
+    money(best.total) +
+    "</div>";
+
+  html += "<div class='small'>" +
+    "Balans mellan pris och antal butiker.<br>" +
+    "Butiker: " + best.stores.join(" + ") +
+    "</div>";
+
+  html += "<div class='store'>" +
+    "🚗 Du behöver besöka " +
+    best.stores.length +
+    " butik" +
+    (best.stores.length > 1 ? "er" : "") +
+    "." +
+    "</div>";
+
+  document.getElementById("smart").innerHTML = html;
+}
+
+</script>
+
+</body>
+</html>
