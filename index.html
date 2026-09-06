@@ -169,113 +169,99 @@ Willys:{price:84.95,member:84.95}
 const stores = ["ICA","Coop","Willys"];
 
 function money(value) {
-return value.toFixed(2).replace(".",",") + " kr";
+  return value.toFixed(2).replace(".",",") + " kr";
 }
 
 function compareBasket() {
 
-const input = document.getElementById("shoppingList").value;
+  const input = document.getElementById("shoppingList").value;
 
-const items = input
-.split("\n")
-.map(x => x.toLowerCase().trim())
-.filter(x => x.length > 0);
+  const items = input
+    .split("\n")
+    .map(x => x.toLowerCase().trim())
+    .filter(x => x.length > 0);
 
-if(items.length === 0) {
-document.getElementById("error").innerHTML =
-"Skriv minst en vara.";
-return;
-}
+  if(items.length === 0) {
+    document.getElementById("error").innerHTML =
+      "Skriv minst en vara.";
+    return;
+  }
 
-const knownItems = items.filter(item => products[item]);
+  const knownItems = items.filter(item => products[item]);
 
-if(knownItems.length === 0) {
-document.getElementById("error").innerHTML =
-"Jag hittar inga av varorna ännu.";
-return;
-}
+  if(knownItems.length === 0) {
+    document.getElementById("error").innerHTML =
+      "Jag hittar inga av varorna ännu.";
+    return;
+  }
 
-document.getElementById("error").innerHTML = "";
+  document.getElementById("error").innerHTML = "";
 
-showOneStore(knownItems);
-showCheapest(knownItems);
-showSmart(knownItems);
-
+  showOneStore(knownItems);
+  showCheapest(knownItems);
+  showSmart(knownItems);
 }
 
 function showOneStore(items) {
 
-let bestStore = "";
-let bestTotal = Infinity;
+  let bestStore = "";
+  let bestTotal = Infinity;
 
-stores.forEach(store => {
+  stores.forEach(store => {
 
-let total = 0;
+    let total = 0;
 
-items.forEach(item => {
-total += products[item][store].member;
-});
+    items.forEach(item => {
+      total += products[item][store].member;
+    });
 
-if(total < bestTotal) {
-bestTotal = total;
-bestStore = store;
-}
+    if(total < bestTotal) {
+      bestTotal = total;
+      bestStore = store;
+    }
+  });
 
-});
-
-document.getElementById("oneStore").innerHTML =
-"<div class='total'>" + money(bestTotal) + "</div>" +
-"<div class='small'>Billigast om allt köps i samma butik.</div>" +
-"<div class='store'><strong>" + bestStore + "</strong></div>";
-
+  document.getElementById("oneStore").innerHTML =
+    "<div class='total'>" + money(bestTotal) + "</div>" +
+    "<div class='small'>Billigast om allt köps i samma butik.</div>" +
+    "<div class='store'><strong>" + bestStore + "</strong></div>";
 }
 
 function showCheapest(items) {
 
-let total = 0;
-let html = "";
+  let total = 0;
+  let html = "";
 
-items.forEach(item => {
+  items.forEach(item => {
 
-let cheapest = Infinity;
-let store = "";
+    let cheapest = Infinity;
+    let store = "";
 
-stores.forEach(s => {
+    stores.forEach(s => {
 
-let price = products[item][s].member;
+      let price = products[item][s].member;
 
-if(price < cheapest) {
-cheapest = price;
-store = s;
+      if(price < cheapest) {
+        cheapest = price;
+        store = s;
+      }
+    });
+
+    total += cheapest;
+
+    html +=
+      "<div class='item'>" +
+      "<span>" + item + " (" + store + ")</span>" +
+      "<span>" + money(cheapest) + "</span>" +
+      "</div>";
+  });
+
+  document.getElementById("cheapest").innerHTML =
+    "<div class='total'>" + money(total) + "</div>" +
+    "<div class='small'>Lägsta möjliga pris per vara.</div>" +
+    "<div class='store'>" + html + "</div>";
 }
 
-});
-
-total += cheapest;
-
-html +=
-"<div class='item'>" +
-"<span>" + item + " (" + store + ")</span>" +
-"<span>" + money(cheapest) + "</span>" +
-"</div>";
-
-});
-
-document.getElementById("cheapest").innerHTML =
-"<div class='total'>" + money(total) + "</div>" +
-"<div class='small'>Lägsta möjliga pris per vara.</div>" +
-"<div class='store'>" + html + "</div>";
-
-}
-
-function showSmart(items) {
-
-let oneStoreTotal = Infinity;
-let oneStore = "";
-
-stores.forEach(store => {
-
-let total = 0;
 function showSmart(items) {
 
   let bestOneStoreTotal = Infinity;
@@ -289,46 +275,21 @@ function showSmart(items) {
       total += products[item][store].member;
     });
 
-    if (total < bestOneStoreTotal) {
+    if(total < bestOneStoreTotal) {
       bestOneStoreTotal = total;
       bestOneStore = store;
     }
-
   });
 
+  let bestSmartTotal = bestOneStoreTotal;
+  let bestSmartStores = [bestOneStore];
 
-  let bestSmartTotal = Infinity;
-  let bestSmartStores = [];
+  for(let i = 0; i < stores.length; i++) {
 
+    for(let j = i + 1; j < stores.length; j++) {
 
-  // Testar kombinationer av 1 eller 2 butiker
-  for (let i = 0; i < stores.length; i++) {
-
-    let selected = [stores[i]];
-
-    let total = 0;
-
-    items.forEach(item => {
-
-      let cheapest = products[item][stores[i]].member;
-
-      total += cheapest;
-
-    });
-
-    if (total < bestSmartTotal) {
-
-      bestSmartTotal = total;
-      bestSmartStores = selected;
-
-    }
-
-
-    for (let j = i + 1; j < stores.length; j++) {
-
-      selected = [stores[i], stores[j]];
-
-      total = 0;
+      const selected = [stores[i], stores[j]];
+      let total = 0;
 
       items.forEach(item => {
 
@@ -336,48 +297,31 @@ function showSmart(items) {
 
         selected.forEach(store => {
 
-          let price = products[item][store].member;
+          const price = products[item][store].member;
 
-          if (price < cheapest) {
+          if(price < cheapest) {
             cheapest = price;
           }
-
         });
 
         total += cheapest;
-
       });
 
-
-      // En extra butik måste ge minst 10 kr besparing
-      // för att Smartast ska välja två butiker.
-
-      if (
-        total + 10 < bestSmartTotal &&
-        total + 10 < bestOneStoreTotal
-      ) {
-
+      if(total + 10 < bestSmartTotal) {
         bestSmartTotal = total;
         bestSmartStores = selected;
-
       }
-
     }
-
   }
 
-
-  let saving =
-    bestOneStoreTotal - bestSmartTotal;
-
+  const saving = bestOneStoreTotal - bestSmartTotal;
 
   let html =
     "<div class='total'>" +
     money(bestSmartTotal) +
     "</div>";
 
-
-  if (bestSmartStores.length === 1) {
+  if(bestSmartStores.length === 1) {
 
     html +=
       "<div class='small'>" +
@@ -400,14 +344,11 @@ function showSmart(items) {
       "<br><br>" +
       "🚗 Eftersom besparingen är minst 10 kr kan den extra butiken vara värd en kort omväg." +
       "</div>";
-
   }
 
-
   document.getElementById("smart").innerHTML = html;
-
 }
-</script>
+
 </script>
 
 </body>
