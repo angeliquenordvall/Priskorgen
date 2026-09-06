@@ -1,0 +1,431 @@
+i<!DOCTYPE html>
+<html lang="sv">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PrisKorgen</title>
+
+<style>
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  font-family: Arial, sans-serif;
+  background: #f4f5f7;
+  color: #18202a;
+}
+
+.container {
+  max-width: 700px;
+  margin: auto;
+  padding: 20px;
+}
+
+.header {
+  background: white;
+  border-radius: 22px;
+  padding: 24px;
+  margin-bottom: 16px;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.06);
+}
+
+.logo {
+  font-size: 30px;
+  font-weight: bold;
+}
+
+.subtitle {
+  color: #697586;
+  margin-bottom: 20px;
+}
+
+textarea {
+  width: 100%;
+  min-height: 130px;
+  border: 1px solid #d5d9df;
+  border-radius: 15px;
+  padding: 14px;
+  font-size: 16px;
+  resize: vertical;
+}
+
+button {
+  border: 0;
+  border-radius: 13px;
+  padding: 13px 16px;
+  font-size: 15px;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+.main-button {
+  width: 100%;
+  margin-top: 12px;
+  background: #18202a;
+  color: white;
+}
+
+.card {
+  background: white;
+  border-radius: 18px;
+  padding: 18px;
+  margin-bottom: 14px;
+  box-shadow: 0 4px 18px rgba(0,0,0,0.05);
+}
+
+.store {
+  border: 1px solid #e0e3e8;
+  border-radius: 14px;
+  padding: 14px;
+  margin-top: 10px;
+}
+
+.store.best {
+  border: 2px solid #18202a;
+}
+
+.store-name {
+  font-weight: bold;
+}
+
+.price {
+  font-size: 23px;
+  font-weight: bold;
+  margin-top: 4px;
+}
+
+.member {
+  color: #39734a;
+  font-size: 14px;
+  margin-top: 5px;
+}
+
+.save {
+  background: #edf8f0;
+  border-radius: 10px;
+  padding: 12px;
+  margin-top: 15px;
+}
+
+.optimize {
+  background: #18202a;
+  color: white;
+  width: 100%;
+  margin-top: 12px;
+}
+
+.item {
+  display: flex;
+  justify-content: space-between;
+  padding: 11px 0;
+  border-bottom: 1px solid #eee;
+}
+
+.small {
+  color: #697586;
+  font-size: 13px;
+}
+</style>
+</head>
+
+<body>
+
+<div class="container">
+
+  <div class="header">
+
+    <div class="logo">🛒 PrisKorgen</div>
+
+    <div class="subtitle">
+      Hitta det billigaste sättet att handla din korg.
+    </div>
+
+    <textarea id="shoppingList" placeholder="Skriv din inköpslista...
+
+Exempel:
+mjölk
+ägg
+kaffe
+bananer
+köttfärs"></textarea>
+
+    <button class="main-button" onclick="compareBasket()">
+      Jämför min korg
+    </button>
+
+  </div>
+
+  <div id="results"></div>
+
+</div>
+
+
+<script>
+
+/*
+  TESTDATA
+
+  Senare kopplar vi detta till riktig prisdata.
+*/
+
+const products = {
+
+  "mjölk": {
+    "ICA": {price: 19.95, member: 17.95},
+    "Coop": {price: 20.90, member: 18.90},
+    "Willys": {price: 17.95, member: 17.95}
+  },
+
+  "ägg": {
+    "ICA": {price: 32.95, member: 29.95},
+    "Coop": {price: 34.95, member: 29.95},
+    "Willys": {price: 31.95, member: 31.95}
+  },
+
+  "kaffe": {
+    "ICA": {price: 69.95, member: 59.95},
+    "Coop": {price: 74.95, member: 59.95},
+    "Willys": {price: 64.95, member: 64.95}
+  },
+
+  "bananer": {
+    "ICA": {price: 27.95, member: 24.95},
+    "Coop": {price: 29.90, member: 25.90},
+    "Willys": {price: 23.95, member: 23.95}
+  },
+
+  "köttfärs": {
+    "ICA": {price: 89.95, member: 79.95},
+    "Coop": {price: 94.95, member: 79.95},
+    "Willys": {price: 84.95, member: 84.95}
+  }
+
+};
+
+
+function compareBasket() {
+
+  const text =
+    document.getElementById("shoppingList").value;
+
+  const items =
+    text.split(/\n|,/)
+    .map(item => item.trim().toLowerCase())
+    .filter(item => item.length > 0);
+
+
+  if (items.length === 0) {
+
+    alert("Skriv några varor först.");
+
+    return;
+  }
+
+
+  const stores = ["ICA", "Coop", "Willys"];
+
+  const totals = {
+    "ICA": 0,
+    "Coop": 0,
+    "Willys": 0
+  };
+
+  const memberTotals = {
+    "ICA": 0,
+    "Coop": 0,
+    "Willys": 0
+  };
+
+
+  let foundItems = [];
+  let missingItems = [];
+
+
+  items.forEach(item => {
+
+    if (products[item]) {
+
+      foundItems.push(item);
+
+      stores.forEach(store => {
+
+        totals[store] += products[item][store].price;
+
+        memberTotals[store] += products[item][store].member;
+
+      });
+
+    } else {
+
+      missingItems.push(item);
+
+    }
+
+  });
+
+
+  if (foundItems.length === 0) {
+
+    document.getElementById("results").innerHTML =
+      `<div class="card">
+        <b>Jag hittade inga produkter ännu.</b>
+        <p class="small">
+        I den riktiga versionen ska AI:n kunna förstå
+        betydligt fler sätt att skriva samma produkt.
+        </p>
+      </div>`;
+
+    return;
+  }
+
+
+  const cheapest =
+    stores.reduce((a,b) =>
+      totals[a] < totals[b] ? a : b
+    );
+
+
+  const cheapestMember =
+    stores.reduce((a,b) =>
+      memberTotals[a] < memberTotals[b] ? a : b
+    );
+
+
+  let html = `
+
+    <div class="card">
+
+      <div class="small">
+        BILLIGASTE KORGEN
+      </div>
+
+      <div class="price">
+        ${totals[cheapest].toFixed(2)} kr
+      </div>
+
+      <p>
+        ${cheapest}
+      </p>
+
+      <div class="save">
+        ⭐ Med medlemspris:
+        <b>${memberTotals[cheapest].toFixed(2)} kr</b>
+      </div>
+
+      <button class="optimize"
+              onclick="optimizeBasket()">
+        ✨ Optimera min korg
+      </button>
+
+    </div>
+  `;
+
+
+  stores.forEach(store => {
+
+    html += `
+
+      <div class="card store
+        ${store === cheapest ? "best" : ""}">
+
+        <div class="store-name">
+          ${store}
+        </div>
+
+        <div class="price">
+          ${totals[store].toFixed(2)} kr
+        </div>
+
+        <div class="member">
+          ⭐ Medlemspris:
+          ${memberTotals[store].toFixed(2)} kr
+        </div>
+
+      </div>
+    `;
+
+  });
+
+
+  html += `
+
+    <div class="card">
+
+      <b>Din korg</b>
+
+  `;
+
+
+  foundItems.forEach(item => {
+
+    html += `
+
+      <div class="item">
+
+        <span>${item}</span>
+
+        <span>
+          ${products[item][cheapest].price.toFixed(2)} kr
+        </span>
+
+      </div>
+
+    `;
+
+  });
+
+
+  if (missingItems.length > 0) {
+
+    html += `
+
+      <p class="small">
+
+        Kunde inte hitta ännu:
+        ${missingItems.join(", ")}
+
+      </p>
+
+    `;
+
+  }
+
+
+  html += `</div>`;
+
+
+  document.getElementById("results").innerHTML = html;
+
+}
+
+
+function optimizeBasket() {
+
+  document.getElementById("results").insertAdjacentHTML(
+    "afterbegin",
+
+    `<div class="card">
+
+      <b>✨ Smart optimering</b>
+
+      <p>
+        Nästa steg är att låta appen automatiskt
+        dela upp korgen mellan butiker.
+      </p>
+
+      <p class="small">
+        Exempel: 7 varor på Willys + 3 varor på ICA
+        om det ger lägre totalpris.
+      </p>
+
+    </div>`
+  );
+
+}
+
+</script>
+
+</body>
+</html>
