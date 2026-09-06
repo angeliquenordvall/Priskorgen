@@ -21,6 +21,7 @@ body {
 
 h1 {
   text-align: center;
+  margin-bottom: 5px;
 }
 
 .subtitle {
@@ -72,29 +73,56 @@ button {
 
 .store {
   margin-top: 10px;
-  padding: 10px;
+  padding: 12px;
   background: #f1f1f1;
-  border-radius: 8px;
+  border-radius: 10px;
 }
 
 .product {
-  padding: 12px 0;
-  border-bottom: 1px solid #ddd;
-}
-
-.product:last-child {
-  border-bottom: none;
+  background: white;
+  padding: 14px;
+  margin-bottom: 10px;
+  border-radius: 10px;
+  border: 1px solid #ddd;
 }
 
 .product-name {
   font-weight: bold;
-  margin-bottom: 6px;
+  font-size: 17px;
+}
+
+.brand {
+  color: #666;
+  font-size: 14px;
+  margin-top: 3px;
+}
+
+.product-info {
+  color: #666;
+  font-size: 13px;
+  margin-top: 5px;
+}
+
+.price-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 10px;
 }
 
 .price {
-  display: flex;
-  justify-content: space-between;
-  padding: 4px 0;
+  font-size: 20px;
+  font-weight: bold;
+}
+
+.store-name {
+  font-weight: bold;
+}
+
+.member {
+  color: #16833b;
+  font-size: 14px;
+  margin-top: 3px;
 }
 
 .error {
@@ -115,6 +143,17 @@ button {
 
 .hidden {
   display: none;
+}
+
+.result-title {
+  margin-bottom: 12px;
+}
+
+.attribution {
+  text-align: center;
+  margin-top: 25px;
+  color: #777;
+  font-size: 12px;
 }
 </style>
 </head>
@@ -149,33 +188,37 @@ Hämtar riktiga priser...
 
 <div id="results">
 
-<div class="mode">
-<h2>🏪 En butik</h2>
-<div id="oneStore">
-<div class="small">
-Vi hämtar riktiga priser från Primat.
-</div>
-</div>
+  <div class="mode">
+    <h2>🏪 En butik</h2>
+    <div id="oneStore">
+      <div class="small">
+        Resultatet visas när du jämför din korg.
+      </div>
+    </div>
+  </div>
+
+  <div class="mode">
+    <h2>✨ Billigast möjligt</h2>
+    <div id="cheapest">
+      <div class="small">
+        Resultatet visas när du jämför din korg.
+      </div>
+    </div>
+  </div>
+
+  <div class="mode">
+    <h2>🚗 Smartast</h2>
+    <div id="smart">
+      <div class="small">
+        Smartast byggs när vi har riktiga priser och butikernas avstånd.
+      </div>
+    </div>
+  </div>
+
 </div>
 
-<div class="mode">
-<h2>✨ Billigast möjligt</h2>
-<div id="cheapest">
-<div class="small">
-Priserna visas när du jämför din korg.
-</div>
-</div>
-</div>
-
-<div class="mode">
-<h2>🚗 Smartast</h2>
-<div id="smart">
-<div class="small">
-Smartast byggs ovanpå de riktiga priserna.
-</div>
-</div>
-</div>
-
+<div class="attribution">
+Prisdata från primat.nu
 </div>
 
 </div>
@@ -196,6 +239,21 @@ function money(value) {
 }
 
 
+function chainName(chain) {
+
+  const names = {
+    coop: "Coop",
+    ica: "ICA",
+    willys: "Willys",
+    hemkop: "Hemköp",
+    lidl: "Lidl",
+    citygross: "City Gross"
+  };
+
+  return names[chain] || chain;
+}
+
+
 async function searchProduct(query) {
 
   const response = await fetch(
@@ -206,7 +264,7 @@ async function searchProduct(query) {
   if (!response.ok) {
 
     throw new Error(
-      "Kunde inte hämta " + query
+      "Kunde inte hämta priser för " + query
     );
 
   }
@@ -215,100 +273,30 @@ async function searchProduct(query) {
 }
 
 
-function getProductsFromData(data) {
+function getBestPrice(product) {
 
-  if (Array.isArray(data)) {
-    return data;
+  if (
+    product.prices &&
+    typeof product.prices.effective === "number"
+  ) {
+    return product.prices.effective;
   }
 
-  if (Array.isArray(data.products)) {
-    return data.products;
-  }
-
-  if (Array.isArray(data.results)) {
-    return data.results;
-  }
-
-  return [];
-}
-
-
-function getProductName(product) {
-
-  return (
-    product.name ||
-    product.product_name ||
-    product.title ||
-    "Okänd produkt"
-  );
-}
-
-
-function getStoreName(product) {
-
-  return (
-    product.store_name ||
-    product.store ||
-    product.chain ||
-    product.retailer ||
-    "Butik"
-  );
-}
-
-
-function getPrice(product) {
-
-  const possiblePrices = [
-
-    product.effective,
-
-    product.member,
-
-    product.price,
-
-    product.regular,
-
-    product.comparison
-
-  ];
-
-  for (const price of possiblePrices) {
-
-    if (
-      typeof price === "number" &&
-      !isNaN(price)
-    ) {
-      return price;
-    }
-
-    if (
-      typeof price === "string" &&
-      price.trim() !== ""
-    ) {
-
-      const number =
-        parseFloat(
-          price.replace(",", ".")
-        );
-
-      if (!isNaN(number)) {
-        return number;
-      }
-
-    }
-
+  if (
+    product.prices &&
+    typeof product.prices.regular === "number"
+  ) {
+    return product.prices.regular;
   }
 
   return null;
 }
 
 
-async function compareBasket() {
+function compareBasket() {
 
   const input =
-    document.getElementById(
-      "shoppingList"
-    ).value;
+    document.getElementById("shoppingList").value;
 
   const items =
     input
@@ -318,9 +306,6 @@ async function compareBasket() {
 
   const error =
     document.getElementById("error");
-
-  const loading =
-    document.getElementById("loading");
 
   if (items.length === 0) {
 
@@ -332,6 +317,15 @@ async function compareBasket() {
 
   error.innerHTML = "";
 
+  loadBasket(items);
+}
+
+
+async function loadBasket(items) {
+
+  const loading =
+    document.getElementById("loading");
+
   loading.classList.remove("hidden");
 
   document.getElementById("oneStore").innerHTML = "";
@@ -340,30 +334,28 @@ async function compareBasket() {
 
   try {
 
-    const allResults = [];
+    const results = [];
 
     for (const item of items) {
 
       const data =
         await searchProduct(item);
 
-      const products =
-        getProductsFromData(data);
-
-      allResults.push({
+      results.push({
         query: item,
-        products: products
+        products: Array.isArray(data.data)
+          ? data.data
+          : []
       });
 
     }
 
-    showRealResults(allResults);
+    displayResults(results);
 
-  } catch (errorObject) {
+  } catch (error) {
 
-    error.innerHTML =
-      "Något gick fel: " +
-      errorObject.message;
+    document.getElementById("error").innerHTML =
+      "Något gick fel: " + error.message;
 
   }
 
@@ -371,116 +363,385 @@ async function compareBasket() {
 }
 
 
-function showRealResults(allResults) {
+function displayResults(results) {
+
+  let allProducts = [];
+
+  results.forEach(result => {
+
+    result.products.forEach(product => {
+
+      allProducts.push({
+        query: result.query,
+        product: product
+      });
+
+    });
+
+  });
+
+
+  if (allProducts.length === 0) {
+
+    document.getElementById("cheapest").innerHTML =
+      "<div class='error'>" +
+      "Inga produkter hittades." +
+      "</div>";
+
+    return;
+  }
+
+
+  /*
+   * VISA RIKTIGA PRODUKTER
+   */
 
   let html = "";
 
-  let totalProducts = 0;
-
-  allResults.forEach(result => {
+  results.forEach(result => {
 
     html +=
-      "<div class='product'>";
-
-    html +=
-      "<div class='product-name'>" +
+      "<h3 class='result-title'>" +
       "🔎 " +
       result.query +
-      "</div>";
+      "</h3>";
 
-    if (
-      result.products.length === 0
-    ) {
+    if (result.products.length === 0) {
 
       html +=
         "<div class='small'>" +
         "Ingen produkt hittades." +
         "</div>";
 
-    } else {
+      return;
+    }
 
-      const products =
-        result.products.slice(0, 10);
 
-      products.forEach(product => {
+    /*
+     * Visa max 10 relevanta resultat
+     */
+
+    result.products
+      .slice(0, 10)
+      .forEach(product => {
 
         const name =
-          getProductName(product);
+          product.name || "Okänd produkt";
+
+        const brand =
+          product.brand || "";
 
         const store =
-          getStoreName(product);
+          chainName(product.chain);
+
+        const packageInfo =
+          product.package || "";
 
         const price =
-          getPrice(product);
+          getBestPrice(product);
+
+        const member =
+          product.prices &&
+          typeof product.prices.member === "number"
+            ? product.prices.member
+            : null;
 
         html +=
 
-          "<div class='price'>" +
+          "<div class='product'>" +
 
-          "<span>" +
+          "<div class='product-name'>" +
           name +
-          "<br>" +
-          "<span class='small'>" +
+          "</div>" +
+
+          (
+            brand
+              ? "<div class='brand'>" +
+                brand +
+                "</div>"
+              : ""
+          ) +
+
+          "<div class='product-info'>" +
+          packageInfo +
+          "</div>" +
+
+          "<div class='price-row'>" +
+
+          "<span class='store-name'>" +
           store +
           "</span>" +
-          "</span>" +
 
-          "<strong>" +
+          "<span class='price'>" +
           (
             price !== null
               ? money(price)
               : "Pris saknas"
           ) +
-          "</strong>" +
+          "</span>" +
+
+          "</div>" +
+
+          (
+            member !== null
+              ? "<div class='member'>" +
+                "⭐ Medlemspris: " +
+                money(member) +
+                "</div>"
+              : ""
+          ) +
 
           "</div>";
 
-        totalProducts++;
-
       });
 
+  });
+
+
+  /*
+   * BILLIGAST MÖJLIGT
+   */
+
+  const cheapestProducts = [];
+
+
+  results.forEach(result => {
+
+    let best = null;
+
+    result.products.forEach(product => {
+
+      const price =
+        getBestPrice(product);
+
+      if (
+        price !== null &&
+        (
+          best === null ||
+          price < best.price
+        )
+      ) {
+
+        best = {
+          query: result.query,
+          product: product,
+          price: price
+        };
+
+      }
+
+    });
+
+    if (best !== null) {
+      cheapestProducts.push(best);
     }
 
-    html +=
+  });
+
+
+  let cheapestTotal = 0;
+
+  let cheapestHtml = "";
+
+
+  cheapestProducts.forEach(item => {
+
+    cheapestTotal += item.price;
+
+    cheapestHtml +=
+
+      "<div class='price-row'>" +
+
+      "<span>" +
+
+      item.query +
+      "<br>" +
+
+      "<span class='small'>" +
+      chainName(item.product.chain) +
+      " – " +
+      item.product.name +
+      "</span>" +
+
+      "</span>" +
+
+      "<strong>" +
+      money(item.price) +
+      "</strong>" +
+
       "</div>";
 
   });
 
 
-  document.getElementById(
-    "cheapest"
-  ).innerHTML =
+  document.getElementById("cheapest").innerHTML =
+
+    "<div class='total'>" +
+    money(cheapestTotal) +
+    "</div>" +
 
     "<div class='small'>" +
-    "Riktiga sökresultat från Primat." +
+    "Billigaste hittade alternativet per vara." +
     "</div>" +
 
     "<div class='store'>" +
-    html +
+    cheapestHtml +
     "</div>";
 
 
-  document.getElementById(
-    "oneStore"
-  ).innerHTML =
+  /*
+   * EN BUTIK
+   *
+   * Vi räknar här på kedjenivå.
+   * Senare kopplar vi detta till specifika
+   * butiker nära användaren.
+   */
+
+  const stores = {};
+
+  allProducts.forEach(item => {
+
+    const product =
+      item.product;
+
+    const price =
+      getBestPrice(product);
+
+    if (price === null) {
+      return;
+    }
+
+    const chain =
+      product.chain;
+
+    if (!stores[chain]) {
+
+      stores[chain] = {
+        total: 0,
+        items: {}
+      };
+
+    }
+
+    /*
+     * Om samma vara finns flera gånger
+     * behåller vi billigaste alternativet.
+     */
+
+    if (
+      !stores[chain].items[item.query] ||
+      price <
+      stores[chain].items[item.query].price
+    ) {
+
+      stores[chain].items[item.query] = {
+        price: price,
+        product: product
+      };
+
+    }
+
+  });
+
+
+  let bestStore = null;
+
+
+  Object.keys(stores).forEach(chain => {
+
+    const store =
+      stores[chain];
+
+    let total = 0;
+
+    let itemCount = 0;
+
+    Object.keys(store.items).forEach(item => {
+
+      total +=
+        store.items[item].price;
+
+      itemCount++;
+
+    });
+
+
+    if (
+      itemCount === results.length &&
+      (
+        bestStore === null ||
+        total < bestStore.total
+      )
+    ) {
+
+      bestStore = {
+        chain: chain,
+        total: total
+      };
+
+    }
+
+  });
+
+
+  if (bestStore) {
+
+    document.getElementById("oneStore").innerHTML =
+
+      "<div class='total'>" +
+      money(bestStore.total) +
+      "</div>" +
+
+      "<div class='small'>" +
+      "Billigast hittills om hela korgen " +
+      "kan köpas hos samma butikskedja." +
+      "</div>" +
+
+      "<div class='store'>" +
+      "<strong>" +
+      chainName(bestStore.chain) +
+      "</strong>" +
+      "</div>";
+
+  } else {
+
+    document.getElementById("oneStore").innerHTML =
+
+      "<div class='small'>" +
+      "Vi hittade ännu inte alla varor " +
+      "hos samma butikskedja." +
+      "</div>";
+
+  }
+
+
+  /*
+   * SMARTAST
+   */
+
+  document.getElementById("smart").innerHTML =
 
     "<div class='small'>" +
-    "Vi har nu kopplat Priskorgen till " +
-    "riktig prisdata. Nästa steg är att " +
-    "samla priserna per butik och räkna " +
-    "ut billigaste hela korgen." +
+    "🚗 Vi har nu riktiga priser. " +
+    "Nästa steg för Smartast är att koppla " +
+    "priserna till faktiska butiker och avstånd, " +
+    "så att appen kan räkna på om en extra butik " +
+    "verkligen är värd resan." +
     "</div>";
 
 
-  document.getElementById(
-    "smart"
-  ).innerHTML =
+  /*
+   * VISA ALLA RIKTIGA PRODUKTER
+   */
 
-    "<div class='small'>" +
-    "🚗 Smartast kommer att använda " +
-    "de riktiga butikspriserna när " +
-    "butikskopplingen är klar." +
-    "</div>";
+  document.getElementById("cheapest").innerHTML +=
+
+    "<hr>" +
+
+    "<h3>🛒 Hittade produkter</h3>" +
+
+    html;
+
 }
 
 </script>
