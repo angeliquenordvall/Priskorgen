@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Matprisappen</title>
+<title>Priskorgen</title>
 
 <style>
 body {
@@ -90,6 +90,11 @@ button {
   color: #a00000;
   border-radius: 10px;
 }
+
+pre {
+  white-space: pre-wrap;
+  word-break: break-word;
+}
 </style>
 </head>
 
@@ -97,7 +102,7 @@ button {
 
 <div class="container">
 
-<h1>🛒 Matprisappen</h1>
+<h1>🛒 Priskorgen</h1>
 
 <div class="subtitle">
 Skriv din inköpslista och jämför priser
@@ -113,13 +118,13 @@ köttfärs"></textarea>
 🔎 Jämför min korg
 </button>
 
-<div id="primatTest"></div>  
-
-<button onclick="testPrimat()">
+<button onclick="loadRealPrices()">
 🧪 Testa riktig prisdata
 </button>
 
 <div id="error"></div>
+
+<div id="primatTest"></div>
 
 <div id="results">
 
@@ -145,31 +150,37 @@ köttfärs"></textarea>
 <script>
 
 const products = {
+
 "mjölk": {
 ICA:{price:19.95,member:17.95},
 Coop:{price:20.90,member:18.90},
 Willys:{price:17.95,member:17.95}
 },
+
 "ägg": {
 ICA:{price:32.95,member:29.95},
 Coop:{price:34.95,member:29.95},
 Willys:{price:31.95,member:31.95}
 },
+
 "kaffe": {
 ICA:{price:69.95,member:59.95},
 Coop:{price:74.95,member:59.95},
 Willys:{price:64.95,member:64.95}
 },
+
 "bananer": {
 ICA:{price:27.95,member:24.95},
 Coop:{price:29.90,member:25.90},
 Willys:{price:23.95,member:23.95}
 },
+
 "köttfärs": {
 ICA:{price:89.95,member:79.95},
 Coop:{price:94.95,member:79.95},
 Willys:{price:84.95,member:84.95}
 }
+
 };
 
 const stores = ["ICA","Coop","Willys"];
@@ -178,9 +189,11 @@ function money(value) {
   return value.toFixed(2).replace(".",",") + " kr";
 }
 
+
 function compareBasket() {
 
-  const input = document.getElementById("shoppingList").value;
+  const input =
+    document.getElementById("shoppingList").value;
 
   const items = input
     .split("\n")
@@ -188,29 +201,38 @@ function compareBasket() {
     .filter(x => x.length > 0);
 
   if(items.length === 0) {
+
     document.getElementById("error").innerHTML =
       "Skriv minst en vara.";
+
     return;
   }
 
-  const knownItems = items.filter(item => products[item]);
+  const knownItems =
+    items.filter(item => products[item]);
 
   if(knownItems.length === 0) {
+
     document.getElementById("error").innerHTML =
       "Jag hittar inga av varorna ännu.";
+
     return;
   }
 
   document.getElementById("error").innerHTML = "";
 
   showOneStore(knownItems);
+
   showCheapest(knownItems);
+
   showSmart(knownItems);
 }
+
 
 function showOneStore(items) {
 
   let bestStore = "";
+
   let bestTotal = Infinity;
 
   stores.forEach(store => {
@@ -218,59 +240,106 @@ function showOneStore(items) {
     let total = 0;
 
     items.forEach(item => {
+
       total += products[item][store].member;
+
     });
 
     if(total < bestTotal) {
+
       bestTotal = total;
+
       bestStore = store;
+
     }
+
   });
 
   document.getElementById("oneStore").innerHTML =
-    "<div class='total'>" + money(bestTotal) + "</div>" +
-    "<div class='small'>Billigast om allt köps i samma butik.</div>" +
-    "<div class='store'><strong>" + bestStore + "</strong></div>";
+
+    "<div class='total'>" +
+    money(bestTotal) +
+    "</div>" +
+
+    "<div class='small'>" +
+    "Billigast om allt köps i samma butik." +
+    "</div>" +
+
+    "<div class='store'>" +
+    "<strong>" + bestStore + "</strong>" +
+    "</div>";
 }
+
 
 function showCheapest(items) {
 
   let total = 0;
+
   let html = "";
 
   items.forEach(item => {
 
     let cheapest = Infinity;
+
     let store = "";
 
     stores.forEach(s => {
 
-      let price = products[item][s].member;
+      let price =
+        products[item][s].member;
 
       if(price < cheapest) {
+
         cheapest = price;
+
         store = s;
+
       }
+
     });
 
     total += cheapest;
 
     html +=
+
       "<div class='item'>" +
-      "<span>" + item + " (" + store + ")</span>" +
-      "<span>" + money(cheapest) + "</span>" +
+
+      "<span>" +
+      item +
+      " (" +
+      store +
+      ")" +
+      "</span>" +
+
+      "<span>" +
+      money(cheapest) +
+      "</span>" +
+
       "</div>";
+
   });
 
   document.getElementById("cheapest").innerHTML =
-    "<div class='total'>" + money(total) + "</div>" +
-    "<div class='small'>Lägsta möjliga pris per vara.</div>" +
-    "<div class='store'>" + html + "</div>";
+
+    "<div class='total'>" +
+    money(total) +
+    "</div>" +
+
+    "<div class='small'>" +
+    "Lägsta möjliga pris per vara." +
+    "</div>" +
+
+    "<div class='store'>" +
+    html +
+    "</div>";
 }
+
 
 function showSmart(items) {
 
-  let bestOneStoreTotal = Infinity;
+  let bestOneStoreTotal =
+    Infinity;
+
   let bestOneStore = "";
 
   stores.forEach(store => {
@@ -278,23 +347,39 @@ function showSmart(items) {
     let total = 0;
 
     items.forEach(item => {
-      total += products[item][store].member;
+
+      total +=
+        products[item][store].member;
+
     });
 
     if(total < bestOneStoreTotal) {
+
       bestOneStoreTotal = total;
+
       bestOneStore = store;
+
     }
+
   });
 
-  let bestSmartTotal = bestOneStoreTotal;
-  let bestSmartStores = [bestOneStore];
+
+  let bestSmartTotal =
+    bestOneStoreTotal;
+
+  let bestSmartStores =
+    [bestOneStore];
+
 
   for(let i = 0; i < stores.length; i++) {
 
-    for(let j = i + 1; j < stores.length; j++) {
+    for(let j = i + 1;
+        j < stores.length;
+        j++) {
 
-      const selected = [stores[i], stores[j]];
+      const selected =
+        [stores[i], stores[j]];
+
       let total = 0;
 
       items.forEach(item => {
@@ -303,120 +388,174 @@ function showSmart(items) {
 
         selected.forEach(store => {
 
-          const price = products[item][store].member;
+          const price =
+            products[item][store].member;
 
           if(price < cheapest) {
+
             cheapest = price;
+
           }
+
         });
 
         total += cheapest;
+
       });
 
-      if(total + 10 < bestSmartTotal) {
-        bestSmartTotal = total;
-        bestSmartStores = selected;
+
+      if(
+        total + 10 < bestSmartTotal
+      ) {
+
+        bestSmartTotal =
+          total;
+
+        bestSmartStores =
+          selected;
+
       }
+
     }
+
   }
 
-  const saving = bestOneStoreTotal - bestSmartTotal;
+
+  const saving =
+    bestOneStoreTotal -
+    bestSmartTotal;
+
 
   let html =
+
     "<div class='total'>" +
     money(bestSmartTotal) +
     "</div>";
 
+
   if(bestSmartStores.length === 1) {
 
     html +=
+
       "<div class='small'>" +
-      "<strong>En butik är smartast.</strong><br><br>" +
+
+      "<strong>" +
+      "En butik är smartast." +
+      "</strong>" +
+
+      "<br><br>" +
+
       bestSmartStores[0] +
-      " ger det bästa priset utan att behöva åka till flera butiker." +
+
+      " ger det bästa priset utan " +
+      "att behöva åka till flera butiker." +
+
       "</div>";
 
   } else {
 
     html +=
+
       "<div class='small'>" +
-      "<strong>Två butiker är värda besväret.</strong><br><br>" +
-      "Butiker: " +
-      bestSmartStores.join(" + ") +
-      "<br>" +
-      "Du sparar cirka " +
-      money(saving) +
-      " jämfört med att handla allt i en butik." +
+
+      "<strong>" +
+      "Två butiker är värda besväret." +
+      "</strong>" +
+
       "<br><br>" +
-      "🚗 Eftersom besparingen är minst 10 kr kan den extra butiken vara värd en kort omväg." +
+
+      "Butiker: " +
+
+      bestSmartStores.join(" + ") +
+
+      "<br>" +
+
+      "Du sparar cirka " +
+
+      money(saving) +
+
+      " jämfört med att handla " +
+      "allt i en butik." +
+
+      "<br><br>" +
+
+      "🚗 Eftersom besparingen är minst " +
+      "10 kr kan den extra butiken vara " +
+      "värd en kort omväg." +
+
       "</div>";
+
   }
 
-  document.getElementById("smart").innerHTML = html;
+
+  document.getElementById("smart").innerHTML =
+    html;
 }
 
-  async function loadRealPrices() {
-  const box = document.getElementById("primatTest");
 
-  box.innerHTML = "Hämtar riktig prisdata...";
-
-  try {
-    const response = await fetch(
-      "https://primat.nu/api/v3/demo/products?q=banan"
-    );
-
-    if (!response.ok) {
-      throw new Error("API svarade med fel: " + response.status);
-    }
-
-    const data = await response.json();
-
-    box.innerHTML =
-      "<div class='mode'>" +
-      "<h2>🧪 Primat-test</h2>" +
-      "<pre style='white-space:pre-wrap;font-size:12px;'>" +
-      JSON.stringify(data, null, 2) +
-      "</pre>" +
-      "</div>";
-
-  } catch (error) {
-    box.innerHTML =
-      "<div class='error'>" +
-      "Primat-test misslyckades: " +
-      error.message +
-      "</div>";
-  }
-}
 async function loadRealPrices() {
-  const box = document.getElementById("primatTest");
 
-  box.innerHTML = "Hämtar riktiga priser...";
+  const box =
+    document.getElementById("primatTest");
+
+  box.innerHTML =
+    "<div class='mode'>" +
+    "Hämtar riktiga priser..." +
+    "</div>";
 
   try {
-    const response = await fetch("/api/primat");
 
-    if (!response.ok) {
-      throw new Error("Serverfel: " + response.status);
+    const response =
+      await fetch("/api/primat");
+
+    if(!response.ok) {
+
+      throw new Error(
+        "Serverfel: " +
+        response.status
+      );
+
     }
 
-    const data = await response.json();
+    const data =
+      await response.json();
 
     box.innerHTML =
+
       "<div class='mode'>" +
-      "<h2>🛒 Riktiga Primat-data</h2>" +
-      "<pre style='white-space:pre-wrap;font-size:12px;'>" +
-      JSON.stringify(data, null, 2) +
+
+      "<h2>🛒 Riktig Primat-data</h2>" +
+
+      "<pre>" +
+
+      JSON.stringify(
+        data,
+        null,
+        2
+      ) +
+
       "</pre>" +
+
       "</div>";
 
-  } catch (error) {
-    box.innerHTML =
-      "<div class='error'>" +
-      "Kunde inte hämta priser: " +
-      error.message +
-      "</div>";
   }
+
+  catch(error) {
+
+    box.innerHTML =
+
+      "<div class='error'>" +
+
+      "Kunde inte hämta priser: " +
+
+      error.message +
+
+      "</div>";
+
+  }
+
 }
+
 </script>
 
 </body>
