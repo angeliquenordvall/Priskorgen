@@ -26,6 +26,7 @@ h1 {
 .subtitle {
   text-align: center;
   color: #666;
+  margin-bottom: 20px;
 }
 
 textarea {
@@ -76,11 +77,24 @@ button {
   border-radius: 8px;
 }
 
-.item {
+.product {
+  padding: 12px 0;
+  border-bottom: 1px solid #ddd;
+}
+
+.product:last-child {
+  border-bottom: none;
+}
+
+.product-name {
+  font-weight: bold;
+  margin-bottom: 6px;
+}
+
+.price {
   display: flex;
   justify-content: space-between;
-  padding: 7px 0;
-  border-bottom: 1px solid #ddd;
+  padding: 4px 0;
 }
 
 .error {
@@ -91,9 +105,16 @@ button {
   border-radius: 10px;
 }
 
-pre {
-  white-space: pre-wrap;
-  word-break: break-word;
+.loading {
+  margin-top: 15px;
+  padding: 15px;
+  background: white;
+  border-radius: 12px;
+  text-align: center;
+}
+
+.hidden {
+  display: none;
 }
 </style>
 </head>
@@ -105,10 +126,12 @@ pre {
 <h1>🛒 Priskorgen</h1>
 
 <div class="subtitle">
-Skriv din inköpslista och jämför priser
+Skriv din inköpslista och jämför riktiga priser
 </div>
 
-<textarea id="shoppingList" placeholder="mjölk
+<textarea
+  id="shoppingList"
+  placeholder="mjölk
 ägg
 kaffe
 bananer
@@ -118,29 +141,39 @@ köttfärs"></textarea>
 🔎 Jämför min korg
 </button>
 
-<button onclick="loadRealPrices()">
-🧪 Testa riktig prisdata
-</button>
-
 <div id="error"></div>
 
-<div id="primatTest"></div>
+<div id="loading" class="loading hidden">
+Hämtar riktiga priser...
+</div>
 
 <div id="results">
 
 <div class="mode">
 <h2>🏪 En butik</h2>
-<div id="oneStore"></div>
+<div id="oneStore">
+<div class="small">
+Vi hämtar riktiga priser från Primat.
+</div>
+</div>
 </div>
 
 <div class="mode">
 <h2>✨ Billigast möjligt</h2>
-<div id="cheapest"></div>
+<div id="cheapest">
+<div class="small">
+Priserna visas när du jämför din korg.
+</div>
+</div>
 </div>
 
 <div class="mode">
 <h2>🚗 Smartast</h2>
-<div id="smart"></div>
+<div id="smart">
+<div class="small">
+Smartast byggs ovanpå de riktiga priserna.
+</div>
+</div>
 </div>
 
 </div>
@@ -149,411 +182,305 @@ köttfärs"></textarea>
 
 <script>
 
-const products = {
-
-"mjölk": {
-ICA:{price:19.95,member:17.95},
-Coop:{price:20.90,member:18.90},
-Willys:{price:17.95,member:17.95}
-},
-
-"ägg": {
-ICA:{price:32.95,member:29.95},
-Coop:{price:34.95,member:29.95},
-Willys:{price:31.95,member:31.95}
-},
-
-"kaffe": {
-ICA:{price:69.95,member:59.95},
-Coop:{price:74.95,member:59.95},
-Willys:{price:64.95,member:64.95}
-},
-
-"bananer": {
-ICA:{price:27.95,member:24.95},
-Coop:{price:29.90,member:25.90},
-Willys:{price:23.95,member:23.95}
-},
-
-"köttfärs": {
-ICA:{price:89.95,member:79.95},
-Coop:{price:94.95,member:79.95},
-Willys:{price:84.95,member:84.95}
-}
-
-};
-
-const stores = ["ICA","Coop","Willys"];
-
 function money(value) {
-  return value.toFixed(2).replace(".",",") + " kr";
+
+  if (typeof value !== "number") {
+    value = parseFloat(value);
+  }
+
+  if (isNaN(value)) {
+    return "Pris saknas";
+  }
+
+  return value.toFixed(2).replace(".", ",") + " kr";
 }
 
 
-function compareBasket() {
+async function searchProduct(query) {
+
+  const response = await fetch(
+    "/api/primat?q=" +
+    encodeURIComponent(query)
+  );
+
+  if (!response.ok) {
+
+    throw new Error(
+      "Kunde inte hämta " + query
+    );
+
+  }
+
+  return await response.json();
+}
+
+
+function getProductsFromData(data) {
+
+  if (Array.isArray(data)) {
+    return data;
+  }
+
+  if (Array.isArray(data.products)) {
+    return data.products;
+  }
+
+  if (Array.isArray(data.results)) {
+    return data.results;
+  }
+
+  return [];
+}
+
+
+function getProductName(product) {
+
+  return (
+    product.name ||
+    product.product_name ||
+    product.title ||
+    "Okänd produkt"
+  );
+}
+
+
+function getStoreName(product) {
+
+  return (
+    product.store_name ||
+    product.store ||
+    product.chain ||
+    product.retailer ||
+    "Butik"
+  );
+}
+
+
+function getPrice(product) {
+
+  const possiblePrices = [
+
+    product.effective,
+
+    product.member,
+
+    product.price,
+
+    product.regular,
+
+    product.comparison
+
+  ];
+
+  for (const price of possiblePrices) {
+
+    if (
+      typeof price === "number" &&
+      !isNaN(price)
+    ) {
+      return price;
+    }
+
+    if (
+      typeof price === "string" &&
+      price.trim() !== ""
+    ) {
+
+      const number =
+        parseFloat(
+          price.replace(",", ".")
+        );
+
+      if (!isNaN(number)) {
+        return number;
+      }
+
+    }
+
+  }
+
+  return null;
+}
+
+
+async function compareBasket() {
 
   const input =
-    document.getElementById("shoppingList").value;
+    document.getElementById(
+      "shoppingList"
+    ).value;
 
-  const items = input
-    .split("\n")
-    .map(x => x.toLowerCase().trim())
-    .filter(x => x.length > 0);
+  const items =
+    input
+      .split("\n")
+      .map(x => x.trim())
+      .filter(x => x.length > 0);
 
-  if(items.length === 0) {
+  const error =
+    document.getElementById("error");
 
-    document.getElementById("error").innerHTML =
+  const loading =
+    document.getElementById("loading");
+
+  if (items.length === 0) {
+
+    error.innerHTML =
       "Skriv minst en vara.";
 
     return;
   }
 
-  const knownItems =
-    items.filter(item => products[item]);
+  error.innerHTML = "";
 
-  if(knownItems.length === 0) {
+  loading.classList.remove("hidden");
 
-    document.getElementById("error").innerHTML =
-      "Jag hittar inga av varorna ännu.";
+  document.getElementById("oneStore").innerHTML = "";
+  document.getElementById("cheapest").innerHTML = "";
+  document.getElementById("smart").innerHTML = "";
 
-    return;
-  }
+  try {
 
-  document.getElementById("error").innerHTML = "";
+    const allResults = [];
 
-  showOneStore(knownItems);
+    for (const item of items) {
 
-  showCheapest(knownItems);
+      const data =
+        await searchProduct(item);
 
-  showSmart(knownItems);
-}
+      const products =
+        getProductsFromData(data);
 
-
-function showOneStore(items) {
-
-  let bestStore = "";
-
-  let bestTotal = Infinity;
-
-  stores.forEach(store => {
-
-    let total = 0;
-
-    items.forEach(item => {
-
-      total += products[item][store].member;
-
-    });
-
-    if(total < bestTotal) {
-
-      bestTotal = total;
-
-      bestStore = store;
+      allResults.push({
+        query: item,
+        products: products
+      });
 
     }
 
-  });
+    showRealResults(allResults);
 
-  document.getElementById("oneStore").innerHTML =
+  } catch (errorObject) {
 
-    "<div class='total'>" +
-    money(bestTotal) +
-    "</div>" +
+    error.innerHTML =
+      "Något gick fel: " +
+      errorObject.message;
 
-    "<div class='small'>" +
-    "Billigast om allt köps i samma butik." +
-    "</div>" +
+  }
 
-    "<div class='store'>" +
-    "<strong>" + bestStore + "</strong>" +
-    "</div>";
+  loading.classList.add("hidden");
 }
 
 
-function showCheapest(items) {
-
-  let total = 0;
+function showRealResults(allResults) {
 
   let html = "";
 
-  items.forEach(item => {
+  let totalProducts = 0;
 
-    let cheapest = Infinity;
-
-    let store = "";
-
-    stores.forEach(s => {
-
-      let price =
-        products[item][s].member;
-
-      if(price < cheapest) {
-
-        cheapest = price;
-
-        store = s;
-
-      }
-
-    });
-
-    total += cheapest;
+  allResults.forEach(result => {
 
     html +=
+      "<div class='product'>";
 
-      "<div class='item'>" +
+    html +=
+      "<div class='product-name'>" +
+      "🔎 " +
+      result.query +
+      "</div>";
 
-      "<span>" +
-      item +
-      " (" +
-      store +
-      ")" +
-      "</span>" +
+    if (
+      result.products.length === 0
+    ) {
 
-      "<span>" +
-      money(cheapest) +
-      "</span>" +
+      html +=
+        "<div class='small'>" +
+        "Ingen produkt hittades." +
+        "</div>";
 
+    } else {
+
+      const products =
+        result.products.slice(0, 10);
+
+      products.forEach(product => {
+
+        const name =
+          getProductName(product);
+
+        const store =
+          getStoreName(product);
+
+        const price =
+          getPrice(product);
+
+        html +=
+
+          "<div class='price'>" +
+
+          "<span>" +
+          name +
+          "<br>" +
+          "<span class='small'>" +
+          store +
+          "</span>" +
+          "</span>" +
+
+          "<strong>" +
+          (
+            price !== null
+              ? money(price)
+              : "Pris saknas"
+          ) +
+          "</strong>" +
+
+          "</div>";
+
+        totalProducts++;
+
+      });
+
+    }
+
+    html +=
       "</div>";
 
   });
 
-  document.getElementById("cheapest").innerHTML =
 
-    "<div class='total'>" +
-    money(total) +
-    "</div>" +
+  document.getElementById(
+    "cheapest"
+  ).innerHTML =
 
     "<div class='small'>" +
-    "Lägsta möjliga pris per vara." +
+    "Riktiga sökresultat från Primat." +
     "</div>" +
 
     "<div class='store'>" +
     html +
     "</div>";
-}
 
 
-function showSmart(items) {
+  document.getElementById(
+    "oneStore"
+  ).innerHTML =
 
-  let bestOneStoreTotal =
-    Infinity;
-
-  let bestOneStore = "";
-
-  stores.forEach(store => {
-
-    let total = 0;
-
-    items.forEach(item => {
-
-      total +=
-        products[item][store].member;
-
-    });
-
-    if(total < bestOneStoreTotal) {
-
-      bestOneStoreTotal = total;
-
-      bestOneStore = store;
-
-    }
-
-  });
-
-
-  let bestSmartTotal =
-    bestOneStoreTotal;
-
-  let bestSmartStores =
-    [bestOneStore];
-
-
-  for(let i = 0; i < stores.length; i++) {
-
-    for(let j = i + 1;
-        j < stores.length;
-        j++) {
-
-      const selected =
-        [stores[i], stores[j]];
-
-      let total = 0;
-
-      items.forEach(item => {
-
-        let cheapest = Infinity;
-
-        selected.forEach(store => {
-
-          const price =
-            products[item][store].member;
-
-          if(price < cheapest) {
-
-            cheapest = price;
-
-          }
-
-        });
-
-        total += cheapest;
-
-      });
-
-
-      if(
-        total + 10 < bestSmartTotal
-      ) {
-
-        bestSmartTotal =
-          total;
-
-        bestSmartStores =
-          selected;
-
-      }
-
-    }
-
-  }
-
-
-  const saving =
-    bestOneStoreTotal -
-    bestSmartTotal;
-
-
-  let html =
-
-    "<div class='total'>" +
-    money(bestSmartTotal) +
+    "<div class='small'>" +
+    "Vi har nu kopplat Priskorgen till " +
+    "riktig prisdata. Nästa steg är att " +
+    "samla priserna per butik och räkna " +
+    "ut billigaste hela korgen." +
     "</div>";
 
 
-  if(bestSmartStores.length === 1) {
+  document.getElementById(
+    "smart"
+  ).innerHTML =
 
-    html +=
-
-      "<div class='small'>" +
-
-      "<strong>" +
-      "En butik är smartast." +
-      "</strong>" +
-
-      "<br><br>" +
-
-      bestSmartStores[0] +
-
-      " ger det bästa priset utan " +
-      "att behöva åka till flera butiker." +
-
-      "</div>";
-
-  } else {
-
-    html +=
-
-      "<div class='small'>" +
-
-      "<strong>" +
-      "Två butiker är värda besväret." +
-      "</strong>" +
-
-      "<br><br>" +
-
-      "Butiker: " +
-
-      bestSmartStores.join(" + ") +
-
-      "<br>" +
-
-      "Du sparar cirka " +
-
-      money(saving) +
-
-      " jämfört med att handla " +
-      "allt i en butik." +
-
-      "<br><br>" +
-
-      "🚗 Eftersom besparingen är minst " +
-      "10 kr kan den extra butiken vara " +
-      "värd en kort omväg." +
-
-      "</div>";
-
-  }
-
-
-  document.getElementById("smart").innerHTML =
-    html;
-}
-
-
-async function loadRealPrices() {
-
-  const box =
-    document.getElementById("primatTest");
-
-  box.innerHTML =
-    "<div class='mode'>" +
-    "Hämtar riktiga priser..." +
+    "<div class='small'>" +
+    "🚗 Smartast kommer att använda " +
+    "de riktiga butikspriserna när " +
+    "butikskopplingen är klar." +
     "</div>";
-
-  try {
-
-    const response =
-      await fetch("/api/primat");
-
-    if(!response.ok) {
-
-      throw new Error(
-        "Serverfel: " +
-        response.status
-      );
-
-    }
-
-    const data =
-      await response.json();
-
-    box.innerHTML =
-
-      "<div class='mode'>" +
-
-      "<h2>🛒 Riktig Primat-data</h2>" +
-
-      "<pre>" +
-
-      JSON.stringify(
-        data,
-        null,
-        2
-      ) +
-
-      "</pre>" +
-
-      "</div>";
-
-  }
-
-  catch(error) {
-
-    box.innerHTML =
-
-      "<div class='error'>" +
-
-      "Kunde inte hämta priser: " +
-
-      error.message +
-
-      "</div>";
-
-  }
-
 }
 
 </script>
