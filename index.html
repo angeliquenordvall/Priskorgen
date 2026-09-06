@@ -191,6 +191,34 @@
       display: none;
     }
 
+    .summary {
+      background: #111;
+      color: white;
+      border-radius: 14px;
+      padding: 16px;
+      margin-bottom: 18px;
+    }
+
+    .summary-title {
+      font-size: 14px;
+      opacity: 0.8;
+      margin-bottom: 5px;
+    }
+
+    .summary-price {
+      font-size: 28px;
+      font-weight: bold;
+    }
+
+    .store-badge {
+      display: inline-block;
+      background: #eee;
+      border-radius: 8px;
+      padding: 5px 8px;
+      font-size: 12px;
+      margin-top: 5px;
+    }
+
     @media (max-width: 500px) {
       h1 {
         font-size: 28px;
@@ -212,6 +240,7 @@
   <div class="container">
 
     <h1>🛒 Priskorgen</h1>
+
     <p class="subtitle">
       Hitta billigaste sättet att handla din korg.
     </p>
@@ -234,4 +263,517 @@
 
       <textarea
         id="shoppingList"
-        placeholder="Skriv en vara
+        placeholder="Skriv en vara per rad, till exempel:
+
+Mjölk
+Bananer
+Kaffe
+Smör
+Bröd"
+      ></textarea>
+
+      <button id="compareButton">
+        🔎 Jämför min korg
+      </button>
+
+      <div id="message"></div>
+
+    </div>
+
+    <div id="results" class="hidden">
+
+      <div id="summary"></div>
+
+      <div class="box">
+        <h2>✨ Billigast möjligt</h2>
+        <div id="cheapestResults"></div>
+      </div>
+
+      <div class="box">
+        <h2>🏪 En butik</h2>
+        <div id="oneStoreResults"></div>
+      </div>
+
+      <div class="box">
+        <h2>🚗 Smartast</h2>
+
+        <div class="smart">
+          <div class="smart-title">
+            Smartaste alternativet
+          </div>
+
+          <div id="smartResults">
+            Vi räknar på pris och antal butiker.
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <div class="attribution">
+      Prisdata från
+      <a href="https://primat.nu" target="_blank" rel="noopener">
+        primat.nu
+      </a>
+    </div>
+
+  </div>
+
+  <script>
+
+    const compareButton = document.getElementById("compareButton");
+    const postcodeInput = document.getElementById("postcode");
+    const shoppingList = document.getElementById("shoppingList");
+
+    const results = document.getElementById("results");
+    const summary = document.getElementById("summary");
+    const cheapestResults = document.getElementById("cheapestResults");
+    const oneStoreResults = document.getElementById("oneStoreResults");
+    const smartResults = document.getElementById("smartResults");
+    const message = document.getElementById("message");
+
+
+    const storeNames = {
+      coop: "Coop",
+      ica: "ICA",
+      lidl: "Lidl",
+      willys: "Willys",
+      hemkop: "Hemköp"
+    };
+
+
+    function formatPrice(price) {
+
+      if (price === null || price === undefined) {
+        return "–";
+      }
+
+      return Number(price)
+        .toFixed(2)
+        .replace(".", ",") + " kr";
+    }
+
+
+    function escapeHtml(text) {
+
+      return String(text)
+        .replaceAll("&", "&amp;")
+        .replaceAll("<", "&lt;")
+        .replaceAll(">", "&gt;")
+        .replaceAll('"', "&quot;")
+        .replaceAll("'", "&#039;");
+    }
+
+
+    function getStoreName(product) {
+
+      return storeNames[product.chain] || product.chain;
+    }
+
+
+    async function getProducts(query, postcode) {
+
+      const url =
+        "/api/primat?q=" +
+        encodeURIComponent(query) +
+        "&postcode=" +
+        encodeURIComponent(postcode);
+
+      const response = await fetch(url);
+
+      if (!response.ok) {
+        throw new Error(
+          "Kunde inte hämta prisdata för " + query
+        );
+      }
+
+      const data = await response.json();
+
+      if (!data.products || !data.products.data) {
+        return [];
+      }
+
+      return data.products.data;
+    }
+
+
+    function chooseBestProduct(products) {
+
+      const valid = products.filter(product => {
+
+        return product &&
+          product.available !== false &&
+          product.prices &&
+          typeof product.prices.effective === "number";
+
+      });
+
+      if (!valid.length) {
+        return null;
+      }
+
+      return valid.reduce((best, product) => {
+
+        if (!best) {
+          return product;
+        }
+
+        return product.prices.effective <
+          best.prices.effective
+          ? product
+          : best;
+
+      }, null);
+    }
+
+
+    function createItemHtml(item, products) {
+
+      const best = chooseBestProduct(products);
+
+      if (!best) {
+
+        return `
+          <div class="item">
+            <div class="item-name">
+              ${escapeHtml(item)}
+            </div>
+
+            <div class="empty">
+              Ingen passande pris hittades.
+            </div>
+          </div>
+        `;
+
+      }
+
+      const price = best.prices.effective;
+      const store = getStoreName(best);
+
+      const packageText =
+        best.package ||
+        (
+          best.amount
+            ? best.amount + " " + (best.unit || "")
+            : ""
+        );
+
+      return `
+        <div class="item">
+
+          <div class="item-name">
+            ${escapeHtml(best.name)}
+          </div>
+
+          <div class="item-meta">
+            ${escapeHtml(best.brand || "")}
+            ${packageText ? " • " + escapeHtml(packageText) : ""}
+          </div>
+
+          <div class="cheapest">
+
+            <div class="best-label">
+              BILLIGAST HITTAT
+            </div>
+
+            <div class="store-row">
+
+              <span class="store-name">
+                ${escapeHtml(store)}
+              </span>
+
+              <span class="price">
+                ${formatPrice(price)}
+              </span>
+
+            </div>
+
+          </div>
+
+        </div>
+      `;
+    }
+
+
+    function calculateStoreTotals(allResults) {
+
+      const totals = {};
+
+      for (const result of allResults) {
+
+        for (const product of result.products) {
+
+          if (
+            !product.prices ||
+            typeof product.prices.effective !== "number"
+          ) {
+            continue;
+          }
+
+          const storeKey =
+            product.chain + ":" + product.store_id;
+
+          if (!totals[storeKey]) {
+
+            totals[storeKey] = {
+              chain: product.chain,
+              store_id: product.store_id,
+              name: getStoreName(product),
+              total: 0,
+              items: 0
+            };
+
+          }
+
+          totals[storeKey].total +=
+            product.prices.effective;
+
+          totals[storeKey].items += 1;
+
+        }
+
+      }
+
+      return Object.values(totals);
+    }
+
+
+    function renderOneStore(allResults) {
+
+      const totals = calculateStoreTotals(allResults);
+
+      if (!totals.length) {
+
+        oneStoreResults.innerHTML =
+          '<div class="empty">Ingen butik kunde räknas fram.</div>';
+
+        return;
+
+      }
+
+      totals.sort((a, b) => a.total - b.total);
+
+      const best = totals[0];
+
+      oneStoreResults.innerHTML = `
+
+        <div class="item">
+
+          <div class="item-name">
+            🏆 ${escapeHtml(best.name)}
+          </div>
+
+          <div class="item-meta">
+            Baserat på de produkter som kunde matchas.
+          </div>
+
+          <div class="cheapest">
+
+            <div class="best-label">
+              LÄGSTA TOTALEN HITTILLS
+            </div>
+
+            <div class="store-row">
+
+              <span class="store-name">
+                ${escapeHtml(best.name)}
+              </span>
+
+              <span class="price">
+                ${formatPrice(best.total)}
+              </span>
+
+            </div>
+
+          </div>
+
+        </div>
+      `;
+    }
+
+
+    function renderSmart(allResults) {
+
+      const totals = calculateStoreTotals(allResults);
+
+      if (!totals.length) {
+
+        smartResults.innerHTML =
+          "Vi hittade inte tillräckligt med data ännu.";
+
+        return;
+
+      }
+
+      totals.sort((a, b) => a.total - b.total);
+
+      const cheapest = totals[0];
+
+      smartResults.innerHTML = `
+
+        <strong>
+          ${escapeHtml(cheapest.name)}
+        </strong>
+        är just nu det bästa alternativet bland de butiker
+        där vi har hittat priser.
+
+        <br><br>
+
+        Total för matchade varor:
+        <strong>${formatPrice(cheapest.total)}</strong>
+
+        <br><br>
+
+        <small>
+          🚗 Nästa steg blir att väga in avstånd, restid och
+          hur mycket du faktiskt sparar på att åka till flera butiker.
+        </small>
+      `;
+    }
+
+
+    compareButton.addEventListener("click", async function() {
+
+      const postcode =
+        postcodeInput.value.trim();
+
+      const items =
+        shoppingList.value
+          .split("\n")
+          .map(item => item.trim())
+          .filter(item => item.length > 0);
+
+
+      message.innerHTML = "";
+      results.classList.add("hidden");
+
+
+      if (!postcode) {
+
+        message.innerHTML =
+          '<div class="error">Skriv in ditt postnummer.</div>';
+
+        return;
+      }
+
+
+      if (!/^\d{5}$/.test(postcode)) {
+
+        message.innerHTML =
+          '<div class="error">Postnumret måste innehålla 5 siffror.</div>';
+
+        return;
+      }
+
+
+      if (!items.length) {
+
+        message.innerHTML =
+          '<div class="error">Skriv minst en vara i inköpslistan.</div>';
+
+        return;
+      }
+
+
+      compareButton.disabled = true;
+
+      compareButton.textContent =
+        "⏳ Jämför priser...";
+
+
+      message.innerHTML =
+        '<div class="loading">Hämtar aktuella priser...</div>';
+
+
+      try {
+
+        const allResults = [];
+
+        for (const item of items) {
+
+          const products =
+            await getProducts(item, postcode);
+
+          allResults.push({
+            item,
+            products
+          });
+
+        }
+
+
+        const matchedCount =
+          allResults.filter(
+            result => chooseBestProduct(result.products)
+          ).length;
+
+
+        summary.innerHTML = `
+
+          <div class="summary">
+
+            <div class="summary-title">
+              DIN KORG
+            </div>
+
+            <div class="summary-price">
+              ${matchedCount} av ${items.length}
+            </div>
+
+            <div>
+              varor kunde matchas mot prisdata
+            </div>
+
+          </div>
+
+        `;
+
+
+        cheapestResults.innerHTML =
+          allResults
+            .map(result =>
+              createItemHtml(
+                result.item,
+                result.products
+              )
+            )
+            .join("");
+
+
+        renderOneStore(allResults);
+
+        renderSmart(allResults);
+
+
+        message.innerHTML = "";
+
+        results.classList.remove("hidden");
+
+
+      } catch (error) {
+
+        console.error(error);
+
+        message.innerHTML = `
+          <div class="error">
+            Något gick fel när priserna skulle hämtas.
+            <br><br>
+            ${escapeHtml(error.message)}
+          </div>
+        `;
+
+      } finally {
+
+        compareButton.disabled = false;
+
+        compareButton.textContent =
+          "🔎 Jämför min korg";
+
+      }
+
+    });
+
+  </script>
+
+</body>
+</html>
