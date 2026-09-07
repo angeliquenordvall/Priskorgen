@@ -3,29 +3,50 @@ export default async function handler(req, res) {
     const q = req.query.q;
     const postcode = req.query.postcode || "89132";
 
+    const apiKey = process.env.PRIMAT_API_KEY;
+
+    if (!apiKey) {
+      return res.status(500).json({
+        error: "PRIMAT_API_KEY saknas i Vercel."
+      });
+    }
+
+    const headers = {
+      Authorization: `Bearer ${apiKey}`
+    };
+
     // ------------------------------------------------------------
-    // Hämta butiker från Primat
+    // Hämta butiker för postnumret
     // ------------------------------------------------------------
     const storesResponse = await fetch(
-      "https://primat.nu/api/v3/demo/stores/resolve?postcode=" +
-        encodeURIComponent(postcode)
+      "https://primat.nu/api/v3/stores/resolve?postcode=" +
+        encodeURIComponent(postcode),
+      {
+        headers
+      }
     );
 
     if (!storesResponse.ok) {
+      const errorText = await storesResponse.text();
+
       throw new Error(
-        "Kunde inte hitta butiker: " + storesResponse.status
+        "Kunde inte hitta butiker: " +
+          storesResponse.status +
+          " " +
+          errorText
       );
     }
 
     const storesData = await storesResponse.json();
 
     const selectedStores =
-      storesData.default_selection ||
-      storesData.stores?.default_selection ||
-      [];
+      storesData.default_selection || [];
+
+    const stores = selectedStores.join(",");
 
     // ------------------------------------------------------------
-    // Om ingen produktfråga finns: returnera bara butiker
+    // Om ingen sökning finns:
+    // returnera butiksinformationen
     // ------------------------------------------------------------
     if (!q) {
       return res.status(200).json({
@@ -34,98 +55,61 @@ export default async function handler(req, res) {
       });
     }
 
-    const stores = selectedStores.join(",");
-
     // ------------------------------------------------------------
-    // Bestäm vilka sökningar vi ska göra
+    // Sök efter produkter
     //
-    // Normalt gör vi bara en sökning.
-    //
-    // För vissa generiska varor där Primats första sökning
-    // ofta hamnar fel kompletterar vi med mer specifika sökningar.
+    // Den riktiga API:n tillåter större resultatmängd än
+    // demo-API:n. Vi använder 100 för att ge vår matchning
+    // mycket bättre chans att hitta rätt produkt.
     // ------------------------------------------------------------
-    const searches = [q];
+    const productsUrl =
+      "https://primat.nu/api/v3/products?q=" +
+      encodeURIComponent(q) +
+      "&stores=" +
+      encodeURIComponent(stores) +
+      "&limit=100";
 
-    const normalizedQuery = q
-      .toLowerCase()
-      .normalize("NFD")
-      .replace(/[\u0300-\u036f]/g, "");
+    const productsResponse = await fetch(productsUrl, {
+      headers
+    });
 
-    if (
-      normalizedQuery === "smor" ||
-      normalizedQuery === "smör"
-    ) {
-      searches.push("smör normalsaltat");
-      searches.push("smör 500g");
+    if (!productsResponse.ok) {
+      const errorText = await productsResponse.text();
+
+      throw new Error(
+        "Primat svarade med " +
+          productsResponse.status +
+          " " +
+          errorText
+      );
     }
 
-    // ------------------------------------------------------------
-    // Gör sökningarna
-    // ------------------------------------------------------------
-    const allProducts = [];
+    const productsData = await productsResponse.json();
 
-    for (const searchTerm of searches) {
-      const productsUrl =
-        "https://primat.nu/api/v3/demo/products?q=" +
-        encodeURIComponent(searchTerm) +
-        "&stores=" +
-        encodeURIComponent(stores);
-
-      const productsResponse = await fetch(productsUrl);
-
-      if (!productsResponse.ok) {
-        continue;
-      }
-
-      const productsData = await productsResponse.json();
-
-      // Primat kan returnera en array eller ett objekt med products.
-      let rows = [];
-
-      if (Array.isArray(productsData)) {
-        rows = productsData;
-      } else if (Array.isArray(productsData.products)) {
-        rows = productsData.products;
-      } else if (Array.isArray(productsData.data)) {
-        rows = productsData.data;
-      }
-
-      allProducts.push(...rows);
-    }
+    // Primats v3 returnerar produkterna i data[]
+    const products = Array.isArray(productsData.data)
+      ? productsData.data
+      : [];
 
     // ------------------------------------------------------------
-    // Ta bort eventuella dubletter
-    // ------------------------------------------------------------
-    const seen = new Set();
-    const products = [];
-
-    for (const product of allProducts) {
-      const key = [
-        product.gtin || "",
-        product.chain || "",
-        product.store_id || "",
-        product.product_id || "",
-        product.id || "",
-        product.name || ""
-      ].join("|");
-
-      if (!seen.has(key)) {
-        seen.add(key);
-        products.push(product);
-      }
-    }
-
-    // ------------------------------------------------------------
-    // Svara till Priskorgen
+    // Returnera även Primats attribution.
     // ------------------------------------------------------------
     return res.status(200).json({
       postcode,
       selected_stores: selectedStores,
-      search_queries: searches,
-      products
+      query: q,
+      count: products.length,
+      products,
+      attribution:
+        productsData.attribution || {
+          text: "Prisdata från primat.nu",
+          url: "https://primat.nu"
+        }
     });
 
   } catch (error) {
+    console.error("Primat API error:", error);
+
     return res.status(500).json({
       error: error.message
     });
