@@ -1,1208 +1,1160 @@
-<!DOCTYPE html><html lang="sv"><head>
+<!DOCTYPE html>
+<html lang="sv">
+<head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Priskorgen</title>
+
   <style>
     * {
       box-sizing: border-box;
-    }body {
-  margin: 0;
-  font-family: Arial, sans-serif;
-  background: #f5f6f8;
-  color: #222;
-}
+    }
 
-.container {
-  max-width: 760px;
-  margin: 0 auto;
-  padding: 20px 14px 50px;
-}
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background: #f5f6f8;
+      color: #222;
+    }
 
-h1 {
-  margin: 0 0 5px;
-  font-size: 32px;
-}
+    .container {
+      max-width: 760px;
+      margin: 0 auto;
+      padding: 20px 14px 50px;
+    }
 
-.subtitle {
-  margin: 0 0 20px;
-  color: #666;
-}
+    h1 {
+      margin: 0 0 5px;
+      font-size: 32px;
+    }
 
-.box {
-  background: white;
-  border-radius: 16px;
-  padding: 18px;
-  margin-bottom: 16px;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.06);
-}
+    .subtitle {
+      margin: 0 0 20px;
+      color: #666;
+    }
 
-label {
-  display: block;
-  font-weight: bold;
-  margin-bottom: 7px;
-}
+    .box {
+      background: white;
+      border-radius: 16px;
+      padding: 18px;
+      margin-bottom: 16px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+    }
 
-input,
-textarea {
-  width: 100%;
-  border: 1px solid #ccc;
-  border-radius: 10px;
-  padding: 12px;
-  font-size: 16px;
-  font-family: inherit;
-}
+    label {
+      display: block;
+      font-weight: bold;
+      margin-bottom: 7px;
+    }
 
-textarea {
-  min-height: 130px;
-  resize: vertical;
-}
+    input,
+    textarea,
+    select {
+      width: 100%;
+      border: 1px solid #ccc;
+      border-radius: 10px;
+      padding: 12px;
+      font-size: 16px;
+      font-family: inherit;
+      background: white;
+    }
 
-button {
-  width: 100%;
-  border: 0;
-  border-radius: 12px;
-  padding: 14px;
-  font-size: 17px;
-  font-weight: bold;
-  cursor: pointer;
-  margin-top: 12px;
-  background: #111;
-  color: white;
-}
+    textarea {
+      min-height: 130px;
+      resize: vertical;
+    }
 
-button:disabled {
-  opacity: 0.6;
-  cursor: wait;
-}
+    button {
+      width: 100%;
+      border: 0;
+      border-radius: 12px;
+      padding: 14px;
+      font-size: 17px;
+      font-weight: bold;
+      cursor: pointer;
+      margin-top: 12px;
+      background: #111;
+      color: white;
+    }
 
-h2 {
-  font-size: 22px;
-  margin: 0 0 14px;
-}
+    button:disabled {
+      opacity: 0.6;
+      cursor: wait;
+    }
 
-h3 {
-  font-size: 18px;
-  margin: 0;
-}
+    .secondary-button {
+      background: #287a35;
+    }
 
-.item {
-  border-top: 1px solid #eee;
-  padding: 15px 0;
-}
+    h2 {
+      font-size: 22px;
+      margin: 0 0 14px;
+    }
 
-.item:first-child {
-  border-top: 0;
-  padding-top: 0;
-}
+    h3 {
+      font-size: 18px;
+      margin: 0;
+    }
 
-.item-name {
-  font-weight: bold;
-  font-size: 18px;
-  margin-bottom: 10px;
-}
+    .item {
+      border-top: 1px solid #eee;
+      padding: 15px 0;
+    }
 
-.item-meta {
-  color: #777;
-  font-size: 14px;
-  margin-bottom: 12px;
-}
+    .item:first-child {
+      border-top: 0;
+      padding-top: 0;
+    }
 
-.store-row {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  gap: 10px;
-  padding: 8px 0;
-}
+    .item-name {
+      font-weight: bold;
+      font-size: 18px;
+      margin-bottom: 10px;
+    }
 
-.store-name {
-  font-weight: 500;
-}
+    .item-meta {
+      color: #777;
+      font-size: 14px;
+      margin-bottom: 12px;
+    }
 
-.price {
-  font-weight: bold;
-  white-space: nowrap;
-}
+    .product-choice {
+      background: #f7f8fa;
+      border-radius: 12px;
+      padding: 14px;
+      margin-top: 10px;
+    }
 
-.cheapest {
-  background: #eef8ef;
-  border-radius: 10px;
-  padding: 10px;
-  margin-top: 8px;
-}
+    .product-choice label {
+      font-size: 14px;
+      margin-bottom: 7px;
+    }
 
-.best-label {
-  font-size: 13px;
-  color: #287a35;
-  font-weight: bold;
-  margin-bottom: 3px;
-}
+    .choice-help {
+      color: #777;
+      font-size: 13px;
+      margin-top: 7px;
+    }
 
-.smart {
-  background: #f1f5ff;
-  border-radius: 12px;
-  padding: 14px;
-  margin-top: 10px;
-}
+    .store-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 10px;
+      padding: 8px 0;
+    }
 
-.smart-title {
-  font-weight: bold;
-  margin-bottom: 5px;
-}
+    .store-name {
+      font-weight: 500;
+    }
 
-.loading {
-  text-align: center;
-  color: #666;
-  padding: 20px 0;
-}
+    .price {
+      font-weight: bold;
+      white-space: nowrap;
+    }
 
-.error {
-  background: #fff0f0;
-  color: #a40000;
-  border-radius: 10px;
-  padding: 12px;
-  margin-top: 12px;
-}
+    .cheapest {
+      background: #eef8ef;
+      border-radius: 10px;
+      padding: 10px;
+      margin-top: 8px;
+    }
 
-.empty {
-  color: #777;
-  text-align: center;
-  padding: 15px;
-}
+    .best-label {
+      font-size: 13px;
+      color: #287a35;
+      font-weight: bold;
+      margin-bottom: 3px;
+    }
 
-.attribution {
-  text-align: center;
-  font-size: 12px;
-  color: #777;
-  margin-top: 20px;
-}
+    .smart {
+      background: #f1f5ff;
+      border-radius: 12px;
+      padding: 14px;
+      margin-top: 10px;
+    }
 
-.attribution a {
-  color: inherit;
-}
+    .smart-title {
+      font-weight: bold;
+      margin-bottom: 5px;
+    }
 
-.hidden {
-  display: none;
-}
+    .loading {
+      text-align: center;
+      color: #666;
+      padding: 20px 0;
+    }
 
-.summary {
-  background: #111;
-  color: white;
-  border-radius: 14px;
-  padding: 16px;
-  margin-bottom: 18px;
-}
+    .error {
+      background: #fff0f0;
+      color: #a40000;
+      border-radius: 10px;
+      padding: 12px;
+      margin-top: 12px;
+    }
 
-.summary-title {
-  font-size: 14px;
-  opacity: 0.8;
-  margin-bottom: 5px;
-}
+    .empty {
+      color: #777;
+      text-align: center;
+      padding: 15px;
+    }
 
-.summary-price {
-  font-size: 28px;
-  font-weight: bold;
-}
+    .attribution {
+      text-align: center;
+      font-size: 12px;
+      color: #777;
+      margin-top: 20px;
+    }
 
-.store-badge {
-  display: inline-block;
-  background: #eee;
-  border-radius: 8px;
-  padding: 5px 8px;
-  font-size: 12px;
-  margin-top: 5px;
-}
+    .attribution a {
+      color: inherit;
+    }
 
-@media (max-width: 500px) {
-  h1 {
-    font-size: 28px;
-  }
+    .hidden {
+      display: none;
+    }
 
-  .container {
-    padding: 16px 10px 40px;
-  }
+    .summary {
+      background: #111;
+      color: white;
+      border-radius: 14px;
+      padding: 16px;
+      margin-bottom: 18px;
+    }
 
-  .box {
-    padding: 15px;
-  }
-}
+    .summary-title {
+      font-size: 14px;
+      opacity: 0.8;
+      margin-bottom: 5px;
+    }
 
+    .summary-price {
+      font-size: 28px;
+      font-weight: bold;
+    }
+
+    @media (max-width: 500px) {
+      h1 {
+        font-size: 28px;
+      }
+
+      .container {
+        padding: 16px 10px 40px;
+      }
+
+      .box {
+        padding: 15px;
+      }
+    }
   </style>
-</head><body>  <div class="container"><h1>🛒 Priskorgen</h1>
+</head>
 
-<p class="subtitle">
-  Hitta billigaste sättet att handla din korg.
-</p>
+<body>
 
-<div class="box">
+<div class="container">
 
-  <label for="postcode">📍 Postnummer</label>
+  <h1>🛒 Priskorgen</h1>
 
-  <input
-    id="postcode"
-    type="text"
-    value="89132"
-    maxlength="5"
-    inputmode="numeric"
-  >
+  <p class="subtitle">
+    Hitta billigaste sättet att handla din korg.
+  </p>
 
-  <br><br>
+  <div class="box">
 
-  <label for="shoppingList">🛍️ Din inköpslista</label>
+    <label for="postcode">📍 Postnummer</label>
 
-  <textarea
-    id="shoppingList"
-    placeholder="Skriv en vara per rad, till exempel:
+    <input
+      id="postcode"
+      type="text"
+      value="89132"
+      maxlength="5"
+      inputmode="numeric"
+    >
+
+    <br><br>
+
+    <label for="shoppingList">🛍️ Din inköpslista</label>
+
+    <textarea
+      id="shoppingList"
+      placeholder="Skriv en vara per rad, till exempel:
 
 Mjölk
 Bananer
 Kaffe
 Smör
 Bröd"
-></textarea>
+    ></textarea>
 
-  <button id="compareButton">
-    🔎 Jämför min korg
-  </button>
+    <button id="findProductsButton">
+      🔎 Hitta produkter
+    </button>
 
-  <div id="message"></div>
+    <div id="message"></div>
 
-</div>
-
-<div id="results" class="hidden">
-
-  <div id="summary"></div>
-
-  <div class="box">
-    <h2>✨ Billigast möjligt</h2>
-    <div id="cheapestResults"></div>
   </div>
 
-  <div class="box">
-    <h2>🏪 En butik</h2>
-    <div id="oneStoreResults"></div>
+
+  <!-- PRODUKTVAL -->
+
+  <div id="selectionBox" class="box hidden">
+
+    <h2>🛍️ Välj dina produkter</h2>
+
+    <p style="color:#666; margin-top:-5px;">
+      Välj exakt vilken produkt du vill jämföra.
+    </p>
+
+    <div id="productSelections"></div>
+
+    <button
+      id="compareSelectedButton"
+      class="secondary-button"
+    >
+      💰 Jämför valda produkter
+    </button>
+
   </div>
 
-  <div class="box">
-    <h2>🚗 Smartast</h2>
 
-    <div class="smart">
+  <!-- RESULTAT -->
 
-      <div class="smart-title">
-        Smartaste alternativet
-      </div>
+  <div id="results" class="hidden">
 
-      <div id="smartResults">
-        Vi räknar på pris och antal butiker.
+    <div id="summary"></div>
+
+    <div class="box">
+
+      <h2>✨ Billigast möjligt</h2>
+
+      <div id="cheapestResults"></div>
+
+    </div>
+
+
+    <div class="box">
+
+      <h2>🏪 En butik</h2>
+
+      <div id="oneStoreResults"></div>
+
+    </div>
+
+
+    <div class="box">
+
+      <h2>🚗 Smartast</h2>
+
+      <div class="smart">
+
+        <div class="smart-title">
+          Smartaste alternativet
+        </div>
+
+        <div id="smartResults">
+          Vi räknar på pris och antal butiker.
+        </div>
+
       </div>
 
     </div>
+
+  </div>
+
+
+  <div class="attribution">
+
+    Prisdata från
+
+    <a
+      href="https://primat.nu"
+      target="_blank"
+      rel="noopener"
+    >
+      primat.nu
+    </a>
+
   </div>
 
 </div>
 
-<div class="attribution">
-  Prisdata från
-  <a href="https://primat.nu" target="_blank" rel="noopener">
-    primat.nu
-  </a>
-</div>
 
-  </div>  <script>
+<script>
 
-    const compareButton =
-      document.getElementById("compareButton");
+  const findProductsButton =
+    document.getElementById("findProductsButton");
 
-    const postcodeInput =
-      document.getElementById("postcode");
+  const compareSelectedButton =
+    document.getElementById("compareSelectedButton");
 
-    const shoppingList =
-      document.getElementById("shoppingList");
+  const postcodeInput =
+    document.getElementById("postcode");
 
-    const results =
-      document.getElementById("results");
+  const shoppingList =
+    document.getElementById("shoppingList");
 
-    const summary =
-      document.getElementById("summary");
+  const selectionBox =
+    document.getElementById("selectionBox");
 
-    const cheapestResults =
-      document.getElementById("cheapestResults");
+  const productSelections =
+    document.getElementById("productSelections");
 
-    const oneStoreResults =
-      document.getElementById("oneStoreResults");
+  const results =
+    document.getElementById("results");
 
-    const smartResults =
-      document.getElementById("smartResults");
+  const summary =
+    document.getElementById("summary");
 
-    const message =
-      document.getElementById("message");
+  const cheapestResults =
+    document.getElementById("cheapestResults");
 
+  const oneStoreResults =
+    document.getElementById("oneStoreResults");
 
-    const storeNames = {
-      coop: "Coop",
-      ica: "ICA",
-      lidl: "Lidl",
-      willys: "Willys",
-      hemkop: "Hemköp"
-    };
+  const smartResults =
+    document.getElementById("smartResults");
 
+  const message =
+    document.getElementById("message");
 
-    function formatPrice(price) {
 
-      if (
-        price === null ||
-        price === undefined
-      ) {
-        return "–";
-      }
-
-      return Number(price)
-        .toFixed(2)
-        .replace(".", ",") + " kr";
-    }
-
-
-    function escapeHtml(text) {
-
-      return String(text)
-        .replaceAll("&", "&amp;")
-        .replaceAll("<", "&lt;")
-        .replaceAll(">", "&gt;")
-        .replaceAll('"', "&quot;")
-        .replaceAll("'", "&#039;");
-    }
-
-
-    function getStoreName(product) {
-
-      return storeNames[product.chain] ||
-        product.chain;
-    }
-
-
-    /*
-     * NORMALISERING
-     */
-
-    function normalizeText(text) {
-
-      return String(text)
-        .toLowerCase()
-        .normalize("NFD")
-        .replace(/[\u0300-\u036f]/g, "")
-        .replace(/[^a-z0-9åäö\s]/gi, " ")
-        .replace(/\s+/g, " ")
-        .trim();
-    }
-
-
-    function singularizeWord(word) {
-
-      if (
-        word.length > 5 &&
-        word.endsWith("or")
-      ) {
-        return word.slice(0, -2);
-      }
-
-      if (
-        word.length > 5 &&
-        word.endsWith("ar")
-      ) {
-        return word.slice(0, -2);
-      }
-
-      if (
-        word.length > 5 &&
-        word.endsWith("er")
-      ) {
-        return word.slice(0, -2);
-      }
-
-      if (
-        word.length > 5 &&
-        word.endsWith("en")
-      ) {
-        return word.slice(0, -2);
-      }
-
-      if (
-        word.length > 5 &&
-        word.endsWith("et")
-      ) {
-        return word.slice(0, -2);
-      }
-
-      return word;
-    }
-
-
-    /*
-     * ORD SOM TYDLIGT PEKAR PÅ FEL PRODUKT.
-     */
-
-    const excludedWords = {
-
-      mjolk: [
-        "baby",
-        "babys",
-        "babysemp",
-        "ersattning",
-        "mjolkersattning",
-        "havredryck",
-        "mandeldryck",
-        "sojadryck",
-        "kokosdryck",
-        "chokladmjolk",
-        "kaffemjolk"
-      ],
-
-      smor: [
-        "smordeg",
-        "smorgas",
-        "smorgasfett",
-        "smorj",
-        "margarin",
-        "bregott",
-        "rapsolja",
-        "raps",
-        "jordnotssmor",
-        "jordnot",
-        "mandelsmor",
-        "kryddsmor",
-        "vitlokssmor",
-        "persiljesmor",
-        "vitlok",
-        "smorkn",
-        "smorkniv",
-        "smorkringla",
-        "smorgasgurka",
-        "smorgaspapper",
-        "smorgasgrill",
-        "smorgaskex",
-        "smorgasran",
-        "smorgasr",
-        "smordejsplattor",
-        "smordejsplatta"
-      ],
-
-      kaffe: [
-        "kaffefilter",
-        "kaffemugg",
-        "kaffemaskin",
-        "kaffekvarn",
-        "kaffeservis"
-      ],
-
-      brod: [
-        "knackebrod",
-        "skorpor",
-        "brodmix",
-        "brodpudding",
-        "brodpinnar",
-        "french",
-        "twists",
-        "breadsticks",
-        "grissini"
-      ]
-    };
-
-
-    function getSearchTerms(item) {
-
-      return normalizeText(item)
-        .split(" ")
-        .filter(Boolean)
-        .map(singularizeWord);
-    }
-
-
-    function productText(product) {
-
-      return normalizeText(
-        [
-          product.name || "",
-          product.brand || "",
-          product.category || "",
-          product.package || ""
-        ].join(" ")
-      );
-    }
-
-
-    function getProductWords(product) {
-
-      return productText(product)
-        .split(" ")
-        .filter(Boolean)
-        .map(singularizeWord);
-    }
-
-
-    function categoryText(product) {
-
-      return normalizeText(
-        product.category || ""
-      );
-    }
-
-
-    function hasWholeWord(product, word) {
-
-      if (!word) {
-        return false;
-      }
-
-      return getProductWords(product)
-        .includes(word);
-    }
-
-
-    function getConcept(item) {
-
-      const text =
-        normalizeText(item);
-
-      if (
-        text === "mjolk" ||
-        text === "mjolken"
-      ) {
-        return "mjolk";
-      }
-
-      if (
-        text === "smor" ||
-        text === "smoret"
-      ) {
-        return "smor";
-      }
-
-      if (text === "kaffe") {
-        return "kaffe";
-      }
-
-      if (
-        text === "brod" ||
-        text === "brodet"
-      ) {
-        return "brod";
-      }
-
-      if (
-        text === "banan" ||
-        text === "bananer"
-      ) {
-        return "banan";
-      }
-
-      return null;
-    }
-
-
-    function containsExcludedWord(
-      product,
-      exclusions
+  const storeNames = {
+
+    coop: "Coop",
+    ica: "ICA",
+    lidl: "Lidl",
+    willys: "Willys",
+    hemkop: "Hemköp"
+
+  };
+
+
+  /*
+   * Här sparas alla produkter som hämtades
+   * innan användaren gör sitt val.
+   */
+
+  let allResults = [];
+
+
+  function formatPrice(price) {
+
+    if (
+      price === null ||
+      price === undefined
     ) {
-
-      const words =
-        getProductWords(product);
-
-      return exclusions.some(
-        excluded => words.includes(excluded)
-      );
+      return "–";
     }
 
+    return Number(price)
+      .toFixed(2)
+      .replace(".", ",") + " kr";
 
-    /*
-     * SMÖR-SPECIFIKA KONTROLLER
-     */
-
-    function isOrdinaryButter(product) {
-
-      const name =
-        normalizeText(product.name || "");
-
-      const category =
-        categoryText(product);
-
-      const brand =
-        normalizeText(product.brand || "");
-
-      const combined =
-        productText(product);
+  }
 
 
-      /*
-       * Dessa är inte vanligt smör.
-       */
+  function escapeHtml(text) {
 
-      const badTerms = [
-        "bregott",
-        "smor raps",
-        "smor rapsolja",
-        "rapsolja",
-        "raps",
-        "margarin",
-        "smorgas",
-        "smordeg",
-        "jordnotssmor",
-        "jordnot",
-        "mandelsmor",
-        "kryddsmor",
-        "vitlokssmor",
-        "persiljesmor",
-        "smorkniv",
-        "smorkringla",
-        "smorgasgurka",
-        "smorgaspapper",
-        "smorgasgrill",
-        "smorgaskex"
-      ];
+    return String(text)
+      .replaceAll("&", "&amp;")
+      .replaceAll("<", "&lt;")
+      .replaceAll(">", "&gt;")
+      .replaceAll('"', "&quot;")
+      .replaceAll("'", "&#039;");
+
+  }
 
 
-      for (const term of badTerms) {
+  function getStoreName(product) {
 
-        if (
-          name.includes(term) ||
-          brand.includes(term)
-        ) {
-          return false;
-        }
-      }
+    return storeNames[product.chain]
+      || product.chain
+      || "Okänd butik";
+
+  }
 
 
-      /*
-       * Rätt kategori är den starkaste signalen.
-       *
-       * Exempel:
-       * "Mejeri & Ost > Smör & Margarin > Matfett smör"
-       */
+  function normalizeText(text) {
 
-      if (
-        category.includes("matfett smor")
-      ) {
-        return true;
-      }
+    return String(text)
+      .toLowerCase()
+      .normalize("NFD")
+      .replace(/[\u0300-\u036f]/g, "")
+      .replace(/[^a-z0-9åäö\s]/gi, " ")
+      .replace(/\s+/g, " ")
+      .trim();
 
-
-      /*
-       * Även andra kategorier under smör
-       * kan innehålla riktiga smörprodukter.
-       */
-
-      if (
-        category.includes("smor & margarin") &&
-        (
-          name.includes("smor") ||
-          name.includes("smorstav")
-        ) &&
-        !name.includes("bregott")
-      ) {
-        return true;
-      }
+  }
 
 
-      /*
-       * Namnet måste då tydligt säga smör.
-       */
+  function singularizeWord(word) {
 
-      if (
-        hasWholeWord(product, "smor") &&
-        (
-          name.includes("normalsaltat") ||
-          name.includes("osaltat") ||
-          name.includes("extrasaltat") ||
-          name.includes("80%") ||
-          name.includes("81%") ||
-          name.includes("82%")
-        )
-      ) {
-        return true;
-      }
+    if (
+      word.length > 5 &&
+      word.endsWith("or")
+    ) {
+      return word.slice(0, -2);
+    }
+
+    if (
+      word.length > 5 &&
+      word.endsWith("ar")
+    ) {
+      return word.slice(0, -2);
+    }
+
+    if (
+      word.length > 5 &&
+      word.endsWith("er")
+    ) {
+      return word.slice(0, -2);
+    }
+
+    if (
+      word.length > 5 &&
+      word.endsWith("en")
+    ) {
+      return word.slice(0, -2);
+    }
+
+    if (
+      word.length > 5 &&
+      word.endsWith("et")
+    ) {
+      return word.slice(0, -2);
+    }
+
+    return word;
+
+  }
 
 
-      /*
-       * "Smörstav" är fortfarande riktigt smör.
-       */
+  /*
+   * Sökord som vi inte vill att ska styra
+   * produktvalet.
+   */
 
-      if (
-        name.includes("smorstav") &&
-        !name.includes("smorgas")
-      ) {
-        return true;
-      }
+  const excludedWords = {
+
+    mjolk: [
+      "baby",
+      "babys",
+      "babysemp",
+      "ersattning",
+      "mjolkersattning",
+      "havredryck",
+      "mandeldryck",
+      "sojadryck",
+      "kokosdryck",
+      "chokladmjolk",
+      "kaffemjolk"
+    ],
+
+    smor: [
+      "smordeg",
+      "smorgas",
+      "smorgasfett",
+      "smorj",
+      "margarin",
+      "bregott",
+      "rapsolja",
+      "raps",
+      "jordnotssmor",
+      "jordnot",
+      "mandelsmor",
+      "kryddsmor",
+      "vitlokssmor",
+      "persiljesmor",
+      "smorkniv",
+      "smorkringla",
+      "smorgasgurka",
+      "smorgaspapper",
+      "smorgasgrill",
+      "smorgaskex",
+      "smorgasran",
+      "smordejsplattor",
+      "smordejsplatta"
+    ],
+
+    kaffe: [
+      "kaffefilter",
+      "kaffemugg",
+      "kaffemaskin",
+      "kaffekvarn",
+      "kaffeservis",
+      "kaffekapsel",
+      "kaffekapslar",
+      "kapsel",
+      "kapslar"
+    ],
+
+    brod: [
+      "knackebrod",
+      "skorpor",
+      "brodmix",
+      "brodpudding",
+      "brodpinnar",
+      "french",
+      "twists",
+      "breadsticks",
+      "grissini"
+    ]
+
+  };
 
 
+  function getSearchTerms(item) {
+
+    return normalizeText(item)
+      .split(" ")
+      .filter(Boolean)
+      .map(singularizeWord);
+
+  }
+
+
+  function productText(product) {
+
+    return normalizeText(
+
+      [
+        product.name || "",
+        product.brand || "",
+        product.category || "",
+        product.package || ""
+      ].join(" ")
+
+    );
+
+  }
+
+
+  function getProductWords(product) {
+
+    return productText(product)
+      .split(" ")
+      .filter(Boolean)
+      .map(singularizeWord);
+
+  }
+
+
+  function categoryText(product) {
+
+    return normalizeText(
+      product.category || ""
+    );
+
+  }
+
+
+  function hasWholeWord(product, word) {
+
+    if (!word) {
       return false;
     }
 
+    return getProductWords(product)
+      .includes(word);
+
+  }
+
+
+  function getConcept(item) {
+
+    const text =
+      normalizeText(item);
+
+    if (
+      text === "mjolk" ||
+      text === "mjolken"
+    ) {
+      return "mjolk";
+    }
+
+    if (
+      text === "smor" ||
+      text === "smoret"
+    ) {
+      return "smor";
+    }
+
+    if (text === "kaffe") {
+      return "kaffe";
+    }
+
+    if (
+      text === "brod" ||
+      text === "brodet"
+    ) {
+      return "brod";
+    }
+
+    if (
+      text === "banan" ||
+      text === "bananer"
+    ) {
+      return "banan";
+    }
+
+    return null;
+
+  }
+
+
+  function containsExcludedWord(
+    product,
+    exclusions
+  ) {
+
+    const words =
+      getProductWords(product);
+
+    return exclusions.some(
+      excluded => words.includes(excluded)
+    );
+
+  }
+
+
+  /*
+   * Produktmatchning används nu främst för
+   * att sortera produkterna i rullistan.
+   *
+   * Vi väljer alltså INTE längre automatiskt
+   * vilken produkt användaren måste köpa.
+   */
+
+  function scoreProduct(item, product) {
+
+    if (
+      !product ||
+      product.available === false ||
+      !product.prices ||
+      typeof product.prices.effective !== "number"
+    ) {
+      return -Infinity;
+    }
+
+
+    const query =
+      normalizeText(item);
+
+    const queryWords =
+      getSearchTerms(item);
+
+    const name =
+      normalizeText(product.name || "");
+
+    const category =
+      categoryText(product);
+
+    const brand =
+      normalizeText(product.brand || "");
+
+    const productWords =
+      getProductWords(product);
+
+
+    let score = 0;
+
 
     /*
-     * MATCHNING
+     * Exakt namn.
      */
 
-    function scoreProduct(item, product) {
+    if (name === query) {
+      score += 150;
+    }
+
+
+    /*
+     * Egna ord.
+     */
+
+    for (const word of queryWords) {
+
+      if (!word) {
+        continue;
+      }
 
       if (
-        !product ||
-        product.available === false ||
-        !product.prices ||
-        typeof product.prices.effective !== "number"
+        productWords.includes(word)
       ) {
-        return -Infinity;
+        score += 40;
       }
-
-
-      const query =
-        normalizeText(item);
-
-      const queryWords =
-        getSearchTerms(item);
-
-      const name =
-        normalizeText(product.name || "");
-
-      const category =
-        categoryText(product);
-
-      const brand =
-        normalizeText(product.brand || "");
-
-      const productWords =
-        getProductWords(product);
-
-
-      let score = 0;
-
-
-      /*
-       * EXAKT NAMN
-       */
-
-      if (name === query) {
-        score += 150;
-      }
-
-
-      /*
-       * ORDTRÄFFAR
-       */
-
-      for (const word of queryWords) {
-
-        if (!word) {
-          continue;
-        }
-
-        if (
-          productWords.includes(word)
-        ) {
-          score += 40;
-        }
-
-        if (
-          category
-            .split(" ")
-            .map(singularizeWord)
-            .includes(word)
-        ) {
-          score += 20;
-        }
-
-        if (brand === word) {
-          score += 5;
-        }
-      }
-
-
-      /*
-       * NAMNET INNEHÅLLER SÖKNINGEN
-       */
 
       if (
-        name.includes(query)
+        category
+          .split(" ")
+          .map(singularizeWord)
+          .includes(word)
       ) {
-        score += 15;
+        score += 20;
       }
 
+      if (brand === word) {
+        score += 5;
+      }
+
+    }
+
+
+    if (name.includes(query)) {
+      score += 15;
+    }
+
+
+    if (name.startsWith(query)) {
+      score += 10;
+    }
+
+
+    const concept =
+      getConcept(item);
+
+
+    /*
+     * MJÖLK
+     */
+
+    if (concept === "mjolk") {
 
       if (
-        name.startsWith(query)
+        hasWholeWord(product, "mjolk") &&
+        !containsExcludedWord(
+          product,
+          excludedWords.mjolk
+        )
       ) {
-        score += 10;
+        score += 100;
       }
-
-
-      const concept =
-        getConcept(item);
-
-
-      /*
-       * MJÖLK
-       */
-
-      if (concept === "mjolk") {
-
-        const hasMilkWord =
-          hasWholeWord(product, "mjolk");
-
-        const excluded =
-          containsExcludedWord(
-            product,
-            excludedWords.mjolk
-          );
-
-        if (
-          hasMilkWord &&
-          !excluded
-        ) {
-          score += 100;
-        }
-
-        if (
-          category.includes("mjolk")
-        ) {
-          score += 35;
-        }
-
-        if (
-          name.includes("standardmjolk") ||
-          name.includes("mellanmjolk") ||
-          name.includes("lattemjolk")
-        ) {
-          score += 25;
-        }
-      }
-
-
-      /*
-       * SMÖR
-       *
-       * Här använder vi produktkategori
-       * mycket hårdare än tidigare.
-       */
-
-      if (concept === "smor") {
-
-        const ordinaryButter =
-          isOrdinaryButter(product);
-
-        const excluded =
-          containsExcludedWord(
-            product,
-            excludedWords.smor
-          );
-
-
-        /*
-         * Om det uttryckligen är en
-         * blandning/margarinprodukt
-         * ska den inte kunna vinna på pris.
-         */
-
-        if (
-          excluded ||
-          !ordinaryButter
-        ) {
-          score -= 500;
-        }
-
-
-        if (ordinaryButter) {
-
-          /*
-           * Mycket stark signal:
-           * kategori = Matfett smör
-           */
-
-          if (
-            category.includes("matfett smor")
-          ) {
-            score += 180;
-          }
-
-
-          /*
-           * Vanliga smörvarianter.
-           */
-
-          if (
-            name.includes("normalsaltat")
-          ) {
-            score += 50;
-          }
-
-          if (
-            name.includes("osaltat")
-          ) {
-            score += 45;
-          }
-
-          if (
-            name.includes("extrasaltat")
-          ) {
-            score += 45;
-          }
-
-
-          /*
-           * Typiska fetthalter för smör.
-           */
-
-          if (
-            name.includes("82%") ||
-            name.includes("81%") ||
-            name.includes("80%")
-          ) {
-            score += 35;
-          }
-
-
-          if (
-            hasWholeWord(product, "smor")
-          ) {
-            score += 100;
-          }
-        }
-      }
-
-
-      /*
-       * BANAN
-       */
-
-      if (concept === "banan") {
-
-        if (
-          hasWholeWord(product, "banan")
-        ) {
-          score += 100;
-        }
-
-        if (
-          category.includes("frukt") ||
-          category.includes("banan")
-        ) {
-          score += 30;
-        }
-      }
-
-
-      /*
-       * KAFFE
-       */
-
-      if (concept === "kaffe") {
-
-        const hasCoffeeWord =
-          hasWholeWord(product, "kaffe");
-
-        const excluded =
-          containsExcludedWord(
-            product,
-            excludedWords.kaffe
-          );
-
-        if (
-          hasCoffeeWord &&
-          !excluded
-        ) {
-          score += 100;
-        }
-
-        if (
-          category.includes("kaffe")
-        ) {
-          score += 40;
-        }
-
-        if (
-          name.includes("bryggkaffe") ||
-          name.includes("kaffebonor") ||
-          name.includes("kaffebon") ||
-          name.includes("mellanrost") ||
-          name.includes("morkrost") ||
-          name.includes("ljusrost")
-        ) {
-          score += 20;
-        }
-      }
-
-
-      /*
-       * BRÖD
-       */
-
-      if (concept === "brod") {
-
-        const hasBreadWord =
-          hasWholeWord(product, "brod");
-
-        const excluded =
-          containsExcludedWord(
-            product,
-            excludedWords.brod
-          );
-
-        if (
-          hasBreadWord &&
-          !excluded
-        ) {
-          score += 110;
-        }
-
-        if (
-          category.includes("brod") &&
-          !excluded
-        ) {
-          score += 40;
-        }
-
-        if (excluded) {
-          score -= 300;
-        }
-      }
-
-
-      /*
-       * GENERELLA EXKLUDERINGAR
-       */
-
-      const exclusions =
-        excludedWords[concept] || [];
-
 
       if (
+        category.includes("mjolk")
+      ) {
+        score += 35;
+      }
+
+      if (
+        name.includes("standardmjolk") ||
+        name.includes("mellanmjolk") ||
+        name.includes("lattemjolk")
+      ) {
+        score += 25;
+      }
+
+    }
+
+
+    /*
+     * SMÖR
+     */
+
+    if (concept === "smor") {
+
+      const excluded =
         containsExcludedWord(
           product,
-          exclusions
-        )
-      ) {
-        score -= 250;
-      }
-
-
-      /*
-       * ENSAMT SÖKORD
-       */
-
-      if (
-        queryWords.length === 1
-      ) {
-
-        const word =
-          queryWords[0];
-
-        const exactWord =
-          productWords.includes(word);
-
-        const categoryMatch =
-          category
-            .split(" ")
-            .map(singularizeWord)
-            .includes(word);
-
-
-        if (
-          !exactWord &&
-          !categoryMatch
-        ) {
-          score -= 100;
-        }
-      }
-
-
-      /*
-       * SMÅ FÖRPACKNINGAR
-       */
-
-      if (
-        product.amount &&
-        Number(product.amount) < 100 &&
-        (
-          concept === "mjolk" ||
-          concept === "smor" ||
-          concept === "brod"
-        )
-      ) {
-        score -= 20;
-      }
-
-
-      return score;
-    }
-
-
-    async function getProducts(
-      query,
-      postcode
-    ) {
-
-      const url =
-        "/api/primat?q=" +
-        encodeURIComponent(query) +
-        "&postcode=" +
-        encodeURIComponent(postcode);
-
-
-      const response =
-        await fetch(url);
-
-
-      if (!response.ok) {
-
-        throw new Error(
-          "Kunde inte hämta prisdata för " +
-          query
+          excludedWords.smor
         );
+
+      if (excluded) {
+        score -= 500;
       }
-
-
-      const data =
-        await response.json();
-
 
       if (
-        !data.products ||
-        !data.products.data
+        hasWholeWord(product, "smor") &&
+        !excluded
       ) {
-        return [];
+        score += 110;
       }
 
+      if (
+        category.includes("smor") &&
+        !excluded
+      ) {
+        score += 40;
+      }
 
-      return data.products.data;
+      if (
+        name.includes("normalsaltat") ||
+        name.includes("osaltat") ||
+        name.includes("extrasaltat")
+      ) {
+        score += 30;
+      }
+
+      if (
+        name.includes("80%") ||
+        name.includes("81%") ||
+        name.includes("82%")
+      ) {
+        score += 25;
+      }
+
     }
 
 
     /*
-     * VÄLJ BÄSTA PRODUKT
+     * BANAN
      */
 
-    function chooseBestProduct(
-      item,
-      products
+    if (concept === "banan") {
+
+      if (
+        hasWholeWord(product, "banan")
+      ) {
+        score += 100;
+      }
+
+      if (
+        category.includes("frukt") ||
+        category.includes("banan")
+      ) {
+        score += 30;
+      }
+
+    }
+
+
+    /*
+     * KAFFE
+     */
+
+    if (concept === "kaffe") {
+
+      const excluded =
+        containsExcludedWord(
+          product,
+          excludedWords.kaffe
+        );
+
+      if (excluded) {
+        score -= 500;
+      }
+
+      if (
+        hasWholeWord(product, "kaffe") &&
+        !excluded
+      ) {
+        score += 100;
+      }
+
+      if (
+        category.includes("kaffe") &&
+        !excluded
+      ) {
+        score += 40;
+      }
+
+      if (
+        name.includes("bryggkaffe") ||
+        name.includes("kaffebonor") ||
+        name.includes("kaffebon") ||
+        name.includes("mellanrost") ||
+        name.includes("morkrost") ||
+        name.includes("ljusrost")
+      ) {
+        score += 30;
+      }
+
+    }
+
+
+    /*
+     * BRÖD
+     */
+
+    if (concept === "brod") {
+
+      const excluded =
+        containsExcludedWord(
+          product,
+          excludedWords.brod
+        );
+
+      if (excluded) {
+        score -= 500;
+      }
+
+      if (
+        hasWholeWord(product, "brod") &&
+        !excluded
+      ) {
+        score += 110;
+      }
+
+      if (
+        category.includes("brod") &&
+        !excluded
+      ) {
+        score += 40;
+      }
+
+    }
+
+
+    /*
+     * Generella exkluderingar.
+     */
+
+    const exclusions =
+      excludedWords[concept] || [];
+
+
+    if (
+      containsExcludedWord(
+        product,
+        exclusions
+      )
+    ) {
+      score -= 250;
+    }
+
+
+    /*
+     * Ensamt sökord.
+     */
+
+    if (
+      queryWords.length === 1
     ) {
 
-      const valid =
-        products.filter(product => {
+      const word =
+        queryWords[0];
+
+      const exactWord =
+        productWords.includes(word);
+
+      const categoryMatch =
+        category
+          .split(" ")
+          .map(singularizeWord)
+          .includes(word);
+
+
+      if (
+        !exactWord &&
+        !categoryMatch
+      ) {
+        score -= 100;
+      }
+
+    }
+
+
+    return score;
+
+  }
+
+
+  async function getProducts(
+    query,
+    postcode
+  ) {
+
+    const url =
+      "/api/primat?q=" +
+      encodeURIComponent(query) +
+      "&postcode=" +
+      encodeURIComponent(postcode);
+
+
+    const response =
+      await fetch(url);
+
+
+    if (!response.ok) {
+
+      throw new Error(
+        "Kunde inte hämta prisdata för " +
+        query
+      );
+
+    }
+
+
+    const data =
+      await response.json();
+
+
+    if (
+      !data.products ||
+      !data.products.data
+    ) {
+      return [];
+    }
+
+
+    return data.products.data;
+
+  }
+
+
+  /*
+   * Skapar en identifierare för produkten.
+   *
+   * GTIN är bäst.
+   * Om GTIN saknas använder vi namn + varumärke +
+   * förpackning som reserv.
+   */
+
+  function getProductKey(product) {
+
+    if (product.gtin) {
+      return "gtin:" + product.gtin;
+    }
+
+
+    return [
+
+      normalizeText(product.name || ""),
+
+      normalizeText(product.brand || ""),
+
+      normalizeText(
+        product.package ||
+        (
+          product.amount
+            ? product.amount +
+              " " +
+              (product.unit || "")
+            : ""
+        )
+      )
+
+    ].join("|");
+
+  }
+
+
+  /*
+   * Tar fram unika produktalternativ.
+   *
+   * Samma produkt kan finnas hos flera butiker.
+   * Den ska bara visas en gång i rullistan.
+   */
+
+  function getProductChoices(
+    item,
+    products
+  ) {
+
+    const candidates =
+      products
+        .filter(product => {
 
           return product &&
             product.available !== false &&
             product.prices &&
             typeof product.prices.effective === "number";
 
-        });
-
-
-      if (!valid.length) {
-        return null;
-      }
-
-
-      const scored =
-        valid.map(product => {
+        })
+        .map(product => {
 
           return {
+
             product,
 
             score:
@@ -1213,160 +1165,505 @@ Bröd"
 
           };
 
-        });
+        })
+        .filter(entry => entry.score > 0);
 
 
-      scored.sort((a, b) => {
+    candidates.sort((a, b) => {
 
-        if (
-          b.score !== a.score
-        ) {
-          return b.score - a.score;
-        }
+      if (b.score !== a.score) {
+        return b.score - a.score;
+      }
 
+      return (
+        a.product.prices.effective -
+        b.product.prices.effective
+      );
 
-        return (
-          a.product.prices.effective -
-          b.product.prices.effective
-        );
-
-      });
+    });
 
 
-      const winner =
-        scored[0];
+    const unique = [];
+    const seen = new Set();
+
+
+    for (const entry of candidates) {
+
+      const key =
+        getProductKey(entry.product);
+
+
+      if (seen.has(key)) {
+        continue;
+      }
+
+
+      seen.add(key);
+
+      unique.push(entry.product);
 
 
       /*
-       * Säkerhetsgräns.
+       * Rullistan behöver inte bli enorm.
        */
 
-      if (
-        !winner ||
-        winner.score < 25
-      ) {
-        return null;
+      if (unique.length >= 20) {
+        break;
       }
 
-
-      return winner.product;
     }
 
 
-    function createItemHtml(
-      item,
-      products
-    ) {
+    return unique;
 
-      const best =
-        chooseBestProduct(
-          item,
-          products
-        );
+  }
 
 
-      if (!best) {
+  /*
+   * Visar produktvalen.
+   */
 
-        return `
-          <div class="item">
+  function renderProductSelections() {
 
-            <div class="item-name">
-              ${escapeHtml(item)}
-            </div>
-
-            <div class="empty">
-              Ingen tillräckligt säker produktmatch hittades.
-            </div>
-
-          </div>
-        `;
-      }
+    productSelections.innerHTML = "";
 
 
-      const price =
-        best.prices.effective;
+    allResults.forEach(
+      (result, index) => {
 
-
-      const store =
-        getStoreName(best);
-
-
-      const packageText =
-        best.package ||
-        (
-          best.amount
-            ? best.amount + " " +
-              (best.unit || "")
-            : ""
-        );
-
-
-      return `
-        <div class="item">
-
-          <div class="item-name">
-            ${escapeHtml(best.name)}
-          </div>
-
-          <div class="item-meta">
-            ${escapeHtml(best.brand || "")}
-            ${
-              packageText
-                ? " • " +
-                  escapeHtml(packageText)
-                : ""
-            }
-          </div>
-
-          <div class="cheapest">
-
-            <div class="best-label">
-              BILLIGAST HITTAT
-            </div>
-
-            <div class="store-row">
-
-              <span class="store-name">
-                ${escapeHtml(store)}
-              </span>
-
-              <span class="price">
-                ${formatPrice(price)}
-              </span>
-
-            </div>
-
-          </div>
-
-        </div>
-      `;
-    }
-
-
-    function calculateStoreTotals(
-      allResults
-    ) {
-
-      const totals = {};
-
-
-      for (const result of allResults) {
-
-        const product =
-          chooseBestProduct(
+        const choices =
+          getProductChoices(
             result.item,
             result.products
           );
 
 
+        const wrapper =
+          document.createElement("div");
+
+        wrapper.className = "item";
+
+
+        const title =
+          document.createElement("div");
+
+        title.className = "item-name";
+
+        title.textContent =
+          result.item;
+
+
+        wrapper.appendChild(title);
+
+
+        if (!choices.length) {
+
+          const empty =
+            document.createElement("div");
+
+          empty.className = "empty";
+
+          empty.textContent =
+            "Ingen relevant produkt hittades.";
+
+          wrapper.appendChild(empty);
+
+
+          result.choices = [];
+
+          return;
+
+        }
+
+
+        result.choices =
+          choices;
+
+
+        const choiceBox =
+          document.createElement("div");
+
+        choiceBox.className =
+          "product-choice";
+
+
+        const label =
+          document.createElement("label");
+
+        label.textContent =
+          "Välj produkt:";
+
+
+        choiceBox.appendChild(label);
+
+
+        const select =
+          document.createElement("select");
+
+        select.id =
+          "product-select-" + index;
+
+
+        choices.forEach(
+          (product, choiceIndex) => {
+
+            const option =
+              document.createElement("option");
+
+            option.value =
+              String(choiceIndex);
+
+
+            const packageText =
+              product.package ||
+              (
+                product.amount
+                  ? product.amount +
+                    " " +
+                    (product.unit || "")
+                  : ""
+              );
+
+
+            const brand =
+              product.brand
+                ? product.brand + " • "
+                : "";
+
+
+            option.textContent =
+              product.name +
+              (
+                brand
+                  ? " — " + brand.trim()
+                  : ""
+              ) +
+              (
+                packageText
+                  ? " • " + packageText
+                  : ""
+              );
+
+
+            select.appendChild(option);
+
+          }
+        );
+
+
+        choiceBox.appendChild(select);
+
+
+        const help =
+          document.createElement("div");
+
+        help.className =
+          "choice-help";
+
+        help.textContent =
+          choices.length +
+          " relevanta produktalternativ hittades.";
+
+
+        choiceBox.appendChild(help);
+
+
+        wrapper.appendChild(choiceBox);
+
+
+        productSelections.appendChild(wrapper);
+
+      }
+    );
+
+  }
+
+
+  /*
+   * Hämtar de produkter användaren faktiskt
+   * valde i rullistorna.
+   */
+
+  function getSelectedProducts() {
+
+    const selectedResults = [];
+
+
+    allResults.forEach(
+      (result, index) => {
+
+        const select =
+          document.getElementById(
+            "product-select-" + index
+          );
+
+
+        if (
+          !select ||
+          !result.choices ||
+          !result.choices.length
+        ) {
+          return;
+        }
+
+
+        const choiceIndex =
+          Number(select.value);
+
+
+        const selected =
+          result.choices[choiceIndex];
+
+
+        if (!selected) {
+          return;
+        }
+
+
+        selectedResults.push({
+
+          item: result.item,
+
+          selectedProduct: selected,
+
+          products: result.products
+
+        });
+
+      }
+    );
+
+
+    return selectedResults;
+
+  }
+
+
+  /*
+   * När användaren valt en produkt jämför vi
+   * samma produktidentifierare mot butikerna.
+   */
+
+  function getSameProductPrices(
+    selectedProduct,
+    products
+  ) {
+
+    const selectedKey =
+      getProductKey(selectedProduct);
+
+
+    const matches =
+      products.filter(product => {
+
         if (
           !product ||
+          product.available === false ||
           !product.prices ||
           typeof product.prices.effective !== "number"
         ) {
-          continue;
+          return false;
         }
 
+
+        return (
+          getProductKey(product) ===
+          selectedKey
+        );
+
+      });
+
+
+    /*
+     * Samma butik ska inte visas flera gånger.
+     */
+
+    const byStore = {};
+
+
+    matches.forEach(product => {
+
+      const key =
+        product.chain +
+        ":" +
+        product.store_id;
+
+
+      if (!byStore[key]) {
+        byStore[key] = product;
+      }
+
+    });
+
+
+    return Object.values(byStore);
+
+  }
+
+
+  function createItemHtml(result) {
+
+    const selected =
+      result.selectedProduct;
+
+
+    const matches =
+      getSameProductPrices(
+        selected,
+        result.products
+      );
+
+
+    matches.sort(
+      (a, b) =>
+        a.prices.effective -
+        b.prices.effective
+    );
+
+
+    if (!matches.length) {
+
+      return `
+
+        <div class="item">
+
+          <div class="item-name">
+            ${escapeHtml(selected.name)}
+          </div>
+
+          <div class="empty">
+            Ingen butik med denna exakta produkt
+            hittades i prisdatan.
+          </div>
+
+        </div>
+
+      `;
+
+    }
+
+
+    const cheapest =
+      matches[0];
+
+
+    const packageText =
+      selected.package ||
+      (
+        selected.amount
+          ? selected.amount +
+            " " +
+            (selected.unit || "")
+          : ""
+      );
+
+
+    return `
+
+      <div class="item">
+
+        <div class="item-name">
+          ${escapeHtml(selected.name)}
+        </div>
+
+        <div class="item-meta">
+
+          ${escapeHtml(
+            selected.brand || ""
+          )}
+
+          ${
+            packageText
+              ? " • " +
+                escapeHtml(packageText)
+              : ""
+          }
+
+        </div>
+
+
+        <div class="cheapest">
+
+          <div class="best-label">
+            BILLIGAST
+          </div>
+
+          <div class="store-row">
+
+            <span class="store-name">
+              ${escapeHtml(
+                getStoreName(cheapest)
+              )}
+            </span>
+
+            <span class="price">
+              ${formatPrice(
+                cheapest.prices.effective
+              )}
+            </span>
+
+          </div>
+
+        </div>
+
+
+        <div style="margin-top:10px;">
+
+          ${
+            matches.map(product => `
+
+              <div class="store-row">
+
+                <span class="store-name">
+                  ${escapeHtml(
+                    getStoreName(product)
+                  )}
+                </span>
+
+                <span class="price">
+                  ${formatPrice(
+                    product.prices.effective
+                  )}
+                </span>
+
+              </div>
+
+            `).join("")
+          }
+
+        </div>
+
+      </div>
+
+    `;
+
+  }
+
+
+  /*
+   * Beräknar totalen per butik för de produkter
+   * användaren faktiskt valt.
+   */
+
+  function calculateStoreTotals(
+    selectedResults
+  ) {
+
+    const totals = {};
+
+
+    for (
+      const result of selectedResults
+    ) {
+
+      const matches =
+        getSameProductPrices(
+          result.selectedProduct,
+          result.products
+        );
+
+
+      matches.forEach(product => {
 
         const storeKey =
           product.chain +
@@ -1392,328 +1689,420 @@ Bröd"
             items: 0
 
           };
+
         }
 
 
         totals[storeKey].total +=
           product.prices.effective;
 
-        totals[storeKey].items +=
-          1;
-      }
 
+        totals[storeKey].items += 1;
 
-      return Object.values(totals);
+      });
+
     }
 
 
-    function renderOneStore(
-      allResults
-    ) {
+    return Object.values(totals);
 
-      const totals =
-        calculateStoreTotals(
-          allResults
-        );
+  }
 
 
-      if (!totals.length) {
+  function renderOneStore(
+    selectedResults
+  ) {
 
-        oneStoreResults.innerHTML =
-          '<div class="empty">Ingen butik kunde räknas fram.</div>';
-
-        return;
-      }
-
-
-      totals.sort(
-        (a, b) =>
-          a.total - b.total
+    const totals =
+      calculateStoreTotals(
+        selectedResults
       );
 
 
-      const best =
-        totals[0];
+    if (!totals.length) {
+
+      oneStoreResults.innerHTML =
+        '<div class="empty">Ingen butik kunde räknas fram.</div>';
+
+      return;
+
+    }
 
 
-      oneStoreResults.innerHTML = `
+    /*
+     * För En butik krävs egentligen att butiken
+     * har alla valda produkter.
+     *
+     * Därför sorterar vi först på antal kompletta
+     * produkter och sedan totalpris.
+     */
 
-        <div class="item">
+    totals.sort((a, b) => {
 
-          <div class="item-name">
-            🏆 ${escapeHtml(best.name)}
+      if (b.items !== a.items) {
+        return b.items - a.items;
+      }
+
+      return a.total - b.total;
+
+    });
+
+
+    const best =
+      totals[0];
+
+
+    oneStoreResults.innerHTML = `
+
+      <div class="item">
+
+        <div class="item-name">
+          🏆 ${escapeHtml(best.name)}
+        </div>
+
+        <div class="item-meta">
+
+          ${best.items} av
+          ${selectedResults.length}
+          valda produkter finns i denna butik.
+
+        </div>
+
+
+        <div class="cheapest">
+
+          <div class="best-label">
+            TOTAL FÖR TILLGÄNGLIGA PRODUKTER
           </div>
 
-          <div class="item-meta">
-            ${best.items} av
-            ${allResults.length}
-            varor kunde matchas i denna butik.
-          </div>
+          <div class="store-row">
 
-          <div class="cheapest">
+            <span class="store-name">
+              ${escapeHtml(best.name)}
+            </span>
 
-            <div class="best-label">
-              LÄGSTA TOTALEN HITTILLS
-            </div>
-
-            <div class="store-row">
-
-              <span class="store-name">
-                ${escapeHtml(best.name)}
-              </span>
-
-              <span class="price">
-                ${formatPrice(best.total)}
-              </span>
-
-            </div>
+            <span class="price">
+              ${formatPrice(best.total)}
+            </span>
 
           </div>
 
         </div>
-      `;
-    }
+
+      </div>
+
+    `;
+
+  }
 
 
-    function renderSmart(
-      allResults
-    ) {
+  function renderSmart(
+    selectedResults
+  ) {
 
-      const totals =
-        calculateStoreTotals(
-          allResults
-        );
-
-
-      if (!totals.length) {
-
-        smartResults.innerHTML =
-          "Vi hittade inte tillräckligt med data ännu.";
-
-        return;
-      }
-
-
-      totals.sort(
-        (a, b) =>
-          a.total - b.total
+    const totals =
+      calculateStoreTotals(
+        selectedResults
       );
 
 
-      const cheapest =
-        totals[0];
+    if (!totals.length) {
 
+      smartResults.innerHTML =
+        "Vi hittade inte tillräckligt med data ännu.";
 
-      smartResults.innerHTML = `
+      return;
 
-        <strong>
-          ${escapeHtml(cheapest.name)}
-        </strong>
-        är just nu det bästa alternativet bland de butiker
-        där vi har hittat priser.
-
-        <br><br>
-
-        Total för matchade varor:
-        <strong>
-          ${formatPrice(cheapest.total)}
-        </strong>
-
-        <br><br>
-
-        <small>
-          🚗 Nästa steg blir att väga in avstånd, restid och
-          hur mycket du faktiskt sparar på att åka till flera butiker.
-        </small>
-      `;
     }
 
 
-    compareButton.addEventListener(
-      "click",
-      async function() {
+    totals.sort((a, b) => {
 
-        const postcode =
-          postcodeInput.value.trim();
+      if (b.items !== a.items) {
+        return b.items - a.items;
+      }
+
+      return a.total - b.total;
+
+    });
 
 
-        const items =
-          shoppingList.value
-            .split("\n")
-            .map(item => item.trim())
-            .filter(
-              item =>
-                item.length > 0
+    const best =
+      totals[0];
+
+
+    smartResults.innerHTML = `
+
+      <strong>
+        ${escapeHtml(best.name)}
+      </strong>
+
+      har just nu det bästa alternativet
+      bland de butiker där vi hittar dina valda produkter.
+
+      <br><br>
+
+      ${best.items} av
+      ${selectedResults.length}
+      produkter:
+
+      <strong>
+        ${formatPrice(best.total)}
+      </strong>
+
+      <br><br>
+
+      <small>
+        🚗 Nästa steg blir att väga in avstånd,
+        restid och hur mycket du faktiskt sparar
+        på att åka till flera butiker.
+      </small>
+
+    `;
+
+  }
+
+
+  /*
+   * STEG 1:
+   *
+   * Hämta produkter och visa rullistor.
+   */
+
+  findProductsButton.addEventListener(
+    "click",
+    async function() {
+
+      const postcode =
+        postcodeInput.value.trim();
+
+
+      const items =
+        shoppingList.value
+          .split("\n")
+          .map(item => item.trim())
+          .filter(item => item.length > 0);
+
+
+      message.innerHTML = "";
+
+      results.classList.add("hidden");
+
+      selectionBox.classList.add("hidden");
+
+
+      if (!postcode) {
+
+        message.innerHTML =
+          '<div class="error">Skriv in ditt postnummer.</div>';
+
+        return;
+
+      }
+
+
+      if (!/^\d{5}$/.test(postcode)) {
+
+        message.innerHTML =
+          '<div class="error">Postnumret måste innehålla 5 siffror.</div>';
+
+        return;
+
+      }
+
+
+      if (!items.length) {
+
+        message.innerHTML =
+          '<div class="error">Skriv minst en vara i inköpslistan.</div>';
+
+        return;
+
+      }
+
+
+      findProductsButton.disabled =
+        true;
+
+      findProductsButton.textContent =
+        "⏳ Hittar produkter...";
+
+
+      message.innerHTML =
+        '<div class="loading">Hämtar produktalternativ...</div>';
+
+
+      try {
+
+        allResults = [];
+
+
+        for (
+          const item of items
+        ) {
+
+          const products =
+            await getProducts(
+              item,
+              postcode
             );
 
 
-        message.innerHTML = "";
+          allResults.push({
 
-        results.classList.add(
+            item,
+
+            products
+
+          });
+
+        }
+
+
+        renderProductSelections();
+
+
+        selectionBox.classList.remove(
           "hidden"
         );
 
 
-        if (!postcode) {
-
-          message.innerHTML =
-            '<div class="error">Skriv in ditt postnummer.</div>';
-
-          return;
-        }
+        message.innerHTML = "";
 
 
-        if (!/^\d{5}$/.test(postcode)) {
-
-          message.innerHTML =
-            '<div class="error">Postnumret måste innehålla 5 siffror.</div>';
-
-          return;
-        }
+        selectionBox.scrollIntoView({
+          behavior: "smooth",
+          block: "start"
+        });
 
 
-        if (!items.length) {
+      } catch (error) {
 
-          message.innerHTML =
-            '<div class="error">Skriv minst en vara i inköpslistan.</div>';
-
-          return;
-        }
+        console.error(error);
 
 
-        compareButton.disabled =
-          true;
+        message.innerHTML = `
 
+          <div class="error">
 
-        compareButton.textContent =
-          "⏳ Jämför priser...";
+            Något gick fel när produkterna
+            skulle hämtas.
 
+            <br><br>
 
-        message.innerHTML =
-          '<div class="loading">Hämtar aktuella priser...</div>';
+            ${escapeHtml(
+              error.message
+            )}
 
+          </div>
 
-        try {
+        `;
 
-          const allResults = [];
+      } finally {
 
+        findProductsButton.disabled =
+          false;
 
-          for (
-            const item of items
-          ) {
-
-            const products =
-              await getProducts(
-                item,
-                postcode
-              );
-
-
-            allResults.push({
-
-              item,
-
-              products
-
-            });
-          }
-
-
-          const matchedCount =
-            allResults.filter(
-              result =>
-                chooseBestProduct(
-                  result.item,
-                  result.products
-                )
-            ).length;
-
-
-          summary.innerHTML = `
-
-            <div class="summary">
-
-              <div class="summary-title">
-                DIN KORG
-              </div>
-
-              <div class="summary-price">
-                ${matchedCount}
-                av
-                ${items.length}
-              </div>
-
-              <div>
-                varor kunde matchas mot prisdata
-              </div>
-
-            </div>
-
-          `;
-
-
-          cheapestResults.innerHTML =
-            allResults
-              .map(
-                result =>
-                  createItemHtml(
-                    result.item,
-                    result.products
-                  )
-              )
-              .join("");
-
-
-          renderOneStore(
-            allResults
-          );
-
-
-          renderSmart(
-            allResults
-          );
-
-
-          message.innerHTML = "";
-
-          results.classList.remove(
-            "hidden"
-          );
-
-
-        } catch (error) {
-
-          console.error(error);
-
-
-          message.innerHTML = `
-
-            <div class="error">
-
-              Något gick fel när priserna
-              skulle hämtas.
-
-              <br><br>
-
-              ${escapeHtml(
-                error.message
-              )}
-
-            </div>
-
-          `;
-
-        } finally {
-
-          compareButton.disabled =
-            false;
-
-          compareButton.textContent =
-            "🔎 Jämför min korg";
-        }
+        findProductsButton.textContent =
+          "🔎 Hitta produkter";
 
       }
-    );
 
-  </script></body>
+    }
+  );
+
+
+  /*
+   * STEG 2:
+   *
+   * Jämför exakt de produkter användaren
+   * valt i rullistorna.
+   */
+
+  compareSelectedButton.addEventListener(
+    "click",
+    function() {
+
+      const selectedResults =
+        getSelectedProducts();
+
+
+      if (!selectedResults.length) {
+
+        message.innerHTML =
+          '<div class="error">Välj minst en produkt först.</div>';
+
+        return;
+
+      }
+
+
+      const matchedCount =
+        selectedResults.filter(result => {
+
+          return getSameProductPrices(
+            result.selectedProduct,
+            result.products
+          ).length > 0;
+
+        }).length;
+
+
+      summary.innerHTML = `
+
+        <div class="summary">
+
+          <div class="summary-title">
+            DIN KORG
+          </div>
+
+          <div class="summary-price">
+            ${matchedCount} av
+            ${selectedResults.length}
+          </div>
+
+          <div>
+            valda produkter kunde jämföras
+            mellan butikerna
+          </div>
+
+        </div>
+
+      `;
+
+
+      cheapestResults.innerHTML =
+        selectedResults
+          .map(result =>
+            createItemHtml(result)
+          )
+          .join("");
+
+
+      renderOneStore(
+        selectedResults
+      );
+
+
+      renderSmart(
+        selectedResults
+      );
+
+
+      results.classList.remove(
+        "hidden"
+      );
+
+
+      results.scrollIntoView({
+        behavior: "smooth",
+        block: "start"
+      });
+
+    }
+  );
+
+</script>
+
+</body>
 </html>
