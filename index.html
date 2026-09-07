@@ -1,11 +1,7 @@
-<!DOCTYPE html>
-<html lang="sv">
+<!DOCTYPE html><html lang="sv">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Priskorgen</title>
-
-  <style>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">  <title>Priskorgen</title>  <style>
     * {
       box-sizing: border-box;
     }
@@ -14,1041 +10,327 @@
       margin: 0;
       font-family: Arial, sans-serif;
       background: #f5f6f8;
-      color: #222;
+      color: #202124;
     }
 
     .container {
-      max-width: 760px;
+      max-width: 900px;
       margin: 0 auto;
-      padding: 20px 14px 50px;
+      padding: 20px;
+    }
+
+    header {
+      background: white;
+      border-radius: 18px;
+      padding: 24px;
+      margin-bottom: 18px;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.06);
     }
 
     h1 {
-      margin: 0 0 5px;
+      margin: 0 0 6px;
       font-size: 32px;
     }
 
     .subtitle {
-      margin: 0 0 20px;
       color: #666;
-    }
-
-    .box {
-      background: white;
-      border-radius: 16px;
-      padding: 18px;
-      margin-bottom: 16px;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+      margin-bottom: 20px;
     }
 
     label {
       display: block;
-      font-weight: bold;
-      margin-bottom: 7px;
+      font-weight: 700;
+      margin: 14px 0 7px;
     }
 
     input,
     textarea {
       width: 100%;
-      border: 1px solid #ccc;
-      border-radius: 10px;
-      padding: 12px;
+      border: 1px solid #d4d7dc;
+      border-radius: 12px;
+      padding: 13px;
       font-size: 16px;
-      font-family: inherit;
       background: white;
     }
 
     textarea {
-      min-height: 130px;
+      min-height: 120px;
       resize: vertical;
     }
 
     button {
-      width: 100%;
       border: 0;
       border-radius: 12px;
-      padding: 14px;
-      font-size: 17px;
-      font-weight: bold;
+      padding: 12px 18px;
+      font-size: 16px;
+      font-weight: 700;
       cursor: pointer;
-      margin-top: 12px;
+    }
+
+    .primary {
+      width: 100%;
+      margin-top: 16px;
       background: #111;
       color: white;
     }
 
-    button:disabled {
-      opacity: 0.6;
+    .primary:disabled {
+      opacity: 0.55;
       cursor: wait;
     }
 
-    .secondary-button {
-      background: #287a35;
-    }
-
-    h2 {
-      font-size: 22px;
-      margin: 0 0 14px;
-    }
-
-    h3 {
-      font-size: 18px;
-      margin: 0;
-    }
-
-    .item {
-      border-top: 1px solid #eee;
-      padding: 15px 0;
-    }
-
-    .item:first-child {
-      border-top: 0;
-      padding-top: 0;
-    }
-
-    .item-name {
-      font-weight: bold;
-      font-size: 18px;
-      margin-bottom: 10px;
-    }
-
-    .item-meta {
-      color: #777;
-      font-size: 14px;
-      margin-bottom: 12px;
-    }
-
-    /* PRODUKTVAL */
-
-    .product-choice {
-      margin-top: 10px;
-    }
-
-    .product-count {
-      color: #777;
-      font-size: 13px;
-      margin-bottom: 10px;
-    }
-
-    .product-filters {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 7px;
-      margin-bottom: 12px;
-    }
-
-    .filter-button {
-      width: auto;
-      margin: 0;
-      padding: 8px 11px;
-      font-size: 13px;
-      font-weight: bold;
-      background: #f0f1f3;
-      color: #333;
-      border: 1px solid #ddd;
-      border-radius: 20px;
-    }
-
-    .filter-button.active {
-      background: #111;
-      color: white;
-      border-color: #111;
-    }
-
-    .product-list {
-      display: flex;
-      flex-direction: column;
-      gap: 8px;
-    }
-
-    .product-card {
-      width: 100%;
-      margin: 0;
-      padding: 12px 13px;
-      text-align: left;
+    .section {
       background: white;
-      color: #222;
-      border: 1px solid #ddd;
-      border-radius: 12px;
-      font-weight: normal;
-      cursor: pointer;
+      border-radius: 18px;
+      padding: 20px;
+      margin-bottom: 18px;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.06);
     }
 
-    .product-card:hover {
-      border-color: #999;
+    .section h2 {
+      margin-top: 0;
     }
 
-    .product-card.selected {
-      border: 2px solid #287a35;
-      background: #eef8ef;
-      padding: 11px 12px;
-    }
-
-    .product-card-name {
-      font-size: 16px;
-      font-weight: bold;
-      line-height: 1.3;
-      margin-bottom: 4px;
-    }
-
-    .product-card-meta {
-      color: #777;
-      font-size: 13px;
-      line-height: 1.35;
-    }
-
-    .product-card-price {
-      font-size: 15px;
-      font-weight: bold;
-      margin-top: 6px;
-    }
-
-    .selected-label {
-      color: #287a35;
-      font-size: 12px;
-      font-weight: bold;
-      margin-top: 5px;
-    }
-
-    .show-more-button {
-      background: #f0f1f3;
-      color: #222;
-      margin-top: 8px;
-      padding: 11px;
-      font-size: 14px;
-    }
-
-    .choice-help {
-      color: #777;
-      font-size: 13px;
-      margin-top: 9px;
-    }
-
-    .store-row {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      gap: 10px;
-      padding: 8px 0;
-    }
-
-    .store-name {
-      font-weight: 500;
-    }
-
-    .price {
-      font-weight: bold;
-      white-space: nowrap;
-    }
-
-    .cheapest {
-      background: #eef8ef;
-      border-radius: 10px;
-      padding: 10px;
-      margin-top: 8px;
-    }
-
-    .best-label {
-      font-size: 13px;
-      color: #287a35;
-      font-weight: bold;
-      margin-bottom: 3px;
-    }
-
-    .smart {
-      background: #f1f5ff;
-      border-radius: 12px;
-      padding: 14px;
-      margin-top: 10px;
-    }
-
-    .smart-title {
-      font-weight: bold;
-      margin-bottom: 5px;
-    }
-
-    .loading {
-      text-align: center;
+    .status {
+      margin: 10px 0;
       color: #666;
-      padding: 20px 0;
     }
 
     .error {
       background: #fff0f0;
       color: #a40000;
-      border-radius: 10px;
-      padding: 12px;
+      border-radius: 12px;
+      padding: 13px;
       margin-top: 12px;
     }
 
-    .empty {
-      color: #777;
-      text-align: center;
+    .category-row {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      margin: 14px 0;
+    }
+
+    .category-btn {
+      background: #f0f1f3;
+      color: #333;
+    }
+
+    .category-btn.active {
+      background: #111;
+      color: white;
+    }
+
+    .product-list {
+      display: grid;
+      gap: 10px;
+    }
+
+    .product-card {
+      border: 1px solid #ddd;
+      border-radius: 14px;
+      padding: 14px;
+      background: white;
+      cursor: pointer;
+      transition: 0.15s;
+    }
+
+    .product-card:hover {
+      border-color: #999;
+      transform: translateY(-1px);
+    }
+
+    .product-card.selected {
+      border: 2px solid #111;
+      background: #fafafa;
+    }
+
+    .product-name {
+      font-weight: 700;
+      font-size: 17px;
+      margin-bottom: 5px;
+    }
+
+    .product-meta {
+      color: #666;
+      font-size: 14px;
+      margin-bottom: 7px;
+    }
+
+    .product-price {
+      font-size: 17px;
+      font-weight: 700;
+    }
+
+    .selected-count {
+      margin: 12px 0;
+      font-weight: 700;
+    }
+
+    .result-card {
+      border: 1px solid #ddd;
+      border-radius: 14px;
       padding: 15px;
+      margin-bottom: 12px;
     }
 
-    .attribution {
-      text-align: center;
-      font-size: 12px;
+    .result-card h3 {
+      margin: 0 0 8px;
+    }
+
+    .store-row {
+      display: flex;
+      justify-content: space-between;
+      gap: 10px;
+      padding: 7px 0;
+      border-bottom: 1px solid #eee;
+    }
+
+    .store-row:last-child {
+      border-bottom: 0;
+    }
+
+    .total {
+      font-size: 20px;
+      font-weight: 800;
+      margin-top: 10px;
+    }
+
+    .small {
+      font-size: 13px;
       color: #777;
-      margin-top: 20px;
-    }
-
-    .attribution a {
-      color: inherit;
     }
 
     .hidden {
       display: none;
     }
 
-    .summary {
-      background: #111;
-      color: white;
-      border-radius: 14px;
-      padding: 16px;
-      margin-bottom: 18px;
+    .more-btn {
+      width: 100%;
+      margin-top: 12px;
+      background: #eee;
+      color: #222;
     }
+  </style></head><body><div class="container">  <header>
+    <h1>🛒 Priskorgen</h1>
+    <div class="subtitle">
+      Jämför matpriser i dina lokala butiker.
+    </div><label for="postcode">Postnummer</label>
+<input
+  id="postcode"
+  type="text"
+  value="89132"
+  placeholder="T.ex. 89132"
+>
 
-    .summary-title {
-      font-size: 14px;
-      opacity: 0.8;
-      margin-bottom: 5px;
-    }
+<label for="shoppingList">Vad ska du handla?</label>
+<textarea
+  id="shoppingList"
+  placeholder="Skriv t.ex.:
 
-    .summary-price {
-      font-size: 28px;
-      font-weight: bold;
-    }
-
-    @media (max-width: 500px) {
-      h1 {
-        font-size: 28px;
-      }
-
-      .container {
-        padding: 16px 10px 40px;
-      }
-
-      .box {
-        padding: 15px;
-      }
-    }
-  </style>
-</head>
-
-<body>
-
-<div class="container">
-
-  <h1>🛒 Priskorgen</h1>
-
-  <p class="subtitle">
-    Hitta billigaste sättet att handla din korg.
-  </p>
-
-  <div class="box">
-
-    <label for="postcode">📍 Postnummer</label>
-
-    <input
-      id="postcode"
-      type="text"
-      value="89132"
-      maxlength="5"
-      inputmode="numeric"
-    >
-
-    <br><br>
-
-    <label for="shoppingList">🛍️ Din inköpslista</label>
-
-    <textarea
-      id="shoppingList"
-      placeholder="Skriv en vara per rad, till exempel:
-Mjölk
-Bananer
 Kaffe
 Smör
+Mjölk
 Bröd"
-    ></textarea>
+></textarea>
 
-    <button id="findProductsButton">
-      🔎 Hitta produkter
-    </button>
+<button
+  id="findProductsBtn"
+  class="primary"
+>
+  Hitta produkter
+</button>
 
-    <div id="message"></div>
+<div id="errorBox"></div>
 
-  </div>
+  </header>  <section
+    id="selectionSection"
+    class="section hidden"
+  ><h2>Välj exakt produkt</h2>
 
-
-  <!-- PRODUKTVAL -->
-
-  <div id="selectionBox" class="box hidden">
-
-    <h2>🛍️ Välj dina produkter</h2>
-
-    <p style="color:#666; margin-top:-5px;">
-      Välj exakt vilken produkt du vill jämföra.
-    </p>
-
-    <div id="productSelections"></div>
-
-    <button
-      id="compareSelectedButton"
-      class="secondary-button"
-    >
-      💰 Jämför valda produkter
-    </button>
-
-  </div>
-
-
-  <!-- RESULTAT -->
-
-  <div id="results" class="hidden">
-
-    <div id="summary"></div>
-
-    <div class="box">
-
-      <h2>✨ Billigast möjligt</h2>
-
-      <div id="cheapestResults"></div>
-
-    </div>
-
-
-    <div class="box">
-
-      <h2>🏪 En butik</h2>
-
-      <div id="oneStoreResults"></div>
-
-    </div>
-
-
-    <div class="box">
-
-      <h2>🚗 Smartast</h2>
-
-      <div class="smart">
-
-        <div class="smart-title">
-          Smartaste alternativet
-        </div>
-
-        <div id="smartResults">
-          Vi räknar på pris och antal butiker.
-        </div>
-
-      </div>
-
-    </div>
-
-  </div>
-
-
-  <div class="attribution">
-
-    Prisdata från
-
-    <a
-      href="https://primat.nu"
-      target="_blank"
-      rel="noopener"
-    >
-      primat.nu
-    </a>
-
-  </div>
-
+<div class="small">
+  Vi visar de produkter som bäst matchar det du skrev.
+  Klicka på en produkt för att välja den.
 </div>
 
+<div id="selectionContent"></div>
 
-<script>
+<button
+  id="compareBtn"
+  class="primary"
+  disabled
+>
+  Jämför valda produkter
+</button>
 
-  const findProductsButton =
-    document.getElementById("findProductsButton");
+  </section>  <section
+    id="resultsSection"
+    class="section hidden"
+  ><h2>Resultat</h2>
 
-  const compareSelectedButton =
-    document.getElementById("compareSelectedButton");
+<div id="resultsContent"></div>
 
-  const postcodeInput =
-    document.getElementById("postcode");
-
-  const shoppingList =
-    document.getElementById("shoppingList");
-
-  const selectionBox =
-    document.getElementById("selectionBox");
-
-  const productSelections =
-    document.getElementById("productSelections");
-
-  const results =
-    document.getElementById("results");
-
-  const summary =
-    document.getElementById("summary");
-
-  const cheapestResults =
-    document.getElementById("cheapestResults");
-
-  const oneStoreResults =
-    document.getElementById("oneStoreResults");
-
-  const smartResults =
-    document.getElementById("smartResults");
-
-  const message =
-    document.getElementById("message");
-
+  </section></div><script>
 
   const storeNames = {
-
     coop: "Coop",
     ica: "ICA",
     lidl: "Lidl",
     willys: "Willys",
     hemkop: "Hemköp"
-
   };
 
 
-  let allResults = [];
+  let searchResults = [];
+  let selectedProducts = [];
+  let currentGroups = {};
+  let visibleCounts = {};
 
 
-  const INITIAL_PRODUCTS_TO_SHOW = 8;
+  // ============================================================
+  // TEXT
+  // ============================================================
 
-  const PRODUCTS_TO_ADD = 12;
-
-
-  function formatPrice(price) {
-
-    if (
-      price === null ||
-      price === undefined
-    ) {
-      return "–";
-    }
-
-    return Number(price)
-      .toFixed(2)
-      .replace(".", ",") + " kr";
-
-  }
-
-
-  function escapeHtml(text) {
-
-    return String(text)
-      .replaceAll("&", "&amp;")
-      .replaceAll("<", "&lt;")
-      .replaceAll(">", "&gt;")
-      .replaceAll('"', "&quot;")
-      .replaceAll("'", "&#039;");
-
-  }
-
-
-  function getStoreName(product) {
-
-    return storeNames[product.chain]
-      || product.chain
-      || "Okänd butik";
-
-  }
-
-
-  function normalizeText(text) {
-
-    return String(text)
+  function normalizeText(value) {
+    return String(value || "")
       .toLowerCase()
       .normalize("NFD")
       .replace(/[\u0300-\u036f]/g, "")
-      .replace(/[^a-z0-9åäö\s]/gi, " ")
+      .replace(/[^a-z0-9\s]/g, " ")
       .replace(/\s+/g, " ")
       .trim();
-
-  }
-
-
-  function singularizeWord(word) {
-
-    if (
-      word.length > 5 &&
-      word.endsWith("or")
-    ) {
-      return word.slice(0, -2);
-    }
-
-    if (
-      word.length > 5 &&
-      word.endsWith("ar")
-    ) {
-      return word.slice(0, -2);
-    }
-
-    if (
-      word.length > 5 &&
-      word.endsWith("er")
-    ) {
-      return word.slice(0, -2);
-    }
-
-    if (
-      word.length > 5 &&
-      word.endsWith("en")
-    ) {
-      return word.slice(0, -2);
-    }
-
-    if (
-      word.length > 5 &&
-      word.endsWith("et")
-    ) {
-      return word.slice(0, -2);
-    }
-
-    return word;
-
-  }
-
-
-  function getSearchTerms(item) {
-
-    return normalizeText(item)
-      .split(" ")
-      .filter(Boolean)
-      .map(singularizeWord);
-
   }
 
 
   function productText(product) {
-
     return normalizeText(
       [
-        product.name || "",
-        product.brand || "",
-        product.category || "",
-        product.package || ""
-      ].join(" ")
+        product.name,
+        product.brand,
+        product.offer_label
+      ]
+        .filter(Boolean)
+        .join(" ")
     );
-
   }
 
 
-  function getProductWords(product) {
-
-    return productText(product)
-      .split(" ")
-      .filter(Boolean)
-      .map(singularizeWord);
-
-  }
-
-
-  function categoryText(product) {
-
-    return normalizeText(
-      product.category || ""
-    );
-
-  }
-
-
-  /*
-   * PRODUKTRELEVANS
-   */
-
-  function scoreProduct(item, product) {
-
-    if (
-      !product ||
-      product.available === false
-    ) {
-      return -Infinity;
-    }
-
-    const query =
-      normalizeText(item);
-
-    const queryWords =
-      getSearchTerms(item);
-
-    const name =
-      normalizeText(product.name || "");
-
-    const brand =
-      normalizeText(product.brand || "");
-
-    const category =
-      categoryText(product);
-
-    const fullText =
-      productText(product);
-
-    const productWords =
-      getProductWords(product);
-
-
-    let score = 0;
-
-
-    if (name === query) {
-      score += 1000;
-    }
-
-
-    if (
-      query &&
-      name.startsWith(query)
-    ) {
-      score += 300;
-    }
-
-
-    if (
-      query &&
-      productWords.includes(query)
-    ) {
-      score += 250;
-    }
-
-
-    if (
-      query &&
-      name.includes(query)
-    ) {
-      score += 150;
-    }
-
-
-    for (
-      const word of queryWords
-    ) {
-
-      if (!word) {
-        continue;
-      }
-
-
-      if (
-        productWords.includes(word)
-      ) {
-        score += 100;
-      }
-
-
-      if (
-        category
-          .split(" ")
-          .map(singularizeWord)
-          .includes(word)
-      ) {
-        score += 60;
-      }
-
-
-      if (
-        brand === word
-      ) {
-        score += 30;
-      }
-
-
-      if (
-        fullText.includes(word)
-      ) {
-        score += 20;
-      }
-
-    }
-
-
-    if (
-      queryWords.length > 1 &&
-      queryWords.every(
-        word => fullText.includes(word)
-      )
-    ) {
-      score += 200;
-    }
-
-
-    if (
-      query &&
-      name === query
-    ) {
-      score += 500;
-    }
-
-
-    return score;
-
-  }
-
-
-  /*
-   * EXTRA SÖKVARIANTER
-   *
-   * Primat gör själva sökningen.
-   */
-
-  function getQueryVariants(item) {
-
-    const normalized =
-      normalizeText(item);
-
-    const variants = [item];
-
-
-    if (normalized === "kaffe") {
-
-      variants.push(
-        "bryggkaffe",
-        "malet kaffe",
-        "kokkaffe",
-        "kaffebönor",
-        "kaffekapslar",
-        "kaffefilter"
-      );
-
-    }
-
-
-    if (normalized === "smor") {
-
-      variants.push(
-        "smör normalsaltat",
-        "smör extrasaltat",
-        "smör osaltat"
-      );
-
-    }
-
-
-    if (normalized === "mjolk") {
-
-      variants.push(
-        "mjölk",
-        "standardmjölk",
-        "mellanmjölk",
-        "lättmjölk"
-      );
-
-    }
-
-
-    if (normalized === "brod") {
-
-      variants.push(
-        "bröd",
-        "rostbröd",
-        "formfranska",
-        "limpa"
-      );
-
-    }
-
-
-    return [
-      ...new Set(variants)
-    ];
-
-  }
-
-
-  async function getProducts(
-    query,
-    postcode
-  ) {
-
-    const variants =
-      getQueryVariants(query);
-
-
-    const responses =
-      await Promise.all(
-
-        variants.map(
-          async variant => {
-
-            const url =
-              "/api/primat?q=" +
-              encodeURIComponent(variant) +
-              "&postcode=" +
-              encodeURIComponent(postcode);
-
-
-            const response =
-              await fetch(url);
-
-
-            if (!response.ok) {
-
-              throw new Error(
-                "Kunde inte hämta prisdata för " +
-                variant
-              );
-
-            }
-
-
-            const data =
-              await response.json();
-
-
-            if (
-              !data.products ||
-              !data.products.data
-            ) {
-              return [];
-            }
-
-
-            return data.products.data;
-
-          }
-        )
-
-      );
-
-
-    const productMap =
-      new Map();
-
-
-    for (
-      const products of responses
-    ) {
-
-      for (
-        const product of products
-      ) {
-
-        if (!product) {
-          continue;
-        }
-
-
-        const key =
-          product.gtin
-            ? "gtin:" + product.gtin
-            : [
-                normalizeText(
-                  product.name || ""
-                ),
-                normalizeText(
-                  product.brand || ""
-                ),
-                normalizeText(
-                  product.package || ""
-                ),
-                product.amount || "",
-                product.unit || ""
-              ].join("|");
-
-
-        if (
-          !productMap.has(key)
-        ) {
-
-          productMap.set(
-            key,
-            product
-          );
-
-        }
-
-      }
-
-    }
-
-
-    return Array.from(
-      productMap.values()
-    );
-
-  }
-
-
-  function getProductKey(product) {
-
-    if (product.gtin) {
-      return "gtin:" + product.gtin;
-    }
-
-
-    return [
-
-      normalizeText(product.name || ""),
-
-      normalizeText(product.brand || ""),
-
-      normalizeText(
-        product.package ||
-        (
-          product.amount
-            ? product.amount +
-              " " +
-              (product.unit || "")
-            : ""
-        )
-      )
-
-    ].join("|");
-
-  }
-
-
-  /*
-   * -------------------------------------------------------
-   * PRODUKTKATEGORIER
-   * -------------------------------------------------------
-   *
-   * Viktigt:
-   *
-   * Vi klassificerar mer specifika produkter först.
-   * Därför hamnar exempelvis:
-   *
-   * Kaffefilter → Filter
-   * Kaffekapslar → Kapslar
-   *
-   * även om produktnamnet innehåller ord som kaffe.
-   */
-
+  // ============================================================
+  // KATEGORIER
+  // ============================================================
 
   function getProductGroup(product) {
 
-    const text =
-      productText(product);
-
-
-    /*
-     * 1. FILTER
-     *
-     * Måste komma först.
-     */
+    const text = productText(product);
 
     if (
       text.includes("kaffefilter") ||
       text.includes("kaffe filter") ||
-      text.includes("filter kaffe") ||
-      text.includes("filter 102") ||
-      text.includes("filter 1x4") ||
-      text.includes("kaffefilter")
+      text.includes("filter kaffe")
     ) {
-
       return "Filter";
-
     }
 
-
-    /*
-     * 2. KAPSLAR
-     */
 
     if (
       text.includes("kaffekaps") ||
@@ -1057,60 +339,37 @@ Bröd"
       text.includes("kapsel") ||
       text.includes("capsule")
     ) {
-
       return "Kapslar";
-
     }
 
-
-    /*
-     * 3. BRYGGKAFFE
-     */
 
     if (
       text.includes("bryggkaffe") ||
       text.includes("brygg kaffe")
     ) {
-
       return "Bryggkaffe";
-
     }
 
-
-    /*
-     * 4. KOKKAFFE
-     */
 
     if (
       text.includes("kokkaffe") ||
       text.includes("kok kaffe")
     ) {
-
       return "Kokkaffe";
-
     }
 
-
-    /*
-     * 5. KAFFEBÖNOR
-     */
 
     if (
-      text.includes("kaffebön") ||
+      text.includes("kaffebon") ||
       text.includes("kaffe bon") ||
-      text.includes("espressobön") ||
+      text.includes("espressobon") ||
       text.includes("espresso bon") ||
+      text.includes("coffee bean") ||
       text.includes("coffee beans")
     ) {
-
       return "Kaffebönor";
-
     }
 
-
-    /*
-     * 6. MALET KAFFE
-     */
 
     if (
       text.includes("malet kaffe") ||
@@ -1118,359 +377,219 @@ Bröd"
       text.includes("ground coffee") ||
       text.includes("groundcoffee")
     ) {
-
       return "Malet kaffe";
-
     }
 
-
-    /*
-     * 7. ÖVRIGT
-     */
 
     return "Övrigt";
-
   }
 
 
-  function getAvailableGroups(
-    item,
-    choices
-  ) {
+  // ============================================================
+  // PRIS
+  // ============================================================
 
-    const normalized =
-      normalizeText(item);
+  function getPrice(product) {
+
+    if (product.effective_price != null) {
+      return Number(product.effective_price);
+    }
+
+    if (product.offer_price != null) {
+      return Number(product.offer_price);
+    }
+
+    if (product.member_price != null) {
+      return Number(product.member_price);
+    }
+
+    if (product.price != null) {
+      return Number(product.price);
+    }
+
+    return null;
+  }
 
 
-    /*
-     * Kategorifilter visas just nu
-     * för kaffe eftersom det är där
-     * vi har många olika typer.
-     */
+  function formatPrice(value) {
+
+    if (value == null || Number.isNaN(value)) {
+      return "Pris saknas";
+    }
+
+    return (
+      value.toLocaleString("sv-SE", {
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 2
+      }) + " kr"
+    );
+  }
+
+
+  // ============================================================
+  // PRODUKTNYCKEL
+  // ============================================================
+
+  function getProductKey(product) {
+
+    if (product.gtin) {
+      return "gtin:" + product.gtin;
+    }
+
+    return [
+      product.name,
+      product.brand,
+      product.amount,
+      product.unit
+    ]
+      .filter(Boolean)
+      .join("|")
+      .toLowerCase();
+  }
+
+
+  // ============================================================
+  // HÄMTA PRODUKTER
+  // ============================================================
+
+  async function getProducts(query, postcode) {
+
+    const url =
+      "/api/primat?q=" +
+      encodeURIComponent(query) +
+      "&postcode=" +
+      encodeURIComponent(postcode);
+
+    const response = await fetch(url);
+
+    if (!response.ok) {
+
+      let message =
+        "Kunde inte hämta prisdata.";
+
+      try {
+        const data = await response.json();
+
+        if (data.error) {
+          message = data.error;
+        }
+      } catch (e) {}
+
+      throw new Error(message);
+    }
+
+
+    const data = await response.json();
 
     if (
-      normalized !== "kaffe"
+      !data.products ||
+      !Array.isArray(data.products.data)
     ) {
-
-      return [];
-
-    }
-
-
-    const groups =
-      new Set();
-
-
-    choices.forEach(
-      product => {
-
-        const group =
-          getProductGroup(
-            product
-          );
-
-        groups.add(group);
-
-      }
-    );
-
-
-    /*
-     * Bestämd ordning.
-     *
-     * Vi lägger inte "Övrigt" först.
-     */
-
-    const preferredOrder = [
-
-      "Bryggkaffe",
-      "Kokkaffe",
-      "Kaffebönor",
-      "Kapslar",
-      "Filter",
-      "Malet kaffe",
-      "Övrigt"
-
-    ];
-
-
-    return preferredOrder.filter(
-      group => groups.has(group)
-    );
-
-  }
-
-
-  function getProductChoices(
-    item,
-    products
-  ) {
-
-    const candidates =
-      products
-        .filter(product => {
-
-          return product &&
-            product.available !== false;
-
-        })
-        .map(product => {
-
-          return {
-
-            product,
-
-            score:
-              scoreProduct(
-                item,
-                product
-              )
-
-          };
-
-        });
-
-
-    candidates.sort(
-      (a, b) => {
-
-        if (
-          b.score !== a.score
-        ) {
-
-          return b.score - a.score;
-
-        }
-
-
-        const aPrice =
-          typeof a.product.prices?.effective === "number"
-            ? a.product.prices.effective
-            : Infinity;
-
-
-        const bPrice =
-          typeof b.product.prices?.effective === "number"
-            ? b.product.prices.effective
-            : Infinity;
-
-
-        return aPrice - bPrice;
-
-      }
-    );
-
-
-    const unique = [];
-
-    const seen =
-      new Set();
-
-
-    for (
-      const entry of candidates
-    ) {
-
-      const key =
-        getProductKey(
-          entry.product
-        );
-
-
-      if (
-        seen.has(key)
-      ) {
-
-        continue;
-
-      }
-
-
-      seen.add(key);
-
-      unique.push(
-        entry.product
+      throw new Error(
+        "Primat returnerade inga produkter."
       );
-
-
-      if (
-        unique.length >= 100
-      ) {
-
-        break;
-
-      }
-
     }
 
 
-    return unique;
-
+    return data.products.data;
   }
 
 
-  /*
-   * PRODUKTKORT
-   */
+  // ============================================================
+  // PRODUKTKORT
+  // ============================================================
 
-  function createProductCard(
-    result,
-    product,
-    index,
-    selectedProduct
-  ) {
+  function createProductCard(product, itemIndex) {
+
+    const key = getProductKey(product);
+
+    const selected = selectedProducts.some(
+      item =>
+        item.itemIndex === itemIndex &&
+        getProductKey(item.product) === key
+    );
+
 
     const card =
-      document.createElement("button");
-
-
-    card.type = "button";
-
+      document.createElement("div");
 
     card.className =
-      "product-card";
-
-
-    const isSelected =
-      selectedProduct &&
-      getProductKey(selectedProduct) ===
-      getProductKey(product);
-
-
-    if (isSelected) {
-
-      card.classList.add(
-        "selected"
-      );
-
-    }
+      "product-card" +
+      (selected ? " selected" : "");
 
 
     const name =
       document.createElement("div");
 
-
     name.className =
-      "product-card-name";
-
+      "product-name";
 
     name.textContent =
-      product.name ||
-      "Okänd produkt";
-
-
-    card.appendChild(
-      name
-    );
+      product.name || "Okänd produkt";
 
 
     const meta =
       document.createElement("div");
 
-
     meta.className =
-      "product-card-meta";
-
-
-    const metaParts = [];
-
-
-    if (product.brand) {
-
-      metaParts.push(
-        product.brand
-      );
-
-    }
-
-
-    const packageText =
-      product.package ||
-      (
-        product.amount
-          ? product.amount +
-            " " +
-            (product.unit || "")
-          : ""
-      );
-
-
-    if (packageText) {
-
-      metaParts.push(
-        packageText
-      );
-
-    }
-
+      "product-meta";
 
     meta.textContent =
-      metaParts.join(" • ");
-
-
-    card.appendChild(
-      meta
-    );
+      [
+        product.brand,
+        product.amount,
+        product.unit
+      ]
+        .filter(Boolean)
+        .join(" • ");
 
 
     const price =
       document.createElement("div");
 
-
     price.className =
-      "product-card-price";
+      "product-price";
+
+    const productPrice =
+      getPrice(product);
+
+    price.textContent =
+      productPrice == null
+        ? "Pris saknas"
+        : formatPrice(productPrice);
 
 
-    if (
-      typeof product.prices?.effective === "number"
-    ) {
-
-      price.textContent =
-        formatPrice(
-          product.prices.effective
-        ) +
-        " från";
-
-    } else {
-
-      price.textContent =
-        "Pris saknas";
-
-    }
-
-
-    card.appendChild(
-      price
-    );
-
-
-    if (isSelected) {
-
-      const selectedLabel =
-        document.createElement("div");
-
-
-      selectedLabel.className =
-        "selected-label";
-
-
-      selectedLabel.textContent =
-        "✓ VALD PRODUKT";
-
-
-      card.appendChild(
-        selectedLabel
-      );
-
-    }
+    card.appendChild(name);
+    card.appendChild(meta);
+    card.appendChild(price);
 
 
     card.addEventListener(
       "click",
-      function() {
+      () => {
 
-        result.selectedProduct =
-          product;
+        const existingIndex =
+          selectedProducts.findIndex(
+            item =>
+              item.itemIndex === itemIndex
+          );
+
+
+        if (existingIndex >= 0) {
+
+          selectedProducts.splice(
+            existingIndex,
+            1
+          );
+
+        }
+
+
+        selectedProducts.push({
+          itemIndex,
+          product
+        });
+
 
         renderProductSelections();
 
@@ -1479,1249 +598,909 @@ Bröd"
 
 
     return card;
-
   }
 
 
-  /*
-   * RENDER PRODUKTVÄLJARE
-   */
+  // ============================================================
+  // PRODUKTVAL
+  // ============================================================
 
   function renderProductSelections() {
 
-    productSelections.innerHTML =
-      "";
+    const section =
+      document.getElementById(
+        "selectionSection"
+      );
+
+    const content =
+      document.getElementById(
+        "selectionContent"
+      );
+
+    const compareBtn =
+      document.getElementById(
+        "compareBtn"
+      );
 
 
-    allResults.forEach(
-      (result, index) => {
-
-        const choices =
-          getProductChoices(
-            result.item,
-            result.products
-          );
+    content.innerHTML = "";
 
 
-        const wrapper =
+    const itemNames =
+      Object.keys(currentGroups);
+
+
+    itemNames.forEach(
+      (itemName, itemIndex) => {
+
+        const block =
           document.createElement("div");
 
+        block.style.marginBottom =
+          "24px";
 
-        wrapper.className =
-          "item";
+
+        const heading =
+          document.createElement("h3");
+
+        heading.textContent =
+          itemName;
+
+        block.appendChild(heading);
 
 
-        const title =
+        const categories =
+          currentGroups[itemName];
+
+
+        const categoryRow =
           document.createElement("div");
 
-
-        title.className =
-          "item-name";
-
-
-        title.textContent =
-          result.item;
+        categoryRow.className =
+          "category-row";
 
 
-        wrapper.appendChild(
-          title
-        );
+        const groupNames =
+          Object.keys(categories);
 
 
-        if (
-          !choices.length
-        ) {
+        const allButton =
+          document.createElement("button");
 
-          const empty =
-            document.createElement("div");
+        allButton.className =
+          "category-btn active";
 
-
-          empty.className =
-            "empty";
-
-
-          empty.textContent =
-            "Ingen produkt hittades.";
-
-
-          wrapper.appendChild(
-            empty
-          );
-
-
-          result.choices = [];
-
-          result.selectedProduct =
-            null;
-
-
-          productSelections.appendChild(
-            wrapper
-          );
-
-
-          return;
-
-        }
-
-
-        result.choices =
-          choices;
-
-
-        if (
-          !result.selectedProduct
-        ) {
-
-          result.selectedProduct =
-            null;
-
-        }
-
-
-        const choiceBox =
-          document.createElement("div");
-
-
-        choiceBox.className =
-          "product-choice";
-
-
-        const count =
-          document.createElement("div");
-
-
-        count.className =
-          "product-count";
-
-
-        count.textContent =
-          choices.length +
-          " möjliga produkter hittades.";
-
-
-        choiceBox.appendChild(
-          count
-        );
-
-
-        /*
-         * FILTER
-         */
-
-        const groups =
-          getAvailableGroups(
-            result.item,
-            choices
-          );
-
-
-        let activeGroup =
-          result.activeGroup ||
+        allButton.textContent =
           "Alla";
 
-
-        const filters =
-          document.createElement("div");
-
-
-        filters.className =
-          "product-filters";
+        categoryRow.appendChild(
+          allButton
+        );
 
 
-        if (
-          groups.length > 0
-        ) {
+        groupNames.forEach(
+          group => {
 
-          /*
-           * ALLA
-           */
+            const button =
+              document.createElement(
+                "button"
+              );
 
-          const allButton =
-            document.createElement("button");
+            button.className =
+              "category-btn";
 
+            button.textContent =
+              group;
 
-          allButton.type = "button";
+            button.addEventListener(
+              "click",
+              () => {
 
+                [...categoryRow.children]
+                  .forEach(
+                    b =>
+                      b.classList.remove(
+                        "active"
+                      )
+                  );
 
-          allButton.className =
-            "filter-button";
-
-
-          if (
-            activeGroup === "Alla"
-          ) {
-
-            allButton.classList.add(
-              "active"
-            );
-
-          }
-
-
-          allButton.textContent =
-            "Alla";
-
-
-          allButton.addEventListener(
-            "click",
-            function() {
-
-              result.activeGroup =
-                "Alla";
-
-
-              result.visibleCount =
-                INITIAL_PRODUCTS_TO_SHOW;
-
-
-              renderProductSelections();
-
-            }
-          );
-
-
-          filters.appendChild(
-            allButton
-          );
-
-
-          /*
-           * KATEGORIER
-           */
-
-          groups.forEach(
-            group => {
-
-              const filterButton =
-                document.createElement("button");
-
-
-              filterButton.type = "button";
-
-
-              filterButton.className =
-                "filter-button";
-
-
-              if (
-                activeGroup === group
-              ) {
-
-                filterButton.classList.add(
+                button.classList.add(
                   "active"
                 );
 
+                renderProductsForGroup(
+                  block,
+                  itemName,
+                  itemIndex,
+                  categories,
+                  group
+                );
+
               }
-
-
-              filterButton.textContent =
-                group;
-
-
-              filterButton.addEventListener(
-                "click",
-                function() {
-
-                  result.activeGroup =
-                    group;
-
-
-                  result.visibleCount =
-                    INITIAL_PRODUCTS_TO_SHOW;
-
-
-                  renderProductSelections();
-
-                }
-              );
-
-
-              filters.appendChild(
-                filterButton
-              );
-
-            }
-          );
-
-
-          choiceBox.appendChild(
-            filters
-          );
-
-        }
-
-
-        /*
-         * FILTRERA ENDAST FÖR VISNING
-         */
-
-        let visibleChoices =
-          choices;
-
-
-        if (
-          activeGroup !== "Alla"
-        ) {
-
-          visibleChoices =
-            choices.filter(
-              product =>
-                getProductGroup(product) ===
-                activeGroup
             );
 
-        }
-
-
-        const visibleCount =
-          result.visibleCount ||
-          INITIAL_PRODUCTS_TO_SHOW;
-
-
-        const productsToRender =
-          visibleChoices.slice(
-            0,
-            visibleCount
-          );
-
-
-        const productList =
-          document.createElement("div");
-
-
-        productList.className =
-          "product-list";
-
-
-        productsToRender.forEach(
-          product => {
-
-            productList.appendChild(
-              createProductCard(
-                result,
-                product,
-                index,
-                result.selectedProduct
-              )
+            categoryRow.appendChild(
+              button
             );
 
           }
         );
 
 
-        choiceBox.appendChild(
-          productList
+        block.appendChild(
+          categoryRow
         );
 
 
-        /*
-         * VISA FLER
-         */
-
-        if (
-          visibleChoices.length >
-          visibleCount
-        ) {
-
-          const showMore =
-            document.createElement("button");
-
-
-          showMore.type = "button";
-
-
-          showMore.className =
-            "show-more-button";
-
-
-          showMore.textContent =
-            "Visa fler produkter (" +
-            (
-              visibleChoices.length -
-              visibleCount
-            ) +
-            " kvar)";
-
-
-          showMore.addEventListener(
-            "click",
-            function() {
-
-              result.visibleCount =
-                visibleCount +
-                PRODUCTS_TO_ADD;
-
-
-              renderProductSelections();
-
-            }
-          );
-
-
-          choiceBox.appendChild(
-            showMore
-          );
-
-        }
-
-
-        const help =
-          document.createElement("div");
-
-
-        help.className =
-          "choice-help";
-
-
-        if (
-          result.selectedProduct
-        ) {
-
-          help.textContent =
-            "✓ Produkten är vald. Du kan ändra valet ovan.";
-
-        } else {
-
-          help.textContent =
-            "Tryck på en produkt för att välja den.";
-
-        }
-
-
-        choiceBox.appendChild(
-          help
+        renderProductsForGroup(
+          block,
+          itemName,
+          itemIndex,
+          categories,
+          null
         );
 
 
-        wrapper.appendChild(
-          choiceBox
-        );
-
-
-        productSelections.appendChild(
-          wrapper
-        );
-
-      }
-    );
-
-  }
-
-
-  function getSelectedProducts() {
-
-    const selectedResults = [];
-
-
-    allResults.forEach(
-      result => {
-
-        if (
-          !result.selectedProduct
-        ) {
-
-          return;
-
-        }
-
-
-        selectedResults.push({
-
-          item:
-            result.item,
-
-          selectedProduct:
-            result.selectedProduct,
-
-          products:
-            result.products
-
-        });
+        content.appendChild(block);
 
       }
     );
 
 
-    return selectedResults;
+    const count =
+      selectedProducts.length;
 
+
+    compareBtn.disabled =
+      count === 0;
+
+
+    compareBtn.textContent =
+      count === 0
+        ? "Jämför valda produkter"
+        : "Jämför " +
+          count +
+          " valda produkter";
+
+
+    section.classList.remove(
+      "hidden"
+    );
   }
 
 
-  function getSameProductPrices(
-    selectedProduct,
-    products
+  // ============================================================
+  // VISA PRODUKTER I KATEGORI
+  // ============================================================
+
+  function renderProductsForGroup(
+    block,
+    itemName,
+    itemIndex,
+    categories,
+    group
   ) {
 
-    const selectedKey =
-      getProductKey(
-        selectedProduct
+    const oldList =
+      block.querySelector(
+        ".product-list"
+      );
+
+    const oldMore =
+      block.querySelector(
+        ".more-btn"
       );
 
 
-    const matches =
-      products.filter(product => {
+    if (oldList) {
+      oldList.remove();
+    }
 
-        if (
-          !product ||
-          product.available === false ||
-          !product.prices ||
-          typeof product.prices.effective !== "number"
-        ) {
-
-          return false;
-
-        }
+    if (oldMore) {
+      oldMore.remove();
+    }
 
 
-        return (
-          getProductKey(product) ===
-          selectedKey
-        );
-
-      });
+    let products = [];
 
 
-    const byStore = {};
+    if (group) {
 
+      products =
+        categories[group] || [];
 
-    matches.forEach(
-      product => {
+    } else {
 
-        const key =
-          product.chain +
-          ":" +
-          product.store_id;
-
-
-        if (!byStore[key]) {
-
-          byStore[key] =
-            product;
-
-        }
-
-      }
-    );
-
-
-    return Object.values(
-      byStore
-    );
-
-  }
-
-
-  function createItemHtml(
-    result
-  ) {
-
-    const selected =
-      result.selectedProduct;
-
-
-    const matches =
-      getSameProductPrices(
-        selected,
-        result.products
-      );
-
-
-    matches.sort(
-      (a, b) =>
-        a.prices.effective -
-        b.prices.effective
-    );
-
-
-    if (
-      !matches.length
-    ) {
-
-      return `
-
-        <div class="item">
-
-          <div class="item-name">
-            ${escapeHtml(
-              selected.name
-            )}
-          </div>
-
-          <div class="empty">
-            Ingen butik med denna exakta
-            produkt hittades i prisdatan.
-          </div>
-
-        </div>
-
-      `;
+      products =
+        Object.values(
+          categories
+        ).flat();
 
     }
 
 
-    const cheapest =
-      matches[0];
+    const unique =
+      [];
+
+    const seen =
+      new Set();
 
 
-    const packageText =
-      selected.package ||
-      (
-        selected.amount
-          ? selected.amount +
-            " " +
-            (selected.unit || "")
-          : ""
+    products.forEach(
+      product => {
+
+        const key =
+          getProductKey(product);
+
+        if (!seen.has(key)) {
+
+          seen.add(key);
+          unique.push(product);
+
+        }
+
+      }
+    );
+
+
+    const list =
+      document.createElement(
+        "div"
+      );
+
+    list.className =
+      "product-list";
+
+
+    const initialCount =
+      8;
+
+    const visible =
+      unique.slice(
+        0,
+        initialCount
       );
 
 
-    return `
+    visible.forEach(
+      product => {
 
-      <div class="item">
+        list.appendChild(
+          createProductCard(
+            product,
+            itemIndex
+          )
+        );
 
-        <div class="item-name">
-          ${escapeHtml(
-            selected.name
-          )}
-        </div>
+      }
+    );
 
-        <div class="item-meta">
 
-          ${escapeHtml(
-            selected.brand || ""
-          )}
+    block.appendChild(list);
 
-          ${
-            packageText
-              ? " • " +
-                escapeHtml(
-                  packageText
+
+    if (
+      unique.length >
+      initialCount
+    ) {
+
+      const more =
+        document.createElement(
+          "button"
+        );
+
+      more.className =
+        "more-btn";
+
+      more.textContent =
+        "Visa fler";
+
+
+      let shown =
+        initialCount;
+
+
+      more.addEventListener(
+        "click",
+        () => {
+
+          const next =
+            unique.slice(
+              shown,
+              shown + 12
+            );
+
+
+          next.forEach(
+            product => {
+
+              list.appendChild(
+                createProductCard(
+                  product,
+                  itemIndex
                 )
-              : ""
+              );
+
+            }
+          );
+
+
+          shown += next.length;
+
+
+          if (
+            shown >=
+            unique.length
+          ) {
+            more.remove();
           }
 
-        </div>
+        }
+      );
 
 
-        <div class="cheapest">
+      block.appendChild(
+        more
+      );
 
-          <div class="best-label">
-            BILLIGAST
-          </div>
-
-          <div class="store-row">
-
-            <span class="store-name">
-
-              ${escapeHtml(
-                getStoreName(
-                  cheapest
-                )
-              )}
-
-            </span>
-
-            <span class="price">
-
-              ${formatPrice(
-                cheapest.prices.effective
-              )}
-
-            </span>
-
-          </div>
-
-        </div>
+    }
+  }
 
 
-        <div style="margin-top:10px;">
+  // ============================================================
+  // SKAPA KATEGORIER
+  // ============================================================
 
-          ${
-            matches.map(
-              product => `
+  function buildGroups(products) {
 
-                <div class="store-row">
+    const groups = {};
 
-                  <span class="store-name">
 
-                    ${escapeHtml(
-                      getStoreName(
-                        product
-                      )
-                    )}
+    products.forEach(
+      product => {
 
-                  </span>
+        const group =
+          getProductGroup(product);
 
-                  <span class="price">
 
-                    ${formatPrice(
-                      product.prices.effective
-                    )}
+        if (!groups[group]) {
+          groups[group] = [];
+        }
 
-                  </span>
 
-                </div>
+        groups[group].push(
+          product
+        );
 
-              `
-            ).join("")
+      }
+    );
+
+
+    const preferredOrder = [
+      "Bryggkaffe",
+      "Kokkaffe",
+      "Kaffebönor",
+      "Kapslar",
+      "Filter",
+      "Malet kaffe",
+      "Övrigt"
+    ];
+
+
+    const ordered = {};
+
+
+    preferredOrder.forEach(
+      group => {
+
+        if (groups[group]) {
+          ordered[group] =
+            groups[group];
+        }
+
+      }
+    );
+
+
+    Object.keys(groups).forEach(
+      group => {
+
+        if (!ordered[group]) {
+          ordered[group] =
+            groups[group];
+        }
+
+      }
+    );
+
+
+    return ordered;
+  }
+
+
+  // ============================================================
+  // HITTA PRODUKTER
+  // ============================================================
+
+  document
+    .getElementById(
+      "findProductsBtn"
+    )
+    .addEventListener(
+      "click",
+      async () => {
+
+        const list =
+          document
+            .getElementById(
+              "shoppingList"
+            )
+            .value
+            .split("\n")
+            .map(
+              line =>
+                line.trim()
+            )
+            .filter(Boolean);
+
+
+        const postcode =
+          document
+            .getElementById(
+              "postcode"
+            )
+            .value
+            .trim();
+
+
+        const errorBox =
+          document.getElementById(
+            "errorBox"
+          );
+
+        const button =
+          document.getElementById(
+            "findProductsBtn"
+          );
+
+
+        errorBox.innerHTML = "";
+
+
+        if (!list.length) {
+
+          errorBox.innerHTML =
+            '<div class="error">Skriv minst en vara i inköpslistan.</div>';
+
+          return;
+        }
+
+
+        button.disabled = true;
+
+        button.textContent =
+          "Hämtar produkter...";
+
+
+        selectedProducts = [];
+        currentGroups = {};
+
+
+        try {
+
+          for (
+            const item of list
+          ) {
+
+            const products =
+              await getProducts(
+                item,
+                postcode
+              );
+
+
+            if (
+              !products.length
+            ) {
+
+              currentGroups[item] = {
+                "Övrigt": []
+              };
+
+              continue;
+            }
+
+
+            currentGroups[item] =
+              buildGroups(
+                products
+              );
+
           }
 
-        </div>
 
-      </div>
+          renderProductSelections();
 
-    `;
+        } catch (error) {
+
+          console.error(error);
+
+          errorBox.innerHTML =
+            '<div class="error">' +
+            "Något gick fel när produkterna skulle hämtas." +
+            "<br><br>" +
+            error.message +
+            "</div>";
+
+        } finally {
+
+          button.disabled =
+            false;
+
+          button.textContent =
+            "Hitta produkter";
+
+        }
+
+      }
+    );
+
+
+  // ============================================================
+  // VALDA PRODUKTER
+  // ============================================================
+
+  function getSelectedProducts() {
+
+    return selectedProducts
+      .map(
+        item => item.product
+      );
 
   }
 
 
+  // ============================================================
+  // PRISER PER BUTIK
+  // ============================================================
+
+  function getStorePrice(
+    product,
+    store
+  ) {
+
+    const chain =
+      product.chain;
+
+    const storeId =
+      product.store_id;
+
+
+    if (
+      chain === store.chain &&
+      String(storeId) ===
+      String(store.store_id)
+    ) {
+
+      return getPrice(product);
+
+    }
+
+
+    return null;
+  }
+
+
+  // ============================================================
+  // JÄMFÖR
+  // ============================================================
+
   function calculateStoreTotals(
-    selectedResults
+    products
   ) {
 
     const totals = {};
 
 
-    for (
-      const result of selectedResults
-    ) {
+    products.forEach(
+      product => {
 
-      const matches =
-        getSameProductPrices(
-          result.selectedProduct,
-          result.products
-        );
+        const chain =
+          product.chain;
 
-
-      matches.forEach(
-        product => {
-
-          const storeKey =
-            product.chain +
-            ":" +
-            product.store_id;
+        const storeId =
+          product.store_id;
 
 
-          if (!totals[storeKey]) {
-
-            totals[storeKey] = {
-
-              chain:
-                product.chain,
-
-              store_id:
-                product.store_id,
-
-              name:
-                getStoreName(
-                  product
-                ),
-
-              total:
-                0,
-
-              items:
-                0
-
-            };
-
-          }
+        if (
+          !chain ||
+          !storeId
+        ) {
+          return;
+        }
 
 
-          totals[storeKey].total +=
-            product.prices.effective;
+        const key =
+          chain +
+          ":" +
+          storeId;
 
 
-          totals[storeKey].items +=
-            1;
+        const price =
+          getPrice(product);
+
+
+        if (
+          price == null
+        ) {
+          return;
+        }
+
+
+        if (!totals[key]) {
+
+          totals[key] = {
+            chain,
+            store_id: storeId,
+            total: 0,
+            products: []
+          };
 
         }
-      );
 
-    }
+
+        totals[key].total +=
+          price;
+
+
+        totals[key].products.push(
+          product
+        );
+
+      }
+    );
 
 
     return Object.values(
       totals
+    ).sort(
+      (a, b) =>
+        a.total -
+        b.total
     );
-
   }
 
 
-  function renderOneStore(
-    selectedResults
-  ) {
+  function renderComparison() {
 
-    const totals =
+    const section =
+      document.getElementById(
+        "resultsSection"
+      );
+
+    const content =
+      document.getElementById(
+        "resultsContent"
+      );
+
+
+    content.innerHTML = "";
+
+
+    const products =
+      getSelectedProducts();
+
+
+    if (!products.length) {
+      return;
+    }
+
+
+    // ----------------------------------------------------------
+    // BILLIGAST MÖJLIGT
+    // ----------------------------------------------------------
+
+    const cheapest =
+      document.createElement(
+        "div"
+      );
+
+    cheapest.className =
+      "result-card";
+
+
+    cheapest.innerHTML =
+      "<h3>✨ Billigast möjligt</h3>";
+
+
+    let cheapestTotal =
+      0;
+
+
+    products.forEach(
+      product => {
+
+        const price =
+          getPrice(product);
+
+
+        if (
+          price != null
+        ) {
+          cheapestTotal +=
+            price;
+        }
+
+      }
+    );
+
+
+    cheapest.innerHTML +=
+      '<div class="total">' +
+      formatPrice(
+        cheapestTotal
+      ) +
+      "</div>";
+
+
+    cheapest.innerHTML +=
+      '<div class="small">' +
+      "Baseras på de valda produkternas aktuella priser." +
+      "</div>";
+
+
+    content.appendChild(
+      cheapest
+    );
+
+
+    // ----------------------------------------------------------
+    // EN BUTIK
+    // ----------------------------------------------------------
+
+    const storeResult =
+      document.createElement(
+        "div"
+      );
+
+    storeResult.className =
+      "result-card";
+
+
+    storeResult.innerHTML =
+      "<h3>🏪 En butik</h3>";
+
+
+    const storeTotals =
       calculateStoreTotals(
-        selectedResults
+        products
       );
 
 
     if (
-      !totals.length
+      storeTotals.length
     ) {
 
-      oneStoreResults.innerHTML =
-        '<div class="empty">Ingen butik kunde räknas fram.</div>';
-
-      return;
-
-    }
-
-
-    totals.sort(
-      (a, b) => {
-
-        if (
-          b.items !== a.items
-        ) {
-
-          return b.items - a.items;
-
-        }
-
-
-        return (
-          a.total -
-          b.total
-        );
-
-      }
-    );
-
-
-    const best =
-      totals[0];
-
-
-    oneStoreResults.innerHTML = `
-
-      <div class="item">
-
-        <div class="item-name">
-
-          🏆 ${escapeHtml(
-            best.name
-          )}
-
-        </div>
-
-
-        <div class="item-meta">
-
-          ${best.items} av
-          ${selectedResults.length}
-          valda produkter finns i denna butik.
-
-        </div>
-
-
-        <div class="cheapest">
-
-          <div class="best-label">
-            TOTAL FÖR TILLGÄNGLIGA PRODUKTER
-          </div>
-
-
-          <div class="store-row">
-
-            <span class="store-name">
-
-              ${escapeHtml(
-                best.name
-              )}
-
-            </span>
-
-
-            <span class="price">
-
-              ${formatPrice(
-                best.total
-              )}
-
-            </span>
-
-          </div>
-
-        </div>
-
-      </div>
-
-    `;
-
-  }
-
-
-  function renderSmart(
-    selectedResults
-  ) {
-
-    const totals =
-      calculateStoreTotals(
-        selectedResults
-      );
-
-
-    if (
-      !totals.length
-    ) {
-
-      smartResults.innerHTML =
-        "Vi hittade inte tillräckligt med data ännu.";
-
-      return;
-
-    }
-
-
-    totals.sort(
-      (a, b) => {
-
-        if (
-          b.items !== a.items
-        ) {
-
-          return b.items - a.items;
-
-        }
-
-
-        return (
-          a.total -
-          b.total
-        );
-
-      }
-    );
-
-
-    const best =
-      totals[0];
-
-
-    smartResults.innerHTML = `
-
-      <strong>
-        ${escapeHtml(
-          best.name
-        )}
-      </strong>
-
-      har just nu det bästa alternativet
-      bland de butiker där vi hittar dina valda produkter.
-
-      <br><br>
-
-      ${best.items} av
-      ${selectedResults.length}
-      produkter:
-
-      <strong>
-        ${formatPrice(
-          best.total
-        )}
-      </strong>
-
-      <br><br>
-
-      <small>
-
-        🚗 Nästa steg blir att väga in avstånd,
-        restid och hur mycket du faktiskt sparar
-        på att åka till flera butiker.
-
-      </small>
-
-    `;
-
-  }
-
-
-  /*
-   * STEG 1:
-   *
-   * HÄMTA PRODUKTER
-   */
-
-  findProductsButton.addEventListener(
-    "click",
-    async function() {
-
-      const postcode =
-        postcodeInput.value.trim();
-
-
-      const items =
-        shoppingList.value
-          .split("\n")
-          .map(
-            item => item.trim()
-          )
-          .filter(
-            item => item.length > 0
-          );
-
-
-      message.innerHTML = "";
-
-
-      results.classList.add(
-        "hidden"
-      );
-
-
-      selectionBox.classList.add(
-        "hidden"
-      );
-
-
-      if (!postcode) {
-
-        message.innerHTML =
-          '<div class="error">Skriv in ditt postnummer.</div>';
-
-        return;
-
-      }
-
-
-      if (
-        !/^\d{5}$/.test(
-          postcode
-        )
-      ) {
-
-        message.innerHTML =
-          '<div class="error">Postnumret måste innehålla 5 siffror.</div>';
-
-        return;
-
-      }
-
-
-      if (!items.length) {
-
-        message.innerHTML =
-          '<div class="error">Skriv minst en vara i inköpslistan.</div>';
-
-        return;
-
-      }
-
-
-      findProductsButton.disabled =
-        true;
-
-
-      findProductsButton.textContent =
-        "⏳ Hittar produkter...";
-
-
-      message.innerHTML =
-        '<div class="loading">Hämtar produktalternativ...</div>';
-
-
-      try {
-
-        allResults = [];
-
-
-        for (
-          const item of items
-        ) {
-
-          const products =
-            await getProducts(
-              item,
-              postcode
+      storeTotals
+        .slice(0, 5)
+        .forEach(
+          store => {
+
+            const row =
+              document.createElement(
+                "div"
+              );
+
+            row.className =
+              "store-row";
+
+
+            row.innerHTML =
+              "<span>" +
+              (
+                storeNames[
+                  store.chain
+                ] ||
+                store.chain
+              ) +
+              "</span>" +
+              "<strong>" +
+              formatPrice(
+                store.total
+              ) +
+              "</strong>";
+
+
+            storeResult.appendChild(
+              row
             );
 
-
-          allResults.push({
-
-            item,
-
-            products,
-
-            selectedProduct:
-              null,
-
-            visibleCount:
-              INITIAL_PRODUCTS_TO_SHOW,
-
-            activeGroup:
-              "Alla"
-
-          });
-
-        }
-
-
-        renderProductSelections();
-
-
-        selectionBox.classList.remove(
-          "hidden"
+          }
         );
 
+    } else {
 
-        message.innerHTML =
-          "";
-
-
-        selectionBox.scrollIntoView({
-
-          behavior: "smooth",
-
-          block: "start"
-
-        });
-
-
-      } catch (error) {
-
-        console.error(error);
-
-
-        message.innerHTML = `
-
-          <div class="error">
-
-            Något gick fel när produkterna
-            skulle hämtas.
-
-            <br><br>
-
-            ${escapeHtml(
-              error.message
-            )}
-
-          </div>
-
-        `;
-
-      } finally {
-
-        findProductsButton.disabled =
-          false;
-
-
-        findProductsButton.textContent =
-          "🔎 Hitta produkter";
-
-      }
+      storeResult.innerHTML +=
+        '<div class="small">' +
+        "Butiksjämförelse kunde inte beräknas för de valda produkterna ännu." +
+        "</div>";
 
     }
-  );
 
 
-  /*
-   * STEG 2:
-   *
-   * JÄMFÖR EXAKT DE PRODUKTER
-   * ANVÄNDAREN VALT.
-   */
-
-  compareSelectedButton.addEventListener(
-    "click",
-    function() {
-
-      const selectedResults =
-        getSelectedProducts();
+    content.appendChild(
+      storeResult
+    );
 
 
-      if (
-        !selectedResults.length
-      ) {
+    // ----------------------------------------------------------
+    // SMARTAST
+    // ----------------------------------------------------------
 
-        message.innerHTML =
-          '<div class="error">Välj minst en produkt först.</div>';
-
-        return;
-
-      }
-
-
-      const matchedCount =
-        selectedResults.filter(
-          result => {
-
-            return getSameProductPrices(
-              result.selectedProduct,
-              result.products
-            ).length > 0;
-
-          }
-        ).length;
-
-
-      summary.innerHTML = `
-
-        <div class="summary">
-
-          <div class="summary-title">
-            DIN KORG
-          </div>
-
-          <div class="summary-price">
-
-            ${matchedCount} av
-            ${selectedResults.length}
-
-          </div>
-
-          <div>
-
-            valda produkter kunde jämföras
-            mellan butikerna
-
-          </div>
-
-        </div>
-
-      `;
-
-
-      cheapestResults.innerHTML =
-        selectedResults
-          .map(
-            result =>
-              createItemHtml(
-                result
-              )
-          )
-          .join("");
-
-
-      renderOneStore(
-        selectedResults
+    const smart =
+      document.createElement(
+        "div"
       );
 
+    smart.className =
+      "result-card";
 
-      renderSmart(
-        selectedResults
+
+    smart.innerHTML =
+      "<h3>🚗 Smartast</h3>" +
+      '<div class="small">' +
+      "Här kommer vi att väga samman pris, avstånd och antal butiker. " +
+      "Den mer avancerade reseoptimeringen lägger vi till när butiksavstånden är kopplade till resultaten." +
+      "</div>";
+
+
+    content.appendChild(
+      smart
+    );
+
+
+    // ----------------------------------------------------------
+    // PRIMAT
+    // ----------------------------------------------------------
+
+    const attribution =
+      document.createElement(
+        "div"
       );
 
+    attribution.className =
+      "small";
 
-      results.classList.remove(
-        "hidden"
-      );
+    attribution.style.marginTop =
+      "18px";
+
+    attribution.innerHTML =
+      'Prisdata från <a href="https://primat.nu" target="_blank" rel="noopener">primat.nu</a>.';
 
 
-      results.scrollIntoView({
+    content.appendChild(
+      attribution
+    );
 
-        behavior: "smooth",
 
-        block: "start"
+    section.classList.remove(
+      "hidden"
+    );
+  }
 
-      });
 
-    }
-  );
+  // ============================================================
+  // JÄMFÖR-KNAPP
+  // ============================================================
 
-</script>
+  document
+    .getElementById(
+      "compareBtn"
+    )
+    .addEventListener(
+      "click",
+      renderComparison
+    );
 
-</body>
+</script></body>
 </html>
