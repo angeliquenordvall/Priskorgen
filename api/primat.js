@@ -21,6 +21,7 @@ export default async function handler(req, res) {
 
     if (!storesResponse.ok) {
       const errorText = await storesResponse.text();
+
       throw new Error(
         "Primat kunde inte hitta butiker (" +
           storesResponse.status +
@@ -47,20 +48,19 @@ export default async function handler(req, res) {
     const stores = selectedStores.join(",");
 
     /*
-      Primats vanliga sökning kan ge många träffar av samma typ.
-      Därför gör vi flera breda sökningar för vanliga generiska
-      produkter och slår sedan ihop resultaten.
+      Primats /products är en rankad och begränsad sökning.
+      För generiska ord gör vi därför flera breda sökningar
+      och slår ihop resultaten.
 
-      Vi filtrerar INTE bort produkter här.
-      Primat får fortfarande leverera brett.
+      Vi filtrerar inte bort produkter här.
     */
-
-    const searchVariants = [q];
 
     const normalizedQuery = q
       .toLowerCase()
       .trim()
       .replace(/\s+/g, " ");
+
+    const searchVariants = [q];
 
     const variantMap = {
       kaffe: [
@@ -93,7 +93,6 @@ export default async function handler(req, res) {
       searchVariants.push(...variantMap[normalizedQuery]);
     }
 
-    // Ta bort eventuella dubletter
     const uniqueSearchVariants = [...new Set(searchVariants)];
 
     const results = await Promise.all(
@@ -113,20 +112,36 @@ export default async function handler(req, res) {
 
         if (!response.ok) {
           return {
-            products: [],
-            error: "Sökning misslyckades för: " + searchTerm
+            searchTerm,
+            products: []
           };
         }
 
         const data = await response.json();
 
+        /*
+          Primat v3 returnerar:
+          {
+            data: [...produkter],
+            count: ...,
+            query: ...
+          }
+
+          Vi stödjer även products/array som säkerhetsfallback.
+        */
+        let products = [];
+
+        if (Array.isArray(data.data)) {
+          products = data.data;
+        } else if (Array.isArray(data.products)) {
+          products = data.products;
+        } else if (Array.isArray(data)) {
+          products = data;
+        }
+
         return {
           searchTerm,
-          products: Array.isArray(data.products)
-            ? data.products
-            : Array.isArray(data)
-              ? data
-              : []
+          products
         };
       })
     );
@@ -134,8 +149,8 @@ export default async function handler(req, res) {
     /*
       Slå ihop alla träffar.
 
-      GTIN används i första hand för att identifiera samma produkt.
-      Om GTIN saknas används namn + varumärke + förpackning.
+      GTIN används i första hand.
+      Om GTIN saknas används produktens övriga identitet.
     */
 
     const productMap = new Map();
@@ -147,6 +162,8 @@ export default async function handler(req, res) {
         const key =
           product.gtin ||
           [
+            product.chain,
+            product.store_id,
             product.name,
             product.brand,
             product.package,
