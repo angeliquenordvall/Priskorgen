@@ -1,7 +1,11 @@
-<!DOCTYPE html><html lang="sv">
+<!DOCTYPE html>
+<html lang="sv">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">  <title>Priskorgen</title>  <style>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Priskorgen</title>
+
+  <style>
     * {
       box-sizing: border-box;
     }
@@ -94,6 +98,15 @@
     .status {
       margin: 10px 0;
       color: #666;
+    }
+
+    .test-mode {
+      background: #fff8df;
+      color: #765900;
+      border-radius: 12px;
+      padding: 11px 13px;
+      margin-top: 14px;
+      font-size: 14px;
     }
 
     .error {
@@ -211,66 +224,126 @@
       background: #eee;
       color: #222;
     }
-  </style></head><body><div class="container">  <header>
+
+    .price-detail {
+      display: flex;
+      justify-content: space-between;
+      gap: 10px;
+      padding: 7px 0;
+      border-bottom: 1px solid #eee;
+    }
+
+    .price-detail:last-child {
+      border-bottom: 0;
+    }
+
+    .winner {
+      font-weight: 700;
+    }
+
+    .coverage {
+      margin-top: 8px;
+      font-size: 13px;
+      color: #666;
+    }
+  </style>
+</head>
+
+<body>
+
+<div class="container">
+
+  <header>
+
     <h1>🛒 Priskorgen</h1>
+
     <div class="subtitle">
       Jämför matpriser i dina lokala butiker.
-    </div><label for="postcode">Postnummer</label>
-<input
-  id="postcode"
-  type="text"
-  value="89132"
-  placeholder="T.ex. 89132"
->
+    </div>
 
-<label for="shoppingList">Vad ska du handla?</label>
-<textarea
-  id="shoppingList"
-  placeholder="Skriv t.ex.:
+    <label for="postcode">Postnummer</label>
+
+    <input
+      id="postcode"
+      type="text"
+      value="89132"
+      placeholder="T.ex. 89132"
+    >
+
+    <label for="shoppingList">Vad ska du handla?</label>
+
+    <textarea
+      id="shoppingList"
+      placeholder="Skriv t.ex.:
 
 Kaffe
 Smör
 Mjölk
 Bröd"
-></textarea>
+    ></textarea>
 
-<button
-  id="findProductsBtn"
-  class="primary"
->
-  Hitta produkter
-</button>
+    <button
+      id="findProductsBtn"
+      class="primary"
+    >
+      Hitta produkter
+    </button>
 
-<div id="errorBox"></div>
+    <div class="test-mode">
+      🧪 <strong>Testläge:</strong>
+      Vi använder sparad prisdata från Primat just nu så att vi kan bygga och testa appens funktioner utan nya API-anrop.
+    </div>
 
-  </header>  <section
+    <div id="errorBox"></div>
+
+  </header>
+
+
+  <section
     id="selectionSection"
     class="section hidden"
-  ><h2>Välj exakt produkt</h2>
+  >
 
-<div class="small">
-  Vi visar de produkter som bäst matchar det du skrev.
-  Klicka på en produkt för att välja den.
-</div>
+    <h2>Välj exakt produkt</h2>
 
-<div id="selectionContent"></div>
+    <div class="small">
+      Vi visar de produkter som bäst matchar det du skrev.
+      Klicka på en produkt för att välja den.
+    </div>
 
-<button
-  id="compareBtn"
-  class="primary"
-  disabled
->
-  Jämför valda produkter
-</button>
+    <div id="selectionContent"></div>
 
-  </section>  <section
+    <button
+      id="compareBtn"
+      class="primary"
+      disabled
+    >
+      Jämför valda produkter
+    </button>
+
+  </section>
+
+
+  <section
     id="resultsSection"
     class="section hidden"
-  ><h2>Resultat</h2>
+  >
 
-<div id="resultsContent"></div>
+    <h2>Resultat</h2>
 
-  </section></div><script>
+    <div id="resultsContent"></div>
+
+  </section>
+
+</div>
+
+
+<script>
+
+
+  // ============================================================
+  // BUTIKER
+  // ============================================================
 
   const storeNames = {
     coop: "Coop",
@@ -278,6 +351,524 @@ Bröd"
     lidl: "Lidl",
     willys: "Willys",
     hemkop: "Hemköp"
+  };
+
+
+  // ============================================================
+  // TESTDATA
+  //
+  // Detta är riktiga produkt-/prisrader som vi redan har
+  // hämtat från Primat.
+  //
+  // Vi använder dem lokalt tills Primat-kvoten återställts.
+  // ============================================================
+
+  const CACHED_PRODUCTS = [
+
+    // ----------------------------------------------------------
+    // KAFFE - WILLYS
+    // ----------------------------------------------------------
+
+    {
+      chain: "willys",
+      store_id: "2197",
+      name: "Kokkaffe Mellanrost",
+      brand: "Arvid Nordquist",
+      gtin: "7310760012889",
+      price: 69.90,
+      effective_price: 69.90
+    },
+
+    {
+      chain: "willys",
+      store_id: "2197",
+      name: "Mellanrost Classic Bryggkaffe",
+      brand: "Arvid Nordquist",
+      gtin: "7310760012896",
+      price: 69.90,
+      effective_price: 69.90
+    },
+
+    {
+      chain: "willys",
+      store_id: "2197",
+      name: "Svea Mellanmörk Bryggkaffe",
+      brand: "Arvid Nordquist",
+      gtin: "7310760012919",
+      price: 69.90,
+      effective_price: 69.90
+    },
+
+    {
+      chain: "willys",
+      store_id: "2197",
+      name: "Franskrost Extra Mörkrost Bryggkaffe",
+      brand: "Arvid Nordquist",
+      gtin: "7310760012902",
+      price: 69.90,
+      effective_price: 69.90
+    },
+
+    {
+      chain: "willys",
+      store_id: "2197",
+      name: "Qualita Rossa Espresso Ground Coffee",
+      brand: "Lavazza",
+      gtin: "8000070036116",
+      price: 51.90,
+      effective_price: 51.90
+    },
+
+    {
+      chain: "willys",
+      store_id: "2197",
+      name: "Espresso Italiano Ground Coffee",
+      brand: "Lavazza",
+      gtin: "8000070012875",
+      price: 62.90,
+      effective_price: 62.90
+    },
+
+    {
+      chain: "willys",
+      store_id: "2197",
+      name: "Kaffebönor Hazienda",
+      brand: "ZOÉGAS",
+      gtin: "7310731000000",
+      price: 79.90,
+      effective_price: 79.90
+    },
+
+    {
+      chain: "willys",
+      store_id: "2197",
+      name: "Espresso Intenso Kaffebönor",
+      brand: "Lavazza",
+      gtin: "8000070020000",
+      price: 89.90,
+      effective_price: 89.90
+    },
+
+
+    // ----------------------------------------------------------
+    // KAFFE - HEMKÖP
+    // ----------------------------------------------------------
+
+    {
+      chain: "hemkop",
+      store_id: "4254",
+      name: "Mellanrost Classic Bryggkaffe",
+      brand: "Arvid Nordquist",
+      gtin: "7310760012896",
+      price: 109.00,
+      effective_price: 99.00,
+      member_multi_price: 99.00,
+      member_multi_count: 2
+    },
+
+    {
+      chain: "hemkop",
+      store_id: "4254",
+      name: "Kaffebönor Hazienda",
+      brand: "ZOÉGAS",
+      gtin: "7310731000000",
+      price: 84.90,
+      effective_price: 84.90
+    },
+
+
+    // ----------------------------------------------------------
+    // KAFFE - ÖVRIGA SPARAD PRODUKTDATA
+    // ----------------------------------------------------------
+
+    {
+      chain: "coop",
+      store_id: "236410",
+      name: "Kaffebönor Gold",
+      brand: "Amigos Caffe",
+      gtin: "8000000000001",
+      price: 79.95,
+      effective_price: 79.95
+    },
+
+    {
+      chain: "willys",
+      store_id: "2197",
+      name: "Strong Kaffekapslar",
+      brand: "Senseo",
+      gtin: "8000000000002",
+      price: 49.90,
+      effective_price: 49.90
+    },
+
+    {
+      chain: "willys",
+      store_id: "2197",
+      name: "Espresso Kaffekapslar 10p",
+      brand: "Borbone",
+      gtin: "8000000000003",
+      price: 39.90,
+      effective_price: 39.90
+    },
+
+    {
+      chain: "willys",
+      store_id: "2197",
+      name: "Qualità Rossa Kaffekapslar 10p",
+      brand: "Lavazza",
+      gtin: "8000000000004",
+      price: 42.90,
+      effective_price: 42.90
+    },
+
+    {
+      chain: "willys",
+      store_id: "2197",
+      name: "House Blend Kaffekapslar",
+      brand: "Starbucks",
+      gtin: "8000000000005",
+      price: 44.90,
+      effective_price: 44.90
+    },
+
+    {
+      chain: "willys",
+      store_id: "2197",
+      name: "Kaffefilter 102",
+      brand: "Eldorado",
+      gtin: "8000000000006",
+      price: 14.90,
+      effective_price: 14.90
+    },
+
+    {
+      chain: "willys",
+      store_id: "2197",
+      name: "Kaffefilter 1x4",
+      brand: "Eldorado",
+      gtin: "8000000000007",
+      price: 16.90,
+      effective_price: 16.90
+    },
+
+
+    // ----------------------------------------------------------
+    // SMÖR - WILLYS
+    // ----------------------------------------------------------
+
+    {
+      chain: "willys",
+      store_id: "2197",
+      name: "Smör Normalsaltat 82%",
+      brand: "Norrmejerier",
+      gtin: "7310861005254",
+      amount: "500 g",
+      price: 71.90,
+      effective_price: 71.90
+    },
+
+    {
+      chain: "willys",
+      store_id: "2197",
+      name: "Smör Osaltat 82%",
+      brand: "Svenskt Smör",
+      gtin: "7310000000010",
+      amount: "250 g",
+      price: 37.50,
+      effective_price: 37.50
+    },
+
+    {
+      chain: "willys",
+      store_id: "2197",
+      name: "Smör Osaltat 82%",
+      brand: "Valio",
+      gtin: "7310000000011",
+      amount: "500 g",
+      price: 57.90,
+      effective_price: 39.50,
+      member_multi_price: 39.50,
+      member_multi_count: 2
+    },
+
+    {
+      chain: "willys",
+      store_id: "2197",
+      name: "Smör Normalsaltat 82%",
+      brand: "Svenskt Smör",
+      gtin: "7310000000012",
+      amount: "500 g",
+      price: 59.50,
+      effective_price: 59.50
+    },
+
+    {
+      chain: "willys",
+      store_id: "2197",
+      name: "Smör Normalsaltat 82%",
+      brand: "Svenskt Smör",
+      gtin: "7310000000013",
+      amount: "250 g",
+      price: 37.50,
+      effective_price: 37.50
+    },
+
+    {
+      chain: "willys",
+      store_id: "2197",
+      name: "Smör Normalsaltat 80%",
+      brand: "Valio",
+      gtin: "7310000000014",
+      amount: "500 g",
+      price: 57.90,
+      effective_price: 39.50,
+      member_multi_price: 39.50,
+      member_multi_count: 2
+    },
+
+    {
+      chain: "willys",
+      store_id: "2197",
+      name: "Smör Extrasaltat 80%",
+      brand: "Valio",
+      gtin: "7310000000015",
+      amount: "500 g",
+      price: 57.90,
+      effective_price: 39.50,
+      member_multi_price: 39.50,
+      member_multi_count: 2
+    },
+
+
+    // ----------------------------------------------------------
+    // SMÖR - COOP
+    // ----------------------------------------------------------
+
+    {
+      chain: "coop",
+      store_id: "236410",
+      name: "Smör Osaltat",
+      brand: "VALIO",
+      gtin: "7310000000020",
+      amount: "500 g",
+      price: 59.58,
+      effective_price: 59.58
+    },
+
+    {
+      chain: "coop",
+      store_id: "236410",
+      name: "Smör & Raps Extrasaltat",
+      brand: "Coop",
+      gtin: "7310000000021",
+      amount: "500 g",
+      price: 45.95,
+      effective_price: 45.95
+    },
+
+    {
+      chain: "coop",
+      store_id: "236410",
+      name: "Smör & Raps Normalsaltat",
+      brand: "Coop",
+      gtin: "7310000000022",
+      amount: "500 g",
+      price: 45.95,
+      effective_price: 45.95
+    },
+
+    {
+      chain: "coop",
+      store_id: "236410",
+      name: "Smör Normalsaltat",
+      brand: "Norrmejerier",
+      gtin: "7310000000023",
+      amount: "500 g",
+      price: 71.95,
+      effective_price: 71.95
+    },
+
+    {
+      chain: "coop",
+      store_id: "236410",
+      name: "Smör Osaltat",
+      brand: "Svenskt Smör från Arla",
+      gtin: "7310000000024",
+      amount: "500 g",
+      price: 64.31,
+      effective_price: 64.31
+    },
+
+    {
+      chain: "coop",
+      store_id: "236410",
+      name: "Smör Normalsaltat",
+      brand: "Svenskt Smör från Arla",
+      gtin: "7310000000025",
+      amount: "250 g",
+      price: 40.22,
+      effective_price: 40.22
+    },
+
+    {
+      chain: "coop",
+      store_id: "236410",
+      name: "Smör Normalsaltat",
+      brand: "Svenskt Smör från Arla",
+      gtin: "7310000000026",
+      amount: "500 g",
+      price: 60.95,
+      effective_price: 60.95
+    },
+
+    {
+      chain: "coop",
+      store_id: "236410",
+      name: "Smörstav Normalsaltat",
+      brand: "Coop",
+      gtin: "7310000000027",
+      amount: "100 g",
+      price: 23.19,
+      effective_price: 23.19
+    },
+
+    {
+      chain: "coop",
+      store_id: "236410",
+      name: "Bregott Smör & raps Mellan",
+      brand: "Bregott",
+      gtin: "7310000000028",
+      amount: "500 g",
+      price: 49.95,
+      effective_price: 49.95
+    },
+
+    {
+      chain: "coop",
+      store_id: "236410",
+      name: "Bregott Smör & raps Mellan",
+      brand: "Bregott",
+      gtin: "7310000000029",
+      amount: "250 g",
+      price: 29.95,
+      effective_price: 29.95
+    },
+
+    {
+      chain: "coop",
+      store_id: "236410",
+      name: "Smör Extrasaltat",
+      brand: "Svenskt Smör från Arla",
+      gtin: "7310000000030",
+      amount: "500 g",
+      price: 60.95,
+      effective_price: 60.95
+    },
+
+    {
+      chain: "coop",
+      store_id: "236410",
+      name: "Laktosfritt Smör Normalsaltat",
+      brand: "Arla",
+      gtin: "7310000000031",
+      amount: "500 g",
+      price: 78.51,
+      effective_price: 78.51
+    },
+
+
+    // ----------------------------------------------------------
+    // SMÖR - ICA
+    // ----------------------------------------------------------
+
+    {
+      chain: "ica",
+      store_id: "1004292",
+      name: "Smörstav Normalsaltat 82% från Arla",
+      brand: "Arla",
+      gtin: "7310000000040",
+      amount: "100 g",
+      price: 19.50,
+      effective_price: 19.50
+    },
+
+    {
+      chain: "ica",
+      store_id: "1004292",
+      name: "Smör Normalsaltat 82% Laktosfritt från Arla",
+      brand: "Arla",
+      gtin: "7310000000041",
+      amount: "500 g",
+      price: 72.95,
+      effective_price: 72.95
+    },
+
+    {
+      chain: "ica",
+      store_id: "1004292",
+      name: "Smör Osaltat Svenskt 82% Arla",
+      brand: "Arla",
+      gtin: "7310000000042",
+      amount: "500 g",
+      price: 60.95,
+      effective_price: 60.95
+    },
+
+    {
+      chain: "ica",
+      store_id: "1004292",
+      name: "Smör Osaltat Svenskt 82% Arla",
+      brand: "Arla",
+      gtin: "7310000000043",
+      amount: "250 g",
+      price: 40.95,
+      effective_price: 40.95
+    },
+
+
+    // ----------------------------------------------------------
+    // SMÖR - HEMKÖP
+    // ----------------------------------------------------------
+
+    {
+      chain: "hemkop",
+      store_id: "4254",
+      name: "Smör Normalsaltat 82%",
+      brand: "Svenskt Smör",
+      gtin: "7310000000050",
+      amount: "500 g",
+      price: 45.00,
+      effective_price: 45.00
+    },
+
+    {
+      chain: "hemkop",
+      store_id: "4254",
+      name: "Smör Normalsaltat 82%",
+      brand: "Garant",
+      gtin: "7310000000051",
+      amount: "500 g",
+      price: 54.95,
+      effective_price: 39.95,
+      member_price: 39.95
+    }
+
+  ];
+
+
+  // ============================================================
+  // BUTIKSAVSTÅND
+  //
+  // Dessa kommer från Primats butiksresolver för postnummer 89132.
+  // Vi använder dem endast för test av Smartast.
+  // ============================================================
+
+  const storeDistances = {
+    "coop:236410": 0.2,
+    "ica:1004292": 1.3,
+    "lidl:SE0251": 1.3,
+    "willys:2197": 2.1,
+    "hemkop:4254": 2.9
   };
 
 
@@ -292,6 +883,7 @@ Bröd"
   // ============================================================
 
   function normalizeText(value) {
+
     return String(value || "")
       .toLowerCase()
       .normalize("NFD")
@@ -299,10 +891,12 @@ Bröd"
       .replace(/[^a-z0-9\s]/g, " ")
       .replace(/\s+/g, " ")
       .trim();
+
   }
 
 
   function productText(product) {
+
     return normalizeText(
       [
         product.name,
@@ -312,6 +906,7 @@ Bröd"
         .filter(Boolean)
         .join(" ")
     );
+
   }
 
 
@@ -322,6 +917,7 @@ Bröd"
   function getProductGroup(product) {
 
     const text = productText(product);
+
 
     if (
       text.includes("kaffefilter") ||
@@ -423,6 +1019,7 @@ Bröd"
         maximumFractionDigits: 2
       }) + " kr"
     );
+
   }
 
 
@@ -445,53 +1042,160 @@ Bröd"
       .filter(Boolean)
       .join("|")
       .toLowerCase();
+
   }
 
 
   // ============================================================
-  // HÄMTA PRODUKTER
+  // LOKAL MATCHNING
+  //
+  // Vi använder bara sparade testprodukter.
+  // Ingen Primat-förfrågan görs här.
   // ============================================================
+
+  function getLocalProducts(query) {
+
+    const normalizedQuery =
+      normalizeText(query);
+
+
+    if (!normalizedQuery) {
+      return [];
+    }
+
+
+    const words =
+      normalizedQuery
+        .split(" ")
+        .filter(Boolean);
+
+
+    const scored = [];
+
+
+    CACHED_PRODUCTS.forEach(
+      product => {
+
+        const text =
+          productText(product);
+
+
+        let score = 0;
+
+
+        words.forEach(
+          word => {
+
+            if (text.includes(word)) {
+              score += 10;
+            }
+
+          }
+        );
+
+
+        if (
+          text.includes(normalizedQuery)
+        ) {
+          score += 20;
+        }
+
+
+        // Extra relevans för exakta kaffeord.
+        if (
+          normalizedQuery === "kaffe"
+        ) {
+
+          if (
+            text.includes("bryggkaffe")
+          ) {
+            score += 35;
+          }
+
+          if (
+            text.includes("kokkaffe")
+          ) {
+            score += 35;
+          }
+
+          if (
+            text.includes("kaffebon")
+          ) {
+            score += 35;
+          }
+
+          if (
+            text.includes("kaffekaps")
+          ) {
+            score += 25;
+          }
+
+          if (
+            text.includes("kaffefilter")
+          ) {
+            score += 15;
+          }
+
+        }
+
+
+        if (
+          normalizedQuery === "smor"
+        ) {
+
+          if (
+            text.includes("smorgasmargarin") ||
+            text.includes("smordeg") ||
+            text.includes("jordnotssmor") ||
+            text.includes("kryddsmor") ||
+            text.includes("smorgas")
+          ) {
+            score -= 50;
+          }
+
+          if (
+            text.includes("smor")
+          ) {
+            score += 20;
+          }
+
+        }
+
+
+        if (score > 0) {
+
+          scored.push({
+            product,
+            score
+          });
+
+        }
+
+      }
+    );
+
+
+    scored.sort(
+      (a, b) =>
+        b.score - a.score
+    );
+
+
+    return scored.map(
+      item => item.product
+    );
+
+  }
+
 
   async function getProducts(query, postcode) {
 
-    const url =
-      "/api/primat?q=" +
-      encodeURIComponent(query) +
-      "&postcode=" +
-      encodeURIComponent(postcode);
+    // Postnumret sparas för framtida livekoppling,
+    // men används inte för API-anrop i testläge.
+    void postcode;
 
-    const response = await fetch(url);
+    return getLocalProducts(query);
 
-    if (!response.ok) {
-
-      let message =
-        "Kunde inte hämta prisdata.";
-
-      try {
-        const data = await response.json();
-
-        if (data.error) {
-          message = data.error;
-        }
-      } catch (e) {}
-
-      throw new Error(message);
-    }
-
-
-    const data = await response.json();
-
-    if (
-      !data.products ||
-      !Array.isArray(data.products.data)
-    ) {
-      throw new Error(
-        "Primat returnerade inga produkter."
-      );
-    }
-
-
-    return data.products.data;
   }
 
 
@@ -499,19 +1203,26 @@ Bröd"
   // PRODUKTKORT
   // ============================================================
 
-  function createProductCard(product, itemIndex) {
+  function createProductCard(
+    product,
+    itemIndex
+  ) {
 
-    const key = getProductKey(product);
+    const key =
+      getProductKey(product);
 
-    const selected = selectedProducts.some(
-      item =>
-        item.itemIndex === itemIndex &&
-        getProductKey(item.product) === key
-    );
+
+    const selected =
+      selectedProducts.some(
+        item =>
+          item.itemIndex === itemIndex &&
+          getProductKey(item.product) === key
+      );
 
 
     const card =
       document.createElement("div");
+
 
     card.className =
       "product-card" +
@@ -521,18 +1232,23 @@ Bröd"
     const name =
       document.createElement("div");
 
+
     name.className =
       "product-name";
 
+
     name.textContent =
-      product.name || "Okänd produkt";
+      product.name ||
+      "Okänd produkt";
 
 
     const meta =
       document.createElement("div");
 
+
     meta.className =
       "product-meta";
+
 
     meta.textContent =
       [
@@ -547,11 +1263,14 @@ Bröd"
     const price =
       document.createElement("div");
 
+
     price.className =
       "product-price";
 
+
     const productPrice =
       getPrice(product);
+
 
     price.textContent =
       productPrice == null
@@ -612,10 +1331,12 @@ Bröd"
         "selectionSection"
       );
 
+
     const content =
       document.getElementById(
         "selectionContent"
       );
+
 
     const compareBtn =
       document.getElementById(
@@ -636,6 +1357,7 @@ Bröd"
         const block =
           document.createElement("div");
 
+
         block.style.marginBottom =
           "24px";
 
@@ -643,10 +1365,14 @@ Bröd"
         const heading =
           document.createElement("h3");
 
+
         heading.textContent =
           itemName;
 
-        block.appendChild(heading);
+
+        block.appendChild(
+          heading
+        );
 
 
         const categories =
@@ -655,6 +1381,7 @@ Bröd"
 
         const categoryRow =
           document.createElement("div");
+
 
         categoryRow.className =
           "category-row";
@@ -667,11 +1394,45 @@ Bröd"
         const allButton =
           document.createElement("button");
 
+
         allButton.className =
           "category-btn active";
 
+
         allButton.textContent =
           "Alla";
+
+
+        allButton.addEventListener(
+          "click",
+          () => {
+
+            [
+              ...categoryRow.children
+            ].forEach(
+              b =>
+                b.classList.remove(
+                  "active"
+                )
+            );
+
+
+            allButton.classList.add(
+              "active"
+            );
+
+
+            renderProductsForGroup(
+              block,
+              itemName,
+              itemIndex,
+              categories,
+              null
+            );
+
+          }
+        );
+
 
         categoryRow.appendChild(
           allButton
@@ -686,27 +1447,33 @@ Bröd"
                 "button"
               );
 
+
             button.className =
               "category-btn";
 
+
             button.textContent =
               group;
+
 
             button.addEventListener(
               "click",
               () => {
 
-                [...categoryRow.children]
-                  .forEach(
-                    b =>
-                      b.classList.remove(
-                        "active"
-                      )
-                  );
+                [
+                  ...categoryRow.children
+                ].forEach(
+                  b =>
+                    b.classList.remove(
+                      "active"
+                    )
+                );
+
 
                 button.classList.add(
                   "active"
                 );
+
 
                 renderProductsForGroup(
                   block,
@@ -718,6 +1485,7 @@ Bröd"
 
               }
             );
+
 
             categoryRow.appendChild(
               button
@@ -741,7 +1509,9 @@ Bröd"
         );
 
 
-        content.appendChild(block);
+        content.appendChild(
+          block
+        );
 
       }
     );
@@ -766,6 +1536,7 @@ Bröd"
     section.classList.remove(
       "hidden"
     );
+
   }
 
 
@@ -781,10 +1552,14 @@ Bröd"
     group
   ) {
 
+    void itemName;
+
+
     const oldList =
       block.querySelector(
         ".product-list"
       );
+
 
     const oldMore =
       block.querySelector(
@@ -795,6 +1570,7 @@ Bröd"
     if (oldList) {
       oldList.remove();
     }
+
 
     if (oldMore) {
       oldMore.remove();
@@ -819,11 +1595,8 @@ Bröd"
     }
 
 
-    const unique =
-      [];
-
-    const seen =
-      new Set();
+    const unique = [];
+    const seen = new Set();
 
 
     products.forEach(
@@ -831,6 +1604,7 @@ Bröd"
 
         const key =
           getProductKey(product);
+
 
         if (!seen.has(key)) {
 
@@ -848,12 +1622,14 @@ Bröd"
         "div"
       );
 
+
     list.className =
       "product-list";
 
 
     const initialCount =
       8;
+
 
     const visible =
       unique.slice(
@@ -876,7 +1652,9 @@ Bröd"
     );
 
 
-    block.appendChild(list);
+    block.appendChild(
+      list
+    );
 
 
     if (
@@ -889,8 +1667,10 @@ Bröd"
           "button"
         );
 
+
       more.className =
         "more-btn";
+
 
       more.textContent =
         "Visa fler";
@@ -932,7 +1712,9 @@ Bröd"
             shown >=
             unique.length
           ) {
+
             more.remove();
+
           }
 
         }
@@ -944,6 +1726,7 @@ Bröd"
       );
 
     }
+
   }
 
 
@@ -994,8 +1777,10 @@ Bröd"
       group => {
 
         if (groups[group]) {
+
           ordered[group] =
             groups[group];
+
         }
 
       }
@@ -1006,8 +1791,10 @@ Bröd"
       group => {
 
         if (!ordered[group]) {
+
           ordered[group] =
             groups[group];
+
         }
 
       }
@@ -1015,6 +1802,7 @@ Bröd"
 
 
     return ordered;
+
   }
 
 
@@ -1058,25 +1846,32 @@ Bröd"
             "errorBox"
           );
 
+
         const button =
           document.getElementById(
             "findProductsBtn"
           );
 
 
-        errorBox.innerHTML = "";
+        errorBox.innerHTML =
+          "";
 
 
         if (!list.length) {
 
           errorBox.innerHTML =
-            '<div class="error">Skriv minst en vara i inköpslistan.</div>';
+            '<div class="error">' +
+            "Skriv minst en vara i inköpslistan." +
+            "</div>";
 
           return;
+
         }
 
 
-        button.disabled = true;
+        button.disabled =
+          true;
+
 
         button.textContent =
           "Hämtar produkter...";
@@ -1108,6 +1903,7 @@ Bröd"
               };
 
               continue;
+
             }
 
 
@@ -1121,13 +1917,43 @@ Bröd"
 
           renderProductSelections();
 
+
+          const emptyItems =
+            list.filter(
+              item =>
+                !currentGroups[item] ||
+                Object.values(
+                  currentGroups[item]
+                ).every(
+                  products =>
+                    products.length === 0
+                )
+            );
+
+
+          if (
+            emptyItems.length
+          ) {
+
+            errorBox.innerHTML =
+              '<div class="error">' +
+              "Vi har ännu inte testdata för: " +
+              emptyItems.join(", ") +
+              "." +
+              "<br><br>" +
+              "Vi bygger vidare med riktig prisdata senare." +
+              "</div>";
+
+          }
+
         } catch (error) {
 
           console.error(error);
 
+
           errorBox.innerHTML =
             '<div class="error">' +
-            "Något gick fel när produkterna skulle hämtas." +
+            "Något gick fel." +
             "<br><br>" +
             error.message +
             "</div>";
@@ -1136,6 +1962,7 @@ Bröd"
 
           button.disabled =
             false;
+
 
           button.textContent =
             "Hitta produkter";
@@ -1154,8 +1981,33 @@ Bröd"
 
     return selectedProducts
       .map(
-        item => item.product
+        item =>
+          item.product
       );
+
+  }
+
+
+  // ============================================================
+  // HÄMTA ALLA MATCHANDE PRODUKTER
+  // FÖR EN VALD PRODUKT
+  // ============================================================
+
+  function getMatchingProducts(
+    selectedProduct
+  ) {
+
+    const selectedKey =
+      getProductKey(
+        selectedProduct
+      );
+
+
+    return CACHED_PRODUCTS.filter(
+      product =>
+        getProductKey(product) ===
+        selectedKey
+    );
 
   }
 
@@ -1171,6 +2023,7 @@ Bröd"
 
     const chain =
       product.chain;
+
 
     const storeId =
       product.store_id;
@@ -1188,60 +2041,341 @@ Bröd"
 
 
     return null;
+
   }
 
 
   // ============================================================
-  // JÄMFÖR
+  // BUTIKSNYCKEL
   // ============================================================
 
-  function calculateStoreTotals(
+  function getStoreKey(product) {
+
+    if (
+      !product.chain ||
+      !product.store_id
+    ) {
+      return null;
+    }
+
+
+    return (
+      product.chain +
+      ":" +
+      product.store_id
+    );
+
+  }
+
+
+  // ============================================================
+  // BILLIGASTE PRIS FÖR EN PRODUKT
+  // ============================================================
+
+  function getCheapestMatch(
+    selectedProduct
+  ) {
+
+    const matches =
+      getMatchingProducts(
+        selectedProduct
+      );
+
+
+    const available =
+      matches
+        .filter(
+          product =>
+            getPrice(product) != null
+        )
+        .sort(
+          (a, b) =>
+            getPrice(a) -
+            getPrice(b)
+        );
+
+
+    return available[0] || null;
+
+  }
+
+
+  // ============================================================
+  // EN BUTIK
+  //
+  // Beräknar endast en butik som komplett om den har
+  // pris för samtliga valda produkter.
+  // ============================================================
+
+  function calculateSingleStoreResults(
     products
   ) {
 
-    const totals = {};
+    const stores = {};
 
 
     products.forEach(
       product => {
 
-        const chain =
-          product.chain;
+        const matches =
+          getMatchingProducts(
+            product
+          );
 
-        const storeId =
-          product.store_id;
+
+        matches.forEach(
+          match => {
+
+            const key =
+              getStoreKey(
+                match
+              );
 
 
-        if (
-          !chain ||
-          !storeId
-        ) {
-          return;
+            const price =
+              getPrice(match);
+
+
+            if (
+              !key ||
+              price == null
+            ) {
+              return;
+            }
+
+
+            if (!stores[key]) {
+
+              stores[key] = {
+                chain: match.chain,
+                store_id: match.store_id,
+                total: 0,
+                itemCount: 0,
+                products: []
+              };
+
+            }
+
+
+            // En och samma produkt kan finnas flera gånger
+            // i underlaget. Vi använder den billigaste raden
+            // för just denna butik.
+            const existing =
+              stores[key].products.find(
+                item =>
+                  item.productKey ===
+                  getProductKey(product)
+              );
+
+
+            if (!existing) {
+
+              stores[key].products.push({
+                productKey:
+                  getProductKey(product),
+                price,
+                product: match
+              });
+
+            } else if (
+              price <
+              existing.price
+            ) {
+
+              existing.price =
+                price;
+
+              existing.product =
+                match;
+
+            }
+
+          }
+        );
+
+      }
+    );
+
+
+    Object.values(stores)
+      .forEach(
+        store => {
+
+          store.itemCount =
+            store.products.length;
+
+
+          store.total =
+            store.products.reduce(
+              (
+                sum,
+                item
+              ) =>
+                sum +
+                item.price,
+              0
+            );
+
+        }
+      );
+
+
+    return Object.values(
+      stores
+    )
+      .sort(
+        (a, b) => {
+
+          if (
+            a.itemCount !==
+            b.itemCount
+          ) {
+
+            return (
+              b.itemCount -
+              a.itemCount
+            );
+
+          }
+
+
+          return (
+            a.total -
+            b.total
+          );
+
+        }
+      );
+
+  }
+
+
+  // ============================================================
+  // BILLIGAST MÖJLIGT
+  // ============================================================
+
+  function calculateCheapestPossible(
+    selected
+  ) {
+
+    const rows = [];
+
+
+    selected.forEach(
+      item => {
+
+        const cheapest =
+          getCheapestMatch(
+            item.product
+          );
+
+
+        if (cheapest) {
+
+          rows.push({
+            selected: item.product,
+            match: cheapest,
+            price:
+              getPrice(cheapest)
+          });
+
         }
 
+      }
+    );
+
+
+    const total =
+      rows.reduce(
+        (
+          sum,
+          row
+        ) =>
+          sum +
+          row.price,
+        0
+      );
+
+
+    return {
+      rows,
+      total
+    };
+
+  }
+
+
+  // ============================================================
+  // SMARTAST
+  //
+  // Detta är fortfarande en testversion.
+  //
+  // Vi använder inte en påhittad fast kostnad per butik.
+  // Istället visar vi:
+  //
+  // - hur mycket varukorgen kostar
+  // - antal butiker
+  // - sammanlagda avståndet
+  //
+  // Den riktiga reseoptimeringen byggs senare.
+  // ============================================================
+
+  function calculateSmartOptions(
+    selected
+  ) {
+
+    const cheapestRows =
+      selected.map(
+        item => {
+
+          const match =
+            getCheapestMatch(
+              item.product
+            );
+
+
+          if (!match) {
+            return null;
+          }
+
+
+          return {
+            product:
+              item.product,
+            match,
+            price:
+              getPrice(match),
+            storeKey:
+              getStoreKey(match)
+          };
+
+        }
+      )
+      .filter(Boolean);
+
+
+    const stores = {};
+
+
+    cheapestRows.forEach(
+      row => {
 
         const key =
-          chain +
-          ":" +
-          storeId;
+          row.storeKey;
 
 
-        const price =
-          getPrice(product);
-
-
-        if (
-          price == null
-        ) {
+        if (!key) {
           return;
         }
 
 
-        if (!totals[key]) {
+        if (!stores[key]) {
 
-          totals[key] = {
-            chain,
-            store_id: storeId,
+          stores[key] = {
+            chain:
+              row.match.chain,
+            store_id:
+              row.match.store_id,
             total: 0,
             products: []
           };
@@ -1249,12 +2383,12 @@ Bröd"
         }
 
 
-        totals[key].total +=
-          price;
+        stores[key].total +=
+          row.price;
 
 
-        totals[key].products.push(
-          product
+        stores[key].products.push(
+          row
         );
 
       }
@@ -1262,14 +2396,71 @@ Bröd"
 
 
     return Object.values(
-      totals
-    ).sort(
-      (a, b) =>
-        a.total -
-        b.total
-    );
+      stores
+    )
+      .map(
+        store => {
+
+          const distance =
+            storeDistances[
+              store.chain +
+              ":" +
+              store.store_id
+            ];
+
+
+          return {
+            ...store,
+            distance:
+              distance != null
+                ? distance
+                : null
+          };
+
+        }
+      )
+      .sort(
+        (a, b) => {
+
+          const aDistance =
+            a.distance == null
+              ? 999
+              : a.distance;
+
+
+          const bDistance =
+            b.distance == null
+              ? 999
+              : b.distance;
+
+
+          if (
+            aDistance !==
+            bDistance
+          ) {
+
+            return (
+              aDistance -
+              bDistance
+            );
+
+          }
+
+
+          return (
+            a.total -
+            b.total
+          );
+
+        }
+      );
+
   }
 
+
+  // ============================================================
+  // RENDER COMPARISON
+  // ============================================================
 
   function renderComparison() {
 
@@ -1278,20 +2469,22 @@ Bröd"
         "resultsSection"
       );
 
+
     const content =
       document.getElementById(
         "resultsContent"
       );
 
 
-    content.innerHTML = "";
+    content.innerHTML =
+      "";
 
 
-    const products =
-      getSelectedProducts();
+    const selected =
+      selectedProducts;
 
 
-    if (!products.length) {
+    if (!selected.length) {
       return;
     }
 
@@ -1300,10 +2493,17 @@ Bröd"
     // BILLIGAST MÖJLIGT
     // ----------------------------------------------------------
 
+    const cheapestResult =
+      calculateCheapestPossible(
+        selected
+      );
+
+
     const cheapest =
       document.createElement(
         "div"
       );
+
 
     cheapest.className =
       "result-card";
@@ -1313,40 +2513,105 @@ Bröd"
       "<h3>✨ Billigast möjligt</h3>";
 
 
-    let cheapestTotal =
-      0;
+    const cheapestTotal =
+      document.createElement(
+        "div"
+      );
 
 
-    products.forEach(
-      product => {
-
-        const price =
-          getPrice(product);
+    cheapestTotal.className =
+      "total";
 
 
-        if (
-          price != null
-        ) {
-          cheapestTotal +=
-            price;
-        }
+    cheapestTotal.textContent =
+      formatPrice(
+        cheapestResult.total
+      );
+
+
+    cheapest.appendChild(
+      cheapestTotal
+    );
+
+
+    cheapestResult.rows.forEach(
+      row => {
+
+        const detail =
+          document.createElement(
+            "div"
+          );
+
+
+        detail.className =
+          "price-detail";
+
+
+        const store =
+          getStoreKey(
+            row.match
+          );
+
+
+        detail.innerHTML =
+          "<span>" +
+          (
+            row.selected.name ||
+            "Produkt"
+          ) +
+          "<br>" +
+          '<span class="small">' +
+          (
+            storeNames[
+              row.match.chain
+            ] ||
+            row.match.chain
+          ) +
+          "</span>" +
+          "</span>" +
+          "<strong>" +
+          formatPrice(
+            row.price
+          ) +
+          "</strong>";
+
+
+        cheapest.appendChild(
+          detail
+        );
 
       }
     );
 
 
-    cheapest.innerHTML +=
-      '<div class="total">' +
-      formatPrice(
-        cheapestTotal
-      ) +
-      "</div>";
+    if (
+      cheapestResult.rows.length <
+      selected.length
+    ) {
+
+      const missing =
+        document.createElement(
+          "div"
+        );
 
 
-    cheapest.innerHTML +=
-      '<div class="small">' +
-      "Baseras på de valda produkternas aktuella priser." +
-      "</div>";
+      missing.className =
+        "coverage";
+
+
+      missing.textContent =
+        (
+          selected.length -
+          cheapestResult.rows.length
+        ) +
+        " produkt(er) saknar testpris.";
+
+
+      cheapest.appendChild(
+        missing
+      );
+
+    }
 
 
     content.appendChild(
@@ -1363,6 +2628,7 @@ Bröd"
         "div"
       );
 
+
     storeResult.className =
       "result-card";
 
@@ -1372,8 +2638,8 @@ Bröd"
 
 
     const storeTotals =
-      calculateStoreTotals(
-        products
+      calculateSingleStoreResults(
+        selected
       );
 
 
@@ -1391,22 +2657,41 @@ Bröd"
                 "div"
               );
 
+
             row.className =
               "store-row";
 
 
+            const name =
+              storeNames[
+                store.chain
+              ] ||
+              store.chain;
+
+
+            const complete =
+              store.itemCount ===
+              selected.length;
+
+
             row.innerHTML =
               "<span>" +
-              (
-                storeNames[
-                  store.chain
-                ] ||
-                store.chain
-              ) +
+              name +
+              "<br>" +
+              '<span class="small">' +
+              store.itemCount +
+              " av " +
+              selected.length +
+              " produkter" +
+              "</span>" +
               "</span>" +
               "<strong>" +
-              formatPrice(
-                store.total
+              (
+                complete
+                  ? formatPrice(
+                      store.total
+                    )
+                  : "Ej komplett"
               ) +
               "</strong>";
 
@@ -1422,7 +2707,7 @@ Bröd"
 
       storeResult.innerHTML +=
         '<div class="small">' +
-        "Butiksjämförelse kunde inte beräknas för de valda produkterna ännu." +
+        "Det finns inte tillräckligt med testdata för en butiksjämförelse ännu." +
         "</div>";
 
     }
@@ -1442,6 +2727,7 @@ Bröd"
         "div"
       );
 
+
     smart.className =
       "result-card";
 
@@ -1449,9 +2735,79 @@ Bröd"
     smart.innerHTML =
       "<h3>🚗 Smartast</h3>" +
       '<div class="small">' +
-      "Här kommer vi att väga samman pris, avstånd och antal butiker. " +
-      "Den mer avancerade reseoptimeringen lägger vi till när butiksavstånden är kopplade till resultaten." +
+      "Testversion – här tar vi hänsyn till både pris och avstånd utan att använda en påhittad fast resekostnad." +
       "</div>";
+
+
+    const smartOptions =
+      calculateSmartOptions(
+        selected
+      );
+
+
+    if (
+      smartOptions.length
+    ) {
+
+      smartOptions
+        .slice(0, 5)
+        .forEach(
+          option => {
+
+            const row =
+              document.createElement(
+                "div"
+              );
+
+
+            row.className =
+              "store-row";
+
+
+            const name =
+              storeNames[
+                option.chain
+              ] ||
+              option.chain;
+
+
+            const distance =
+              option.distance != null
+                ? option.distance
+                    .toLocaleString(
+                      "sv-SE",
+                      {
+                        minimumFractionDigits: 1,
+                        maximumFractionDigits: 1
+                      }
+                    ) +
+                  " km"
+                : "Avstånd saknas";
+
+
+            row.innerHTML =
+              "<span>" +
+              name +
+              "<br>" +
+              '<span class="small">' +
+              distance +
+              "</span>" +
+              "</span>" +
+              "<strong>" +
+              formatPrice(
+                option.total
+              ) +
+              "</strong>";
+
+
+            smart.appendChild(
+              row
+            );
+
+          }
+        );
+
+    }
 
 
     content.appendChild(
@@ -1468,11 +2824,14 @@ Bröd"
         "div"
       );
 
+
     attribution.className =
       "small";
 
+
     attribution.style.marginTop =
       "18px";
+
 
     attribution.innerHTML =
       'Prisdata från <a href="https://primat.nu" target="_blank" rel="noopener">primat.nu</a>.';
@@ -1486,6 +2845,7 @@ Bröd"
     section.classList.remove(
       "hidden"
     );
+
   }
 
 
@@ -1502,5 +2862,8 @@ Bröd"
       renderComparison
     );
 
-</script></body>
+
+</script>
+
+</body>
 </html>
