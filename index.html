@@ -1,11 +1,8 @@
-<!DOCTYPE html>
-<html lang="sv">
+<!DOCTYPE html><html lang="sv">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Priskorgen</title>
-
-  <style>
+  <title>Priskorgen</title>  <style>
     * {
       box-sizing: border-box;
     }
@@ -246,140 +243,103 @@
         padding: 15px;
       }
     }
-  </style>
-</head>
-
-<body>
-
-<div class="container">
-
-  <h1>🛒 Priskorgen</h1>
-
-  <p class="subtitle">
+  </style></head><body><div class="container">  <h1>🛒 Priskorgen</h1>  <p class="subtitle">
     Hitta billigaste sättet att handla din korg.
-  </p>
+  </p>  <div class="box"><label for="postcode">📍 Postnummer</label>
 
-  <div class="box">
+<input
+  id="postcode"
+  type="text"
+  value="89132"
+  maxlength="5"
+  inputmode="numeric"
+>
 
-    <label for="postcode">📍 Postnummer</label>
+<br><br>
 
-    <input
-      id="postcode"
-      type="text"
-      value="89132"
-      maxlength="5"
-      inputmode="numeric"
-    >
+<label for="shoppingList">🛍️ Din inköpslista</label>
 
-    <br><br>
-
-    <label for="shoppingList">🛍️ Din inköpslista</label>
-
-    <textarea
-      id="shoppingList"
-      placeholder="Skriv en vara per rad, till exempel:
+<textarea
+  id="shoppingList"
+  placeholder="Skriv en vara per rad, till exempel:
 
 Mjölk
 Bananer
 Kaffe
 Smör
 Bröd"
-    ></textarea>
+></textarea>
 
-    <button id="findProductsButton">
-      🔎 Hitta produkter
-    </button>
+<button id="findProductsButton">
+  🔎 Hitta produkter
+</button>
 
-    <div id="message"></div>
+<div id="message"></div>
 
-  </div>
+  </div>  <!-- PRODUKTVAL -->  <div id="selectionBox" class="box hidden"><h2>🛍️ Välj dina produkter</h2>
+
+<p style="color:#666; margin-top:-5px;">
+  Välj exakt vilken produkt du vill jämföra.
+</p>
+
+<div id="productSelections"></div>
+
+<button
+  id="compareSelectedButton"
+  class="secondary-button"
+>
+  💰 Jämför valda produkter
+</button>
+
+  </div>  <!-- RESULTAT -->  <div id="results" class="hidden"><div id="summary"></div>
+
+<div class="box">
+
+  <h2>✨ Billigast möjligt</h2>
+
+  <div id="cheapestResults"></div>
+
+</div>
 
 
-  <!-- PRODUKTVAL -->
+<div class="box">
 
-  <div id="selectionBox" class="box hidden">
+  <h2>🏪 En butik</h2>
 
-    <h2>🛍️ Välj dina produkter</h2>
+  <div id="oneStoreResults"></div>
 
-    <p style="color:#666; margin-top:-5px;">
-      Välj exakt vilken produkt du vill jämföra.
-    </p>
-
-    <div id="productSelections"></div>
-
-    <button
-      id="compareSelectedButton"
-      class="secondary-button"
-    >
-      💰 Jämför valda produkter
-    </button>
-
-  </div>
+</div>
 
 
-  <!-- RESULTAT -->
+<div class="box">
 
-  <div id="results" class="hidden">
+  <h2>🚗 Smartast</h2>
 
-    <div id="summary"></div>
+  <div class="smart">
 
-    <div class="box">
-
-      <h2>✨ Billigast möjligt</h2>
-
-      <div id="cheapestResults"></div>
-
+    <div class="smart-title">
+      Smartaste alternativet
     </div>
 
-
-    <div class="box">
-
-      <h2>🏪 En butik</h2>
-
-      <div id="oneStoreResults"></div>
-
+    <div id="smartResults">
+      Vi räknar på pris och antal butiker.
     </div>
-
-
-    <div class="box">
-
-      <h2>🚗 Smartast</h2>
-
-      <div class="smart">
-
-        <div class="smart-title">
-          Smartaste alternativet
-        </div>
-
-        <div id="smartResults">
-          Vi räknar på pris och antal butiker.
-        </div>
-
-      </div>
-
-    </div>
-
-  </div>
-
-
-  <div class="attribution">
-
-    Prisdata från
-
-    <a
-      href="https://primat.nu"
-      target="_blank"
-      rel="noopener"
-    >
-      primat.nu
-    </a>
 
   </div>
 
 </div>
 
+  </div>  <div class="attribution">Prisdata från
 
-<script>
+<a
+  href="https://primat.nu"
+  target="_blank"
+  rel="noopener"
+>
+  primat.nu
+</a>
+
+  </div></div><script>
 
   const findProductsButton =
     document.getElementById("findProductsButton");
@@ -1054,7 +1014,7 @@ Bröd"
 
 
       if (
-        unique.length >= 20
+        unique.length >= 100
       ) {
         break;
       }
@@ -2035,7 +1995,5 @@ Bröd"
     }
   );
 
-</script>
-
-</body>
+</script></body>
 </html>
