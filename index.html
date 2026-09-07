@@ -1,8 +1,11 @@
-<!DOCTYPE html><html lang="sv">
+<!DOCTYPE html>
+<html lang="sv">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Priskorgen</title>  <style>
+  <title>Priskorgen</title>
+
+  <style>
     * {
       box-sizing: border-box;
     }
@@ -243,103 +246,140 @@
         padding: 15px;
       }
     }
-  </style></head><body><div class="container">  <h1>🛒 Priskorgen</h1>  <p class="subtitle">
+  </style>
+</head>
+
+<body>
+
+<div class="container">
+
+  <h1>🛒 Priskorgen</h1>
+
+  <p class="subtitle">
     Hitta billigaste sättet att handla din korg.
-  </p>  <div class="box"><label for="postcode">📍 Postnummer</label>
+  </p>
 
-<input
-  id="postcode"
-  type="text"
-  value="89132"
-  maxlength="5"
-  inputmode="numeric"
->
+  <div class="box">
 
-<br><br>
+    <label for="postcode">📍 Postnummer</label>
 
-<label for="shoppingList">🛍️ Din inköpslista</label>
+    <input
+      id="postcode"
+      type="text"
+      value="89132"
+      maxlength="5"
+      inputmode="numeric"
+    >
 
-<textarea
-  id="shoppingList"
-  placeholder="Skriv en vara per rad, till exempel:
+    <br><br>
+
+    <label for="shoppingList">🛍️ Din inköpslista</label>
+
+    <textarea
+      id="shoppingList"
+      placeholder="Skriv en vara per rad, till exempel:
 
 Mjölk
 Bananer
 Kaffe
 Smör
 Bröd"
-></textarea>
+    ></textarea>
 
-<button id="findProductsButton">
-  🔎 Hitta produkter
-</button>
+    <button id="findProductsButton">
+      🔎 Hitta produkter
+    </button>
 
-<div id="message"></div>
+    <div id="message"></div>
 
-  </div>  <!-- PRODUKTVAL -->  <div id="selectionBox" class="box hidden"><h2>🛍️ Välj dina produkter</h2>
-
-<p style="color:#666; margin-top:-5px;">
-  Välj exakt vilken produkt du vill jämföra.
-</p>
-
-<div id="productSelections"></div>
-
-<button
-  id="compareSelectedButton"
-  class="secondary-button"
->
-  💰 Jämför valda produkter
-</button>
-
-  </div>  <!-- RESULTAT -->  <div id="results" class="hidden"><div id="summary"></div>
-
-<div class="box">
-
-  <h2>✨ Billigast möjligt</h2>
-
-  <div id="cheapestResults"></div>
-
-</div>
+  </div>
 
 
-<div class="box">
+  <!-- PRODUKTVAL -->
 
-  <h2>🏪 En butik</h2>
+  <div id="selectionBox" class="box hidden">
 
-  <div id="oneStoreResults"></div>
+    <h2>🛍️ Välj dina produkter</h2>
 
-</div>
+    <p style="color:#666; margin-top:-5px;">
+      Välj exakt vilken produkt du vill jämföra.
+    </p>
+
+    <div id="productSelections"></div>
+
+    <button
+      id="compareSelectedButton"
+      class="secondary-button"
+    >
+      💰 Jämför valda produkter
+    </button>
+
+  </div>
 
 
-<div class="box">
+  <!-- RESULTAT -->
 
-  <h2>🚗 Smartast</h2>
+  <div id="results" class="hidden">
 
-  <div class="smart">
+    <div id="summary"></div>
 
-    <div class="smart-title">
-      Smartaste alternativet
+    <div class="box">
+
+      <h2>✨ Billigast möjligt</h2>
+
+      <div id="cheapestResults"></div>
+
     </div>
 
-    <div id="smartResults">
-      Vi räknar på pris och antal butiker.
+
+    <div class="box">
+
+      <h2>🏪 En butik</h2>
+
+      <div id="oneStoreResults"></div>
+
     </div>
+
+
+    <div class="box">
+
+      <h2>🚗 Smartast</h2>
+
+      <div class="smart">
+
+        <div class="smart-title">
+          Smartaste alternativet
+        </div>
+
+        <div id="smartResults">
+          Vi räknar på pris och antal butiker.
+        </div>
+
+      </div>
+
+    </div>
+
+  </div>
+
+
+  <div class="attribution">
+
+    Prisdata från
+
+    <a
+      href="https://primat.nu"
+      target="_blank"
+      rel="noopener"
+    >
+      primat.nu
+    </a>
 
   </div>
 
 </div>
 
-  </div>  <div class="attribution">Prisdata från
 
-<a
-  href="https://primat.nu"
-  target="_blank"
-  rel="noopener"
->
-  primat.nu
-</a>
-
-  </div></div><script>
+<script>
 
   const findProductsButton =
     document.getElementById("findProductsButton");
@@ -484,14 +524,6 @@ Bröd"
   }
 
 
-  /*
-   * Sökord från användaren.
-   *
-   * Vi använder dessa för att rangordna
-   * Primats träffar, men vi filtrerar inte bort
-   * produkter bara för att de inte ligger högst.
-   */
-
   function getSearchTerms(item) {
 
     return normalizeText(item)
@@ -538,15 +570,8 @@ Bröd"
 
 
   /*
-   * NY MATCHNING:
-   *
-   * Vi försöker inte längre bestämma att
-   * exempelvis "kaffe" måste vara bryggkaffe.
-   *
-   * Alla produkter från Primats sökning får
-   * vara med.
-   *
-   * Poängen används ENDAST för ordningen.
+   * Produktens relevans bestämmer bara ordningen.
+   * Vi filtrerar inte bort produkter här.
    */
 
   function scoreProduct(item, product) {
@@ -584,22 +609,10 @@ Bröd"
     let score = 0;
 
 
-    /*
-     * Exakt hela produktnamnet.
-     */
-
     if (name === query) {
       score += 1000;
     }
 
-
-    /*
-     * Produktnamnet börjar med hela sökningen.
-     *
-     * Exempel:
-     * "kaffe" ->
-     * "Kaffe Brygg..."
-     */
 
     if (
       query &&
@@ -609,11 +622,6 @@ Bröd"
     }
 
 
-    /*
-     * Sökningen finns som ett helt ord
-     * i produktnamnet.
-     */
-
     if (
       query &&
       productWords.includes(query)
@@ -622,10 +630,6 @@ Bröd"
     }
 
 
-    /*
-     * Sökningen finns någonstans i namnet.
-     */
-
     if (
       query &&
       name.includes(query)
@@ -633,13 +637,6 @@ Bröd"
       score += 150;
     }
 
-
-    /*
-     * Varje enskilt sökord.
-     *
-     * Alla ord måste alltså inte finnas i namnet
-     * för att produkten ska visas.
-     */
 
     for (
       const word of queryWords
@@ -683,11 +680,6 @@ Bröd"
     }
 
 
-    /*
-     * Alla sökord finns någonstans i produkten.
-     * Detta ger en extra bonus vid flerordsökningar.
-     */
-
     if (
       queryWords.length > 1 &&
       queryWords.every(
@@ -698,11 +690,6 @@ Bröd"
     }
 
 
-    /*
-     * Om hela sökningen finns exakt i namnet
-     * ska den ligga mycket högt.
-     */
-
     if (
       query &&
       name === query
@@ -711,12 +698,112 @@ Bröd"
     }
 
 
+    return score;
+
+  }
+
+
+  /*
+   * -------------------------------------------------------
+   * NYTT:
+   *
+   * Primat får fortfarande göra sökningen.
+   *
+   * Men för ett generiskt ord kan vi komplettera med
+   * närliggande sökningar så att Primats begränsning
+   * på 100 träffar inte gör att alla relevanta produkter
+   * trängs undan av t.ex. kapslar och filter.
+   *
+   * Vi filtrerar inte bort något av resultaten.
+   * -------------------------------------------------------
+   */
+
+  function getQueryVariants(item) {
+
+    const normalized =
+      normalizeText(item);
+
+
+    const variants = [item];
+
+
     /*
-     * Pris används bara som sista sorteringsfaktor
-     * och påverkar inte om produkten får visas.
+     * Kaffe:
+     *
+     * "kaffe" söker även efter de vanligaste
+     * produktbenämningarna för kaffe.
+     *
+     * Alla träffar slås sedan ihop.
      */
 
-    return score;
+    if (normalized === "kaffe") {
+
+      variants.push(
+        "bryggkaffe",
+        "malet kaffe",
+        "kokkaffe",
+        "kaffebönor",
+        "kaffekapslar"
+      );
+
+    }
+
+
+    /*
+     * Smör:
+     *
+     * Vi kompletterar sökningen utan att
+     * filtrera bort något.
+     */
+
+    if (normalized === "smor") {
+
+      variants.push(
+        "smör normalsaltat",
+        "smör extrasaltat",
+        "smör osaltat"
+      );
+
+    }
+
+
+    /*
+     * Mjölk.
+     */
+
+    if (normalized === "mjolk") {
+
+      variants.push(
+        "mjölk",
+        "standardmjölk",
+        "mellanmjölk",
+        "lättmjölk"
+      );
+
+    }
+
+
+    /*
+     * Bröd.
+     */
+
+    if (normalized === "brod") {
+
+      variants.push(
+        "bröd",
+        "rostbröd",
+        "formfranska",
+        "limpa"
+      );
+
+    }
+
+
+    return [
+      ...new Set(
+        variants
+      )
+    ];
 
   }
 
@@ -726,50 +813,132 @@ Bröd"
     postcode
   ) {
 
-    const url =
-      "/api/primat?q=" +
-      encodeURIComponent(query) +
-      "&postcode=" +
-      encodeURIComponent(postcode);
+    const variants =
+      getQueryVariants(query);
 
 
-    const response =
-      await fetch(url);
+    /*
+     * Kör alla Primat-sökningar parallellt.
+     */
+
+    const responses =
+      await Promise.all(
+
+        variants.map(
+          async variant => {
+
+            const url =
+              "/api/primat?q=" +
+              encodeURIComponent(variant) +
+              "&postcode=" +
+              encodeURIComponent(postcode);
 
 
-    if (!response.ok) {
+            const response =
+              await fetch(url);
 
-      throw new Error(
-        "Kunde inte hämta prisdata för " +
-        query
+
+            if (!response.ok) {
+
+              throw new Error(
+                "Kunde inte hämta prisdata för " +
+                variant
+              );
+
+            }
+
+
+            const data =
+              await response.json();
+
+
+            /*
+             * Den fungerande API-funktionen
+             * returnerar Primats svar i:
+             *
+             * data.products.data
+             */
+
+            if (
+              !data.products ||
+              !data.products.data
+            ) {
+              return [];
+            }
+
+
+            return data.products.data;
+
+          }
+        )
+
       );
 
-    }
+
+    /*
+     * Slå ihop resultaten.
+     *
+     * GTIN används när det finns.
+     * Annars namn + varumärke + förpackning.
+     */
+
+    const productMap =
+      new Map();
 
 
-    const data =
-      await response.json();
-
-
-    if (
-      !data.products ||
-      !data.products.data
+    for (
+      const products of responses
     ) {
-      return [];
+
+      for (
+        const product of products
+      ) {
+
+        if (!product) {
+          continue;
+        }
+
+
+        const key =
+          product.gtin
+            ? "gtin:" + product.gtin
+            : [
+                normalizeText(
+                  product.name || ""
+                ),
+                normalizeText(
+                  product.brand || ""
+                ),
+                normalizeText(
+                  product.package || ""
+                ),
+                product.amount || "",
+                product.unit || ""
+              ].join("|");
+
+
+        if (
+          !productMap.has(key)
+        ) {
+
+          productMap.set(
+            key,
+            product
+          );
+
+        }
+
+      }
+
     }
 
 
-    return data.products.data;
+    return Array.from(
+      productMap.values()
+    );
 
   }
 
-
-  /*
-   * GTIN är den bästa identiteten för en produkt.
-   *
-   * Om GTIN saknas använder vi namn +
-   * varumärke + förpackning.
-   */
 
   function getProductKey(product) {
 
@@ -799,20 +968,6 @@ Bröd"
 
   }
 
-
-  /*
-   * Tar fram produktalternativen.
-   *
-   * VIKTIGT:
-   *
-   * Vi filtrerar INTE längre bort produkter
-   * med låg matchningspoäng.
-   *
-   * Primats sökning bestämmer vilka produkter
-   * som hör till sökningen.
-   *
-   * Vår poäng bestämmer bara ordningen.
-   */
 
   function getProductChoices(
     item,
@@ -846,7 +1001,9 @@ Bröd"
 
     candidates.sort((a, b) => {
 
-      if (b.score !== a.score) {
+      if (
+        b.score !== a.score
+      ) {
         return b.score - a.score;
       }
 
@@ -877,22 +1034,24 @@ Bröd"
     ) {
 
       const key =
-        getProductKey(entry.product);
+        getProductKey(
+          entry.product
+        );
 
 
-      if (seen.has(key)) {
+      if (
+        seen.has(key)
+      ) {
         continue;
       }
 
 
       seen.add(key);
 
-      unique.push(entry.product);
+      unique.push(
+        entry.product
+      );
 
-
-      /*
-       * Vi visar de 20 bästa unika alternativen.
-       */
 
       if (
         unique.length >= 20
@@ -907,10 +1066,6 @@ Bröd"
 
   }
 
-
-  /*
-   * Visar produktvalen.
-   */
 
   function renderProductSelections() {
 
@@ -930,35 +1085,45 @@ Bröd"
         const wrapper =
           document.createElement("div");
 
-        wrapper.className = "item";
+        wrapper.className =
+          "item";
 
 
         const title =
           document.createElement("div");
 
-        title.className = "item-name";
+        title.className =
+          "item-name";
 
         title.textContent =
           result.item;
 
 
-        wrapper.appendChild(title);
+        wrapper.appendChild(
+          title
+        );
 
 
-        if (!choices.length) {
+        if (
+          !choices.length
+        ) {
 
           const empty =
             document.createElement("div");
 
-          empty.className = "empty";
+          empty.className =
+            "empty";
 
           empty.textContent =
             "Ingen produkt hittades.";
 
-          wrapper.appendChild(empty);
+          wrapper.appendChild(
+            empty
+          );
 
 
           result.choices = [];
+
 
           productSelections.appendChild(
             wrapper
@@ -987,7 +1152,9 @@ Bröd"
           "Välj produkt:";
 
 
-        choiceBox.appendChild(label);
+        choiceBox.appendChild(
+          label
+        );
 
 
         const select =
@@ -1094,11 +1261,6 @@ Bröd"
   }
 
 
-  /*
-   * Hämtar de produkter användaren faktiskt
-   * valde i rullistorna.
-   */
-
   function getSelectedProducts() {
 
     const selectedResults = [];
@@ -1158,11 +1320,6 @@ Bröd"
 
   }
 
-
-  /*
-   * När användaren valt en produkt jämför vi
-   * samma produktidentifierare mot butikerna.
-   */
 
   function getSameProductPrices(
     selectedProduct,
@@ -1243,7 +1400,9 @@ Bröd"
     );
 
 
-    if (!matches.length) {
+    if (
+      !matches.length
+    ) {
 
       return `
 
@@ -1376,10 +1535,6 @@ Bröd"
   }
 
 
-  /*
-   * Beräknar totalen per butik.
-   */
-
   function calculateStoreTotals(
     selectedResults
   ) {
@@ -1460,7 +1615,9 @@ Bröd"
       );
 
 
-    if (!totals.length) {
+    if (
+      !totals.length
+    ) {
 
       oneStoreResults.innerHTML =
         '<div class="empty">Ingen butik kunde räknas fram.</div>';
@@ -1551,7 +1708,9 @@ Bröd"
       );
 
 
-    if (!totals.length) {
+    if (
+      !totals.length
+    ) {
 
       smartResults.innerHTML =
         "Vi hittade inte tillräckligt med data ännu.";
@@ -1876,5 +2035,7 @@ Bröd"
     }
   );
 
-</script></body>
+</script>
+
+</body>
 </html>
