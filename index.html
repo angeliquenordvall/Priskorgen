@@ -1,8 +1,11 @@
-<!DOCTYPE html><html lang="sv">
+<!DOCTYPE html>
+<html lang="sv">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Priskorgen</title>  <style>
+  <title>Priskorgen</title>
+
+  <style>
     * {
       box-sizing: border-box;
     }
@@ -330,103 +333,139 @@
         padding: 15px;
       }
     }
-  </style></head><body><div class="container">  <h1>ðŸ›’ Priskorgen</h1>  <p class="subtitle">
-    Hitta billigaste sÃ¤ttet att handla din korg.
-  </p>  <div class="box"><label for="postcode">ðŸ“ Postnummer</label>
+  </style>
+</head>
 
-<input
-  id="postcode"
-  type="text"
-  value="89132"
-  maxlength="5"
-  inputmode="numeric"
->
+<body>
 
-<br><br>
+<div class="container">
 
-<label for="shoppingList">ðŸ›ï¸ Din inkÃ¶pslista</label>
+  <h1>🛒 Priskorgen</h1>
 
-<textarea
-  id="shoppingList"
-  placeholder="Skriv en vara per rad, till exempel:
+  <p class="subtitle">
+    Hitta billigaste sättet att handla din korg.
+  </p>
 
-MjÃ¶lk
+  <div class="box">
+
+    <label for="postcode">📍 Postnummer</label>
+
+    <input
+      id="postcode"
+      type="text"
+      value="89132"
+      maxlength="5"
+      inputmode="numeric"
+    >
+
+    <br><br>
+
+    <label for="shoppingList">🛍️ Din inköpslista</label>
+
+    <textarea
+      id="shoppingList"
+      placeholder="Skriv en vara per rad, till exempel:
+Mjölk
 Bananer
 Kaffe
-SmÃ¶r
-BrÃ¶d"
-></textarea>
+Smör
+Bröd"
+    ></textarea>
 
-<button id="findProductsButton">
-  ðŸ”Ž Hitta produkter
-</button>
+    <button id="findProductsButton">
+      🔎 Hitta produkter
+    </button>
 
-<div id="message"></div>
+    <div id="message"></div>
 
-  </div>  <!-- PRODUKTVAL -->  <div id="selectionBox" class="box hidden"><h2>ðŸ›ï¸ VÃ¤lj dina produkter</h2>
-
-<p style="color:#666; margin-top:-5px;">
-  VÃ¤lj exakt vilken produkt du vill jÃ¤mfÃ¶ra.
-</p>
-
-<div id="productSelections"></div>
-
-<button
-  id="compareSelectedButton"
-  class="secondary-button"
->
-  ðŸ’° JÃ¤mfÃ¶r valda produkter
-</button>
-
-  </div>  <!-- RESULTAT -->  <div id="results" class="hidden"><div id="summary"></div>
-
-<div class="box">
-
-  <h2>âœ¨ Billigast mÃ¶jligt</h2>
-
-  <div id="cheapestResults"></div>
-
-</div>
+  </div>
 
 
-<div class="box">
+  <!-- PRODUKTVAL -->
 
-  <h2>ðŸª En butik</h2>
+  <div id="selectionBox" class="box hidden">
 
-  <div id="oneStoreResults"></div>
+    <h2>🛍️ Välj dina produkter</h2>
 
-</div>
+    <p style="color:#666; margin-top:-5px;">
+      Välj exakt vilken produkt du vill jämföra.
+    </p>
+
+    <div id="productSelections"></div>
+
+    <button
+      id="compareSelectedButton"
+      class="secondary-button"
+    >
+      💰 Jämför valda produkter
+    </button>
+
+  </div>
 
 
-<div class="box">
+  <!-- RESULTAT -->
 
-  <h2>ðŸš— Smartast</h2>
+  <div id="results" class="hidden">
 
-  <div class="smart">
+    <div id="summary"></div>
 
-    <div class="smart-title">
-      Smartaste alternativet
+    <div class="box">
+
+      <h2>✨ Billigast möjligt</h2>
+
+      <div id="cheapestResults"></div>
+
     </div>
 
-    <div id="smartResults">
-      Vi rÃ¤knar pÃ¥ pris och antal butiker.
+
+    <div class="box">
+
+      <h2>🏪 En butik</h2>
+
+      <div id="oneStoreResults"></div>
+
     </div>
+
+
+    <div class="box">
+
+      <h2>🚗 Smartast</h2>
+
+      <div class="smart">
+
+        <div class="smart-title">
+          Smartaste alternativet
+        </div>
+
+        <div id="smartResults">
+          Vi räknar på pris och antal butiker.
+        </div>
+
+      </div>
+
+    </div>
+
+  </div>
+
+
+  <div class="attribution">
+
+    Prisdata från
+
+    <a
+      href="https://primat.nu"
+      target="_blank"
+      rel="noopener"
+    >
+      primat.nu
+    </a>
 
   </div>
 
 </div>
 
-  </div>  <div class="attribution">Prisdata frÃ¥n
 
-<a
-  href="https://primat.nu"
-  target="_blank"
-  rel="noopener"
->
-  primat.nu
-</a>
-
-  </div></div><script>
+<script>
 
   const findProductsButton =
     document.getElementById("findProductsButton");
@@ -471,18 +510,13 @@ BrÃ¶d"
     ica: "ICA",
     lidl: "Lidl",
     willys: "Willys",
-    hemkop: "HemkÃ¶p"
+    hemkop: "Hemköp"
 
   };
 
 
   let allResults = [];
 
-
-  /*
-   * Hur mÃ¥nga produkter som visas
-   * innan anvÃ¤ndaren trycker "Visa fler".
-   */
 
   const INITIAL_PRODUCTS_TO_SHOW = 8;
 
@@ -495,7 +529,7 @@ BrÃ¶d"
       price === null ||
       price === undefined
     ) {
-      return "â€“";
+      return "–";
     }
 
     return Number(price)
@@ -521,7 +555,7 @@ BrÃ¶d"
 
     return storeNames[product.chain]
       || product.chain
-      || "OkÃ¤nd butik";
+      || "Okänd butik";
 
   }
 
@@ -532,7 +566,7 @@ BrÃ¶d"
       .toLowerCase()
       .normalize("NFD")
       .replace(/[\u0300-\u036f]/g, "")
-      .replace(/[^a-z0-9Ã¥Ã¤Ã¶\s]/gi, " ")
+      .replace(/[^a-z0-9åäö\s]/gi, " ")
       .replace(/\s+/g, " ")
       .trim();
 
@@ -594,14 +628,12 @@ BrÃ¶d"
   function productText(product) {
 
     return normalizeText(
-
       [
         product.name || "",
         product.brand || "",
         product.category || "",
         product.package || ""
       ].join(" ")
-
     );
 
   }
@@ -627,8 +659,7 @@ BrÃ¶d"
 
 
   /*
-   * Produktens relevans bestÃ¤mmer ordningen.
-   * Vi filtrerar inte bort produkter hÃ¤r.
+   * PRODUKTRELEVANS
    */
 
   function scoreProduct(item, product) {
@@ -639,7 +670,6 @@ BrÃ¶d"
     ) {
       return -Infinity;
     }
-
 
     const query =
       normalizeText(item);
@@ -761,14 +791,15 @@ BrÃ¶d"
 
 
   /*
-   * Primat fÃ¥r fortfarande gÃ¶ra sÃ¶kningen.
+   * EXTRA SÖKVARIANTER
+   *
+   * Primat gör själva sökningen.
    */
 
   function getQueryVariants(item) {
 
     const normalized =
       normalizeText(item);
-
 
     const variants = [item];
 
@@ -779,8 +810,9 @@ BrÃ¶d"
         "bryggkaffe",
         "malet kaffe",
         "kokkaffe",
-        "kaffebÃ¶nor",
-        "kaffekapslar"
+        "kaffebönor",
+        "kaffekapslar",
+        "kaffefilter"
       );
 
     }
@@ -789,9 +821,9 @@ BrÃ¶d"
     if (normalized === "smor") {
 
       variants.push(
-        "smÃ¶r normalsaltat",
-        "smÃ¶r extrasaltat",
-        "smÃ¶r osaltat"
+        "smör normalsaltat",
+        "smör extrasaltat",
+        "smör osaltat"
       );
 
     }
@@ -800,10 +832,10 @@ BrÃ¶d"
     if (normalized === "mjolk") {
 
       variants.push(
-        "mjÃ¶lk",
-        "standardmjÃ¶lk",
-        "mellanmjÃ¶lk",
-        "lÃ¤ttmjÃ¶lk"
+        "mjölk",
+        "standardmjölk",
+        "mellanmjölk",
+        "lättmjölk"
       );
 
     }
@@ -812,8 +844,8 @@ BrÃ¶d"
     if (normalized === "brod") {
 
       variants.push(
-        "brÃ¶d",
-        "rostbrÃ¶d",
+        "bröd",
+        "rostbröd",
         "formfranska",
         "limpa"
       );
@@ -822,9 +854,7 @@ BrÃ¶d"
 
 
     return [
-      ...new Set(
-        variants
-      )
+      ...new Set(variants)
     ];
 
   }
@@ -859,7 +889,7 @@ BrÃ¶d"
             if (!response.ok) {
 
               throw new Error(
-                "Kunde inte hÃ¤mta prisdata fÃ¶r " +
+                "Kunde inte hämta prisdata för " +
                 variant
               );
 
@@ -978,62 +1008,127 @@ BrÃ¶d"
    * PRODUKTKATEGORIER
    * -------------------------------------------------------
    *
-   * Vi anvÃ¤nder produktens namn och kategori fÃ¶r att
-   * skapa enkla filter.
+   * Viktigt:
    *
-   * Detta filtrerar inte bort produkter frÃ¥n sÃ¶kningen.
-   * Det Ã¤r bara ett sÃ¤tt att gÃ¶ra mÃ¥nga trÃ¤ffar lÃ¤ttare
-   * att Ã¶verblicka.
+   * Vi klassificerar mer specifika produkter först.
+   * Därför hamnar exempelvis:
+   *
+   * Kaffefilter → Filter
+   * Kaffekapslar → Kapslar
+   *
+   * även om produktnamnet innehåller ord som kaffe.
    */
 
-  function getProductGroup(
-    product
-  ) {
+
+  function getProductGroup(product) {
 
     const text =
       productText(product);
 
 
+    /*
+     * 1. FILTER
+     *
+     * Måste komma först.
+     */
+
     if (
-      text.includes("bryggkaffe")
+      text.includes("kaffefilter") ||
+      text.includes("kaffe filter") ||
+      text.includes("filter kaffe") ||
+      text.includes("filter 102") ||
+      text.includes("filter 1x4") ||
+      text.includes("kaffefilter")
     ) {
+
+      return "Filter";
+
+    }
+
+
+    /*
+     * 2. KAPSLAR
+     */
+
+    if (
+      text.includes("kaffekaps") ||
+      text.includes("kaffe kaps") ||
+      text.includes("kapslar") ||
+      text.includes("kapsel") ||
+      text.includes("capsule")
+    ) {
+
+      return "Kapslar";
+
+    }
+
+
+    /*
+     * 3. BRYGGKAFFE
+     */
+
+    if (
+      text.includes("bryggkaffe") ||
+      text.includes("brygg kaffe")
+    ) {
+
       return "Bryggkaffe";
+
     }
 
 
+    /*
+     * 4. KOKKAFFE
+     */
+
     if (
-      text.includes("kokkaffe")
+      text.includes("kokkaffe") ||
+      text.includes("kok kaffe")
     ) {
+
       return "Kokkaffe";
+
     }
 
 
+    /*
+     * 5. KAFFEBÖNOR
+     */
+
     if (
-      text.includes("kaffebÃ¶n")
+      text.includes("kaffebön") ||
+      text.includes("kaffe bon") ||
+      text.includes("espressobön") ||
+      text.includes("espresso bon") ||
+      text.includes("coffee beans")
     ) {
-      return "KaffebÃ¶nor";
+
+      return "Kaffebönor";
+
     }
 
 
-    if (
-      text.includes("kaffekaps")
-      ||
-      text.includes("kapslar")
-    ) {
-      return "Kaffekapslar";
-    }
-
+    /*
+     * 6. MALET KAFFE
+     */
 
     if (
-      text.includes("malet kaffe")
-      ||
-      text.includes("ground coffee")
+      text.includes("malet kaffe") ||
+      text.includes("maletkaffe") ||
+      text.includes("ground coffee") ||
+      text.includes("groundcoffee")
     ) {
+
       return "Malet kaffe";
+
     }
 
 
-    return "Ã–vrigt";
+    /*
+     * 7. ÖVRIGT
+     */
+
+    return "Övrigt";
 
   }
 
@@ -1048,17 +1143,17 @@ BrÃ¶d"
 
 
     /*
-     * Just nu anvÃ¤nder vi de mer specifika
-     * grupperna frÃ¤mst fÃ¶r kaffe.
-     *
-     * FÃ¶r andra varor visas inte onÃ¶diga
-     * filterknappar.
+     * Kategorifilter visas just nu
+     * för kaffe eftersom det är där
+     * vi har många olika typer.
      */
 
     if (
       normalized !== "kaffe"
     ) {
+
       return [];
+
     }
 
 
@@ -1074,18 +1169,34 @@ BrÃ¶d"
             product
           );
 
-
-        if (
-          group !== "Ã–vrigt"
-        ) {
-          groups.add(group);
-        }
+        groups.add(group);
 
       }
     );
 
 
-    return Array.from(groups);
+    /*
+     * Bestämd ordning.
+     *
+     * Vi lägger inte "Övrigt" först.
+     */
+
+    const preferredOrder = [
+
+      "Bryggkaffe",
+      "Kokkaffe",
+      "Kaffebönor",
+      "Kapslar",
+      "Filter",
+      "Malet kaffe",
+      "Övrigt"
+
+    ];
+
+
+    return preferredOrder.filter(
+      group => groups.has(group)
+    );
 
   }
 
@@ -1120,34 +1231,40 @@ BrÃ¶d"
         });
 
 
-    candidates.sort((a, b) => {
+    candidates.sort(
+      (a, b) => {
 
-      if (
-        b.score !== a.score
-      ) {
-        return b.score - a.score;
+        if (
+          b.score !== a.score
+        ) {
+
+          return b.score - a.score;
+
+        }
+
+
+        const aPrice =
+          typeof a.product.prices?.effective === "number"
+            ? a.product.prices.effective
+            : Infinity;
+
+
+        const bPrice =
+          typeof b.product.prices?.effective === "number"
+            ? b.product.prices.effective
+            : Infinity;
+
+
+        return aPrice - bPrice;
+
       }
-
-
-      const aPrice =
-        typeof a.product.prices?.effective === "number"
-          ? a.product.prices.effective
-          : Infinity;
-
-
-      const bPrice =
-        typeof b.product.prices?.effective === "number"
-          ? b.product.prices.effective
-          : Infinity;
-
-
-      return aPrice - bPrice;
-
-    });
+    );
 
 
     const unique = [];
-    const seen = new Set();
+
+    const seen =
+      new Set();
 
 
     for (
@@ -1163,7 +1280,9 @@ BrÃ¶d"
       if (
         seen.has(key)
       ) {
+
         continue;
+
       }
 
 
@@ -1177,7 +1296,9 @@ BrÃ¶d"
       if (
         unique.length >= 100
       ) {
+
         break;
+
       }
 
     }
@@ -1189,7 +1310,7 @@ BrÃ¶d"
 
 
   /*
-   * Visar ett produktkort.
+   * PRODUKTKORT
    */
 
   function createProductCard(
@@ -1202,7 +1323,9 @@ BrÃ¶d"
     const card =
       document.createElement("button");
 
+
     card.type = "button";
+
 
     card.className =
       "product-card";
@@ -1215,18 +1338,25 @@ BrÃ¶d"
 
 
     if (isSelected) {
-      card.classList.add("selected");
+
+      card.classList.add(
+        "selected"
+      );
+
     }
 
 
     const name =
       document.createElement("div");
 
+
     name.className =
       "product-card-name";
 
+
     name.textContent =
-      product.name || "OkÃ¤nd produkt";
+      product.name ||
+      "Okänd produkt";
 
 
     card.appendChild(
@@ -1237,6 +1367,7 @@ BrÃ¶d"
     const meta =
       document.createElement("div");
 
+
     meta.className =
       "product-card-meta";
 
@@ -1245,9 +1376,11 @@ BrÃ¶d"
 
 
     if (product.brand) {
+
       metaParts.push(
         product.brand
       );
+
     }
 
 
@@ -1263,14 +1396,16 @@ BrÃ¶d"
 
 
     if (packageText) {
+
       metaParts.push(
         packageText
       );
+
     }
 
 
     meta.textContent =
-      metaParts.join(" â€¢ ");
+      metaParts.join(" • ");
 
 
     card.appendChild(
@@ -1280,6 +1415,7 @@ BrÃ¶d"
 
     const price =
       document.createElement("div");
+
 
     price.className =
       "product-card-price";
@@ -1293,7 +1429,7 @@ BrÃ¶d"
         formatPrice(
           product.prices.effective
         ) +
-        " frÃ¥n";
+        " från";
 
     } else {
 
@@ -1313,11 +1449,14 @@ BrÃ¶d"
       const selectedLabel =
         document.createElement("div");
 
+
       selectedLabel.className =
         "selected-label";
 
+
       selectedLabel.textContent =
-        "âœ“ VALD PRODUKT";
+        "✓ VALD PRODUKT";
+
 
       card.appendChild(
         selectedLabel
@@ -1345,12 +1484,13 @@ BrÃ¶d"
 
 
   /*
-   * Renderar sjÃ¤lva produktvÃ¤ljaren.
+   * RENDER PRODUKTVÄLJARE
    */
 
   function renderProductSelections() {
 
-    productSelections.innerHTML = "";
+    productSelections.innerHTML =
+      "";
 
 
     allResults.forEach(
@@ -1366,6 +1506,7 @@ BrÃ¶d"
         const wrapper =
           document.createElement("div");
 
+
         wrapper.className =
           "item";
 
@@ -1373,8 +1514,10 @@ BrÃ¶d"
         const title =
           document.createElement("div");
 
+
         title.className =
           "item-name";
+
 
         title.textContent =
           result.item;
@@ -1392,11 +1535,14 @@ BrÃ¶d"
           const empty =
             document.createElement("div");
 
+
           empty.className =
             "empty";
 
+
           empty.textContent =
             "Ingen produkt hittades.";
+
 
           wrapper.appendChild(
             empty
@@ -1413,6 +1559,7 @@ BrÃ¶d"
             wrapper
           );
 
+
           return;
 
         }
@@ -1421,11 +1568,6 @@ BrÃ¶d"
         result.choices =
           choices;
 
-
-        /*
-         * Om anvÃ¤ndaren redan valt en produkt
-         * behÃ¥ller vi valet nÃ¤r sidan ritas om.
-         */
 
         if (
           !result.selectedProduct
@@ -1440,6 +1582,7 @@ BrÃ¶d"
         const choiceBox =
           document.createElement("div");
 
+
         choiceBox.className =
           "product-choice";
 
@@ -1447,12 +1590,14 @@ BrÃ¶d"
         const count =
           document.createElement("div");
 
+
         count.className =
           "product-count";
 
+
         count.textContent =
           choices.length +
-          " mÃ¶jliga produkter hittades.";
+          " möjliga produkter hittades.";
 
 
         choiceBox.appendChild(
@@ -1479,16 +1624,25 @@ BrÃ¶d"
         const filters =
           document.createElement("div");
 
+
         filters.className =
           "product-filters";
 
 
-        if (groups.length > 0) {
+        if (
+          groups.length > 0
+        ) {
+
+          /*
+           * ALLA
+           */
 
           const allButton =
             document.createElement("button");
 
+
           allButton.type = "button";
+
 
           allButton.className =
             "filter-button";
@@ -1497,7 +1651,11 @@ BrÃ¶d"
           if (
             activeGroup === "Alla"
           ) {
-            allButton.classList.add("active");
+
+            allButton.classList.add(
+              "active"
+            );
+
           }
 
 
@@ -1512,8 +1670,10 @@ BrÃ¶d"
               result.activeGroup =
                 "Alla";
 
+
               result.visibleCount =
                 INITIAL_PRODUCTS_TO_SHOW;
+
 
               renderProductSelections();
 
@@ -1526,13 +1686,19 @@ BrÃ¶d"
           );
 
 
+          /*
+           * KATEGORIER
+           */
+
           groups.forEach(
             group => {
 
               const filterButton =
                 document.createElement("button");
 
+
               filterButton.type = "button";
+
 
               filterButton.className =
                 "filter-button";
@@ -1541,9 +1707,11 @@ BrÃ¶d"
               if (
                 activeGroup === group
               ) {
+
                 filterButton.classList.add(
                   "active"
                 );
+
               }
 
 
@@ -1558,8 +1726,10 @@ BrÃ¶d"
                   result.activeGroup =
                     group;
 
+
                   result.visibleCount =
                     INITIAL_PRODUCTS_TO_SHOW;
+
 
                   renderProductSelections();
 
@@ -1583,7 +1753,7 @@ BrÃ¶d"
 
 
         /*
-         * FILTRERA ENDAST FÃ–R VISNING.
+         * FILTRERA ENDAST FÖR VISNING
          */
 
         let visibleChoices =
@@ -1618,6 +1788,7 @@ BrÃ¶d"
 
         const productList =
           document.createElement("div");
+
 
         productList.className =
           "product-list";
@@ -1656,10 +1827,13 @@ BrÃ¶d"
           const showMore =
             document.createElement("button");
 
+
           showMore.type = "button";
+
 
           showMore.className =
             "show-more-button";
+
 
           showMore.textContent =
             "Visa fler produkter (" +
@@ -1678,6 +1852,7 @@ BrÃ¶d"
                 visibleCount +
                 PRODUCTS_TO_ADD;
 
+
               renderProductSelections();
 
             }
@@ -1694,6 +1869,7 @@ BrÃ¶d"
         const help =
           document.createElement("div");
 
+
         help.className =
           "choice-help";
 
@@ -1703,12 +1879,12 @@ BrÃ¶d"
         ) {
 
           help.textContent =
-            "âœ“ Produkten Ã¤r vald. Du kan Ã¤ndra valet ovan.";
+            "✓ Produkten är vald. Du kan ändra valet ovan.";
 
         } else {
 
           help.textContent =
-            "Tryck pÃ¥ en produkt fÃ¶r att vÃ¤lja den.";
+            "Tryck på en produkt för att välja den.";
 
         }
 
@@ -1744,7 +1920,9 @@ BrÃ¶d"
         if (
           !result.selectedProduct
         ) {
+
           return;
+
         }
 
 
@@ -1790,7 +1968,9 @@ BrÃ¶d"
           !product.prices ||
           typeof product.prices.effective !== "number"
         ) {
+
           return false;
+
         }
 
 
@@ -1805,19 +1985,24 @@ BrÃ¶d"
     const byStore = {};
 
 
-    matches.forEach(product => {
+    matches.forEach(
+      product => {
 
-      const key =
-        product.chain +
-        ":" +
-        product.store_id;
+        const key =
+          product.chain +
+          ":" +
+          product.store_id;
 
 
-      if (!byStore[key]) {
-        byStore[key] = product;
+        if (!byStore[key]) {
+
+          byStore[key] =
+            product;
+
+        }
+
       }
-
-    });
+    );
 
 
     return Object.values(
@@ -1864,10 +2049,8 @@ BrÃ¶d"
           </div>
 
           <div class="empty">
-
             Ingen butik med denna exakta
             produkt hittades i prisdatan.
-
           </div>
 
         </div>
@@ -1910,7 +2093,7 @@ BrÃ¶d"
 
           ${
             packageText
-              ? " â€¢ " +
+              ? " • " +
                 escapeHtml(
                   packageText
                 )
@@ -1929,17 +2112,21 @@ BrÃ¶d"
           <div class="store-row">
 
             <span class="store-name">
+
               ${escapeHtml(
                 getStoreName(
                   cheapest
                 )
               )}
+
             </span>
 
             <span class="price">
+
               ${formatPrice(
                 cheapest.prices.effective
               )}
+
             </span>
 
           </div>
@@ -1953,25 +2140,29 @@ BrÃ¶d"
             matches.map(
               product => `
 
-              <div class="store-row">
+                <div class="store-row">
 
-                <span class="store-name">
-                  ${escapeHtml(
-                    getStoreName(
-                      product
-                    )
-                  )}
-                </span>
+                  <span class="store-name">
 
-                <span class="price">
-                  ${formatPrice(
-                    product.prices.effective
-                  )}
-                </span>
+                    ${escapeHtml(
+                      getStoreName(
+                        product
+                      )
+                    )}
 
-              </div>
+                  </span>
 
-            `
+                  <span class="price">
+
+                    ${formatPrice(
+                      product.prices.effective
+                    )}
+
+                  </span>
+
+                </div>
+
+              `
             ).join("")
           }
 
@@ -2002,47 +2193,50 @@ BrÃ¶d"
         );
 
 
-      matches.forEach(product => {
+      matches.forEach(
+        product => {
 
-        const storeKey =
-          product.chain +
-          ":" +
-          product.store_id;
+          const storeKey =
+            product.chain +
+            ":" +
+            product.store_id;
 
 
-        if (!totals[storeKey]) {
+          if (!totals[storeKey]) {
 
-          totals[storeKey] = {
+            totals[storeKey] = {
 
-            chain:
-              product.chain,
+              chain:
+                product.chain,
 
-            store_id:
-              product.store_id,
+              store_id:
+                product.store_id,
 
-            name:
-              getStoreName(
-                product
-              ),
+              name:
+                getStoreName(
+                  product
+                ),
 
-            total:
-              0,
+              total:
+                0,
 
-            items:
-              0
+              items:
+                0
 
-          };
+            };
+
+          }
+
+
+          totals[storeKey].total +=
+            product.prices.effective;
+
+
+          totals[storeKey].items +=
+            1;
 
         }
-
-
-        totals[storeKey].total +=
-          product.prices.effective;
-
-
-        totals[storeKey].items += 1;
-
-      });
+      );
 
     }
 
@@ -2069,28 +2263,32 @@ BrÃ¶d"
     ) {
 
       oneStoreResults.innerHTML =
-        '<div class="empty">Ingen butik kunde rÃ¤knas fram.</div>';
+        '<div class="empty">Ingen butik kunde räknas fram.</div>';
 
       return;
 
     }
 
 
-    totals.sort((a, b) => {
+    totals.sort(
+      (a, b) => {
 
-      if (
-        b.items !== a.items
-      ) {
-        return b.items - a.items;
+        if (
+          b.items !== a.items
+        ) {
+
+          return b.items - a.items;
+
+        }
+
+
+        return (
+          a.total -
+          b.total
+        );
+
       }
-
-
-      return (
-        a.total -
-        b.total
-      );
-
-    });
+    );
 
 
     const best =
@@ -2102,10 +2300,13 @@ BrÃ¶d"
       <div class="item">
 
         <div class="item-name">
-          ðŸ† ${escapeHtml(
+
+          🏆 ${escapeHtml(
             best.name
           )}
+
         </div>
+
 
         <div class="item-meta">
 
@@ -2119,21 +2320,27 @@ BrÃ¶d"
         <div class="cheapest">
 
           <div class="best-label">
-            TOTAL FÃ–R TILLGÃ„NGLIGA PRODUKTER
+            TOTAL FÖR TILLGÄNGLIGA PRODUKTER
           </div>
+
 
           <div class="store-row">
 
             <span class="store-name">
+
               ${escapeHtml(
                 best.name
               )}
+
             </span>
 
+
             <span class="price">
+
               ${formatPrice(
                 best.total
               )}
+
             </span>
 
           </div>
@@ -2162,28 +2369,32 @@ BrÃ¶d"
     ) {
 
       smartResults.innerHTML =
-        "Vi hittade inte tillrÃ¤ckligt med data Ã¤nnu.";
+        "Vi hittade inte tillräckligt med data ännu.";
 
       return;
 
     }
 
 
-    totals.sort((a, b) => {
+    totals.sort(
+      (a, b) => {
 
-      if (
-        b.items !== a.items
-      ) {
-        return b.items - a.items;
+        if (
+          b.items !== a.items
+        ) {
+
+          return b.items - a.items;
+
+        }
+
+
+        return (
+          a.total -
+          b.total
+        );
+
       }
-
-
-      return (
-        a.total -
-        b.total
-      );
-
-    });
+    );
 
 
     const best =
@@ -2198,8 +2409,8 @@ BrÃ¶d"
         )}
       </strong>
 
-      har just nu det bÃ¤sta alternativet
-      bland de butiker dÃ¤r vi hittar dina valda produkter.
+      har just nu det bästa alternativet
+      bland de butiker där vi hittar dina valda produkter.
 
       <br><br>
 
@@ -2216,9 +2427,11 @@ BrÃ¶d"
       <br><br>
 
       <small>
-        ðŸš— NÃ¤sta steg blir att vÃ¤ga in avstÃ¥nd,
+
+        🚗 Nästa steg blir att väga in avstånd,
         restid och hur mycket du faktiskt sparar
-        pÃ¥ att Ã¥ka till flera butiker.
+        på att åka till flera butiker.
+
       </small>
 
     `;
@@ -2229,7 +2442,7 @@ BrÃ¶d"
   /*
    * STEG 1:
    *
-   * HÃ¤mta produkter.
+   * HÄMTA PRODUKTER
    */
 
   findProductsButton.addEventListener(
@@ -2253,9 +2466,11 @@ BrÃ¶d"
 
       message.innerHTML = "";
 
+
       results.classList.add(
         "hidden"
       );
+
 
       selectionBox.classList.add(
         "hidden"
@@ -2279,7 +2494,7 @@ BrÃ¶d"
       ) {
 
         message.innerHTML =
-          '<div class="error">Postnumret mÃ¥ste innehÃ¥lla 5 siffror.</div>';
+          '<div class="error">Postnumret måste innehålla 5 siffror.</div>';
 
         return;
 
@@ -2289,7 +2504,7 @@ BrÃ¶d"
       if (!items.length) {
 
         message.innerHTML =
-          '<div class="error">Skriv minst en vara i inkÃ¶pslistan.</div>';
+          '<div class="error">Skriv minst en vara i inköpslistan.</div>';
 
         return;
 
@@ -2299,12 +2514,13 @@ BrÃ¶d"
       findProductsButton.disabled =
         true;
 
+
       findProductsButton.textContent =
-        "â³ Hittar produkter...";
+        "⏳ Hittar produkter...";
 
 
       message.innerHTML =
-        '<div class="loading">HÃ¤mtar produktalternativ...</div>';
+        '<div class="loading">Hämtar produktalternativ...</div>';
 
 
       try {
@@ -2351,12 +2567,16 @@ BrÃ¶d"
         );
 
 
-        message.innerHTML = "";
+        message.innerHTML =
+          "";
 
 
         selectionBox.scrollIntoView({
+
           behavior: "smooth",
+
           block: "start"
+
         });
 
 
@@ -2369,8 +2589,8 @@ BrÃ¶d"
 
           <div class="error">
 
-            NÃ¥got gick fel nÃ¤r produkterna
-            skulle hÃ¤mtas.
+            Något gick fel när produkterna
+            skulle hämtas.
 
             <br><br>
 
@@ -2387,8 +2607,9 @@ BrÃ¶d"
         findProductsButton.disabled =
           false;
 
+
         findProductsButton.textContent =
-          "ðŸ”Ž Hitta produkter";
+          "🔎 Hitta produkter";
 
       }
 
@@ -2399,8 +2620,8 @@ BrÃ¶d"
   /*
    * STEG 2:
    *
-   * JÃ¤mfÃ¶r exakt de produkter anvÃ¤ndaren
-   * valt.
+   * JÄMFÖR EXAKT DE PRODUKTER
+   * ANVÄNDAREN VALT.
    */
 
   compareSelectedButton.addEventListener(
@@ -2416,7 +2637,7 @@ BrÃ¶d"
       ) {
 
         message.innerHTML =
-          '<div class="error">VÃ¤lj minst en produkt fÃ¶rst.</div>';
+          '<div class="error">Välj minst en produkt först.</div>';
 
         return;
 
@@ -2445,13 +2666,17 @@ BrÃ¶d"
           </div>
 
           <div class="summary-price">
+
             ${matchedCount} av
             ${selectedResults.length}
+
           </div>
 
           <div>
-            valda produkter kunde jÃ¤mfÃ¶ras
+
+            valda produkter kunde jämföras
             mellan butikerna
+
           </div>
 
         </div>
@@ -2486,12 +2711,17 @@ BrÃ¶d"
 
 
       results.scrollIntoView({
+
         behavior: "smooth",
+
         block: "start"
+
       });
 
     }
   );
 
-</script></body>
+</script>
+
+</body>
 </html>
