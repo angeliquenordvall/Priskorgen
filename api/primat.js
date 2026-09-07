@@ -3,51 +3,26 @@ export default async function handler(req, res) {
     const q = req.query.q;
     const postcode = req.query.postcode || "89132";
 
-    const apiKey = process.env.PRIMAT_API_KEY;
-
-    if (!apiKey) {
-      return res.status(500).json({
-        error: "PRIMAT_API_KEY saknas i Vercel."
-      });
-    }
-
-    const headers = {
-      Authorization: `Bearer ${apiKey}`
-    };
-
-    // ------------------------------------------------------------
-    // Hämta butiker för postnumret
-    // ------------------------------------------------------------
+    // Hämta närmaste relevanta butiker
     const storesResponse = await fetch(
-      "https://primat.nu/api/v3/stores/resolve?postcode=" +
-        encodeURIComponent(postcode),
-      {
-        headers
-      }
+      "https://primat.nu/api/v3/demo/stores/resolve?postcode=" +
+        encodeURIComponent(postcode)
     );
 
     if (!storesResponse.ok) {
-      const errorText = await storesResponse.text();
-
       throw new Error(
-        "Kunde inte hitta butiker: " +
-          storesResponse.status +
-          " " +
-          errorText
+        "Kunde inte hitta butiker: " + storesResponse.status
       );
     }
 
     const storesData = await storesResponse.json();
 
     const selectedStores =
-      storesData.default_selection || [];
+      storesData.default_selection ||
+      storesData.stores?.default_selection ||
+      [];
 
-    const stores = selectedStores.join(",");
-
-    // ------------------------------------------------------------
-    // Om ingen sökning finns:
-    // returnera butiksinformationen
-    // ------------------------------------------------------------
+    // Om ingen sökning görs – returnera butiksinformationen
     if (!q) {
       return res.status(200).json({
         postcode,
@@ -55,61 +30,168 @@ export default async function handler(req, res) {
       });
     }
 
-    // ------------------------------------------------------------
-    // Sök efter produkter
-    //
-    // Den riktiga API:n tillåter större resultatmängd än
-    // demo-API:n. Vi använder 100 för att ge vår matchning
-    // mycket bättre chans att hitta rätt produkt.
-    // ------------------------------------------------------------
-    const productsUrl =
-      "https://primat.nu/api/v3/products?q=" +
-      encodeURIComponent(q) +
-      "&stores=" +
-      encodeURIComponent(stores) +
-      "&limit=100";
+    const stores = selectedStores.join(",");
 
-    const productsResponse = await fetch(productsUrl, {
-      headers
-    });
+    /*
+      Vissa vanliga produkter behöver flera sökningar eftersom
+      Primats demo-sökning bara returnerar de 25 högst rankade
+      träffarna.
 
-    if (!productsResponse.ok) {
-      const errorText = await productsResponse.text();
+      För "smör" letar vi därför även efter specifika varianter.
+      Det gör att vanligt mat-smör kan hittas även om exempelvis
+      smördeg, jordnötssmör och smörgåsmargarin rankas högre.
+    */
+    let searchQueries = [q];
 
-      throw new Error(
-        "Primat svarade med " +
-          productsResponse.status +
-          " " +
-          errorText
-      );
+    const normalizedQuery = q
+      .toLowerCase()
+      .normalize("NFD")
+      .replace(/[\u0300-\u036f]/g, "");
+
+    if (
+      normalizedQuery === "smor" ||
+      normalizedQuery === "smör"
+    ) {
+      searchQueries = [
+        "smör",
+        "smör normalsaltat",
+        "smör extrasaltat",
+        "smör osaltat",
+        "smör 82%"
+      ];
     }
 
-    const productsData = await productsResponse.json();
+    // Kör sökningarna
+    const allProducts = [];
 
-    // Primats v3 returnerar produkterna i data[]
-    const products = Array.isArray(productsData.data)
-      ? productsData.data
-      : [];
+    for (const searchQuery of searchQueries) {
+      const productsUrl =
+        "https://primat.nu/api/v3/demo/products?q=" +
+        encodeURIComponent(searchQuery) +
+        "&stores=" +
+        encodeURIComponent(stores);
 
-    // ------------------------------------------------------------
-    // Returnera även Primats attribution.
-    // ------------------------------------------------------------
+      const productsResponse = await fetch(productsUrl);
+
+      if (!productsResponse.ok) {
+        continue;
+      }
+
+      const productsData = await productsResponse.json();
+
+      if (Array.isArray(productsData)) {
+        allProducts.push(...productsData);
+      } else if (Array.isArray(productsData.products)) {
+        allProducts.push(...productsData.products);
+      }
+    }
+
+    // Ta bort eventuella dubbletter
+    const uniqueProducts = [];
+    const seen = new Set();
+
+    for (const product of allProducts) {
+      const key =
+        [
+          product.chain,
+          product.store_id,
+          product.product_id,
+          product.gtin,
+          product.name
+        ]
+          .filter(Boolean)
+          .join("|");
+
+      if (!seen.has(key)) {
+        seen.add(key);
+        uniqueProducts.push(product);
+      }
+    }
+
+    /*
+      Extra backend-skydd för "smör":
+      Vanligt smör ska inte förväxlas med exempelvis:
+      - jordnötssmör
+      - smörgåsmargarin
+      - smördeg
+      - kryddsmör
+      - vitlökssmör
+      - smörgåsfett
+      - växtbaserat
+    */
+    if (
+      normalizedQuery === "smor" ||
+      normalizedQuery === "smör"
+    ) {
+      const ordinaryButter = uniqueProducts.filter((product) => {
+        const text = [
+          product.name,
+          product.brand,
+          product.category
+        ]
+          .filter(Boolean)
+          .join(" ")
+          .toLowerCase()
+          .normalize("NFD")
+          .replace(/[\u0300-\u036f]/g, "");
+
+        const excluded = [
+          "jordnotssmor",
+          "smorgasmargarin",
+          "smorgas",
+          "margarin",
+          "smordeg",
+          "kryddsmor",
+          "vitlokssmor",
+          "smorja",
+          "smorgasfett",
+          "vaxtbaserat",
+          "mjolkfritt"
+        ];
+
+        if (excluded.some((word) => text.includes(word))) {
+          return false;
+        }
+
+        return (
+          text.includes("smor") ||
+          text.includes("butter")
+        );
+      });
+
+      // Lägg de sannolika vanliga smörprodukterna först
+      ordinaryButter.sort((a, b) => {
+        const aText = (a.name || "").toLowerCase();
+        const bText = (b.name || "").toLowerCase();
+
+        const aPlain =
+          aText.includes("smör") &&
+          !aText.includes("smörgås") &&
+          !aText.includes("jordnöt") &&
+          !aText.includes("smördeg");
+
+        const bPlain =
+          bText.includes("smör") &&
+          !bText.includes("smörgås") &&
+          !bText.includes("jordnöt") &&
+          !bText.includes("smördeg");
+
+        return Number(bPlain) - Number(aPlain);
+      });
+
+      return res.status(200).json({
+        postcode,
+        selected_stores: selectedStores,
+        products: ordinaryButter
+      });
+    }
+
     return res.status(200).json({
       postcode,
       selected_stores: selectedStores,
-      query: q,
-      count: products.length,
-      products,
-      attribution:
-        productsData.attribution || {
-          text: "Prisdata från primat.nu",
-          url: "https://primat.nu"
-        }
+      products: uniqueProducts
     });
-
   } catch (error) {
-    console.error("Primat API error:", error);
-
     return res.status(500).json({
       error: error.message
     });
