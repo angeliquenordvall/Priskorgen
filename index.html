@@ -45,8 +45,7 @@
     }
 
     input,
-    textarea,
-    select {
+    textarea {
       width: 100%;
       border: 1px solid #ccc;
       border-radius: 10px;
@@ -115,22 +114,110 @@
       margin-bottom: 12px;
     }
 
+    /* PRODUKTVAL */
+
     .product-choice {
-      background: #f7f8fa;
-      border-radius: 12px;
-      padding: 14px;
       margin-top: 10px;
     }
 
-    .product-choice label {
+    .product-count {
+      color: #777;
+      font-size: 13px;
+      margin-bottom: 10px;
+    }
+
+    .product-filters {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 7px;
+      margin-bottom: 12px;
+    }
+
+    .filter-button {
+      width: auto;
+      margin: 0;
+      padding: 8px 11px;
+      font-size: 13px;
+      font-weight: bold;
+      background: #f0f1f3;
+      color: #333;
+      border: 1px solid #ddd;
+      border-radius: 20px;
+    }
+
+    .filter-button.active {
+      background: #111;
+      color: white;
+      border-color: #111;
+    }
+
+    .product-list {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .product-card {
+      width: 100%;
+      margin: 0;
+      padding: 12px 13px;
+      text-align: left;
+      background: white;
+      color: #222;
+      border: 1px solid #ddd;
+      border-radius: 12px;
+      font-weight: normal;
+      cursor: pointer;
+    }
+
+    .product-card:hover {
+      border-color: #999;
+    }
+
+    .product-card.selected {
+      border: 2px solid #287a35;
+      background: #eef8ef;
+      padding: 11px 12px;
+    }
+
+    .product-card-name {
+      font-size: 16px;
+      font-weight: bold;
+      line-height: 1.3;
+      margin-bottom: 4px;
+    }
+
+    .product-card-meta {
+      color: #777;
+      font-size: 13px;
+      line-height: 1.35;
+    }
+
+    .product-card-price {
+      font-size: 15px;
+      font-weight: bold;
+      margin-top: 6px;
+    }
+
+    .selected-label {
+      color: #287a35;
+      font-size: 12px;
+      font-weight: bold;
+      margin-top: 5px;
+    }
+
+    .show-more-button {
+      background: #f0f1f3;
+      color: #222;
+      margin-top: 8px;
+      padding: 11px;
       font-size: 14px;
-      margin-bottom: 7px;
     }
 
     .choice-help {
       color: #777;
       font-size: 13px;
-      margin-top: 7px;
+      margin-top: 9px;
     }
 
     .store-row {
@@ -392,6 +479,16 @@ Bröd"
   let allResults = [];
 
 
+  /*
+   * Hur många produkter som visas
+   * innan användaren trycker "Visa fler".
+   */
+
+  const INITIAL_PRODUCTS_TO_SHOW = 8;
+
+  const PRODUCTS_TO_ADD = 12;
+
+
   function formatPrice(price) {
 
     if (
@@ -530,7 +627,7 @@ Bröd"
 
 
   /*
-   * Produktens relevans bestämmer bara ordningen.
+   * Produktens relevans bestämmer ordningen.
    * Vi filtrerar inte bort produkter här.
    */
 
@@ -664,18 +761,7 @@ Bröd"
 
 
   /*
-   * -------------------------------------------------------
-   * NYTT:
-   *
    * Primat får fortfarande göra sökningen.
-   *
-   * Men för ett generiskt ord kan vi komplettera med
-   * närliggande sökningar så att Primats begränsning
-   * på 100 träffar inte gör att alla relevanta produkter
-   * trängs undan av t.ex. kapslar och filter.
-   *
-   * Vi filtrerar inte bort något av resultaten.
-   * -------------------------------------------------------
    */
 
   function getQueryVariants(item) {
@@ -686,15 +772,6 @@ Bröd"
 
     const variants = [item];
 
-
-    /*
-     * Kaffe:
-     *
-     * "kaffe" söker även efter de vanligaste
-     * produktbenämningarna för kaffe.
-     *
-     * Alla träffar slås sedan ihop.
-     */
 
     if (normalized === "kaffe") {
 
@@ -709,13 +786,6 @@ Bröd"
     }
 
 
-    /*
-     * Smör:
-     *
-     * Vi kompletterar sökningen utan att
-     * filtrera bort något.
-     */
-
     if (normalized === "smor") {
 
       variants.push(
@@ -726,10 +796,6 @@ Bröd"
 
     }
 
-
-    /*
-     * Mjölk.
-     */
 
     if (normalized === "mjolk") {
 
@@ -742,10 +808,6 @@ Bröd"
 
     }
 
-
-    /*
-     * Bröd.
-     */
 
     if (normalized === "brod") {
 
@@ -776,10 +838,6 @@ Bröd"
     const variants =
       getQueryVariants(query);
 
-
-    /*
-     * Kör alla Primat-sökningar parallellt.
-     */
 
     const responses =
       await Promise.all(
@@ -812,13 +870,6 @@ Bröd"
               await response.json();
 
 
-            /*
-             * Den fungerande API-funktionen
-             * returnerar Primats svar i:
-             *
-             * data.products.data
-             */
-
             if (
               !data.products ||
               !data.products.data
@@ -834,13 +885,6 @@ Bröd"
 
       );
 
-
-    /*
-     * Slå ihop resultaten.
-     *
-     * GTIN används när det finns.
-     * Annars namn + varumärke + förpackning.
-     */
 
     const productMap =
       new Map();
@@ -925,6 +969,123 @@ Bröd"
       )
 
     ].join("|");
+
+  }
+
+
+  /*
+   * -------------------------------------------------------
+   * PRODUKTKATEGORIER
+   * -------------------------------------------------------
+   *
+   * Vi använder produktens namn och kategori för att
+   * skapa enkla filter.
+   *
+   * Detta filtrerar inte bort produkter från sökningen.
+   * Det är bara ett sätt att göra många träffar lättare
+   * att överblicka.
+   */
+
+  function getProductGroup(
+    product
+  ) {
+
+    const text =
+      productText(product);
+
+
+    if (
+      text.includes("bryggkaffe")
+    ) {
+      return "Bryggkaffe";
+    }
+
+
+    if (
+      text.includes("kokkaffe")
+    ) {
+      return "Kokkaffe";
+    }
+
+
+    if (
+      text.includes("kaffebön")
+    ) {
+      return "Kaffebönor";
+    }
+
+
+    if (
+      text.includes("kaffekaps")
+      ||
+      text.includes("kapslar")
+    ) {
+      return "Kaffekapslar";
+    }
+
+
+    if (
+      text.includes("malet kaffe")
+      ||
+      text.includes("ground coffee")
+    ) {
+      return "Malet kaffe";
+    }
+
+
+    return "Övrigt";
+
+  }
+
+
+  function getAvailableGroups(
+    item,
+    choices
+  ) {
+
+    const normalized =
+      normalizeText(item);
+
+
+    /*
+     * Just nu använder vi de mer specifika
+     * grupperna främst för kaffe.
+     *
+     * För andra varor visas inte onödiga
+     * filterknappar.
+     */
+
+    if (
+      normalized !== "kaffe"
+    ) {
+      return [];
+    }
+
+
+    const groups =
+      new Set();
+
+
+    choices.forEach(
+      product => {
+
+        const group =
+          getProductGroup(
+            product
+          );
+
+
+        if (
+          group !== "Övrigt"
+        ) {
+          groups.add(group);
+        }
+
+      }
+    );
+
+
+    return Array.from(groups);
 
   }
 
@@ -1027,6 +1188,166 @@ Bröd"
   }
 
 
+  /*
+   * Visar ett produktkort.
+   */
+
+  function createProductCard(
+    result,
+    product,
+    index,
+    selectedProduct
+  ) {
+
+    const card =
+      document.createElement("button");
+
+    card.type = "button";
+
+    card.className =
+      "product-card";
+
+
+    const isSelected =
+      selectedProduct &&
+      getProductKey(selectedProduct) ===
+      getProductKey(product);
+
+
+    if (isSelected) {
+      card.classList.add("selected");
+    }
+
+
+    const name =
+      document.createElement("div");
+
+    name.className =
+      "product-card-name";
+
+    name.textContent =
+      product.name || "Okänd produkt";
+
+
+    card.appendChild(
+      name
+    );
+
+
+    const meta =
+      document.createElement("div");
+
+    meta.className =
+      "product-card-meta";
+
+
+    const metaParts = [];
+
+
+    if (product.brand) {
+      metaParts.push(
+        product.brand
+      );
+    }
+
+
+    const packageText =
+      product.package ||
+      (
+        product.amount
+          ? product.amount +
+            " " +
+            (product.unit || "")
+          : ""
+      );
+
+
+    if (packageText) {
+      metaParts.push(
+        packageText
+      );
+    }
+
+
+    meta.textContent =
+      metaParts.join(" • ");
+
+
+    card.appendChild(
+      meta
+    );
+
+
+    const price =
+      document.createElement("div");
+
+    price.className =
+      "product-card-price";
+
+
+    if (
+      typeof product.prices?.effective === "number"
+    ) {
+
+      price.textContent =
+        formatPrice(
+          product.prices.effective
+        ) +
+        " från";
+
+    } else {
+
+      price.textContent =
+        "Pris saknas";
+
+    }
+
+
+    card.appendChild(
+      price
+    );
+
+
+    if (isSelected) {
+
+      const selectedLabel =
+        document.createElement("div");
+
+      selectedLabel.className =
+        "selected-label";
+
+      selectedLabel.textContent =
+        "✓ VALD PRODUKT";
+
+      card.appendChild(
+        selectedLabel
+      );
+
+    }
+
+
+    card.addEventListener(
+      "click",
+      function() {
+
+        result.selectedProduct =
+          product;
+
+        renderProductSelections();
+
+      }
+    );
+
+
+    return card;
+
+  }
+
+
+  /*
+   * Renderar själva produktväljaren.
+   */
+
   function renderProductSelections() {
 
     productSelections.innerHTML = "";
@@ -1084,6 +1405,9 @@ Bröd"
 
           result.choices = [];
 
+          result.selectedProduct =
+            null;
+
 
           productSelections.appendChild(
             wrapper
@@ -1098,6 +1422,21 @@ Bröd"
           choices;
 
 
+        /*
+         * Om användaren redan valt en produkt
+         * behåller vi valet när sidan ritas om.
+         */
+
+        if (
+          !result.selectedProduct
+        ) {
+
+          result.selectedProduct =
+            null;
+
+        }
+
+
         const choiceBox =
           document.createElement("div");
 
@@ -1105,80 +1444,195 @@ Bröd"
           "product-choice";
 
 
-        const label =
-          document.createElement("label");
+        const count =
+          document.createElement("div");
 
-        label.textContent =
-          "Välj produkt:";
+        count.className =
+          "product-count";
+
+        count.textContent =
+          choices.length +
+          " möjliga produkter hittades.";
 
 
         choiceBox.appendChild(
-          label
+          count
         );
 
 
-        const select =
-          document.createElement("select");
+        /*
+         * FILTER
+         */
 
-        select.id =
-          "product-select-" + index;
-
-
-        choices.forEach(
-          (product, choiceIndex) => {
-
-            const option =
-              document.createElement("option");
-
-            option.value =
-              String(choiceIndex);
+        const groups =
+          getAvailableGroups(
+            result.item,
+            choices
+          );
 
 
-            const packageText =
-              product.package ||
-              (
-                product.amount
-                  ? product.amount +
-                    " " +
-                    (product.unit || "")
-                  : ""
+        let activeGroup =
+          result.activeGroup ||
+          "Alla";
+
+
+        const filters =
+          document.createElement("div");
+
+        filters.className =
+          "product-filters";
+
+
+        if (groups.length > 0) {
+
+          const allButton =
+            document.createElement("button");
+
+          allButton.type = "button";
+
+          allButton.className =
+            "filter-button";
+
+
+          if (
+            activeGroup === "Alla"
+          ) {
+            allButton.classList.add("active");
+          }
+
+
+          allButton.textContent =
+            "Alla";
+
+
+          allButton.addEventListener(
+            "click",
+            function() {
+
+              result.activeGroup =
+                "Alla";
+
+              result.visibleCount =
+                INITIAL_PRODUCTS_TO_SHOW;
+
+              renderProductSelections();
+
+            }
+          );
+
+
+          filters.appendChild(
+            allButton
+          );
+
+
+          groups.forEach(
+            group => {
+
+              const filterButton =
+                document.createElement("button");
+
+              filterButton.type = "button";
+
+              filterButton.className =
+                "filter-button";
+
+
+              if (
+                activeGroup === group
+              ) {
+                filterButton.classList.add(
+                  "active"
+                );
+              }
+
+
+              filterButton.textContent =
+                group;
+
+
+              filterButton.addEventListener(
+                "click",
+                function() {
+
+                  result.activeGroup =
+                    group;
+
+                  result.visibleCount =
+                    INITIAL_PRODUCTS_TO_SHOW;
+
+                  renderProductSelections();
+
+                }
               );
 
 
-            const brand =
-              product.brand
-                ? product.brand + " • "
-                : "";
+              filters.appendChild(
+                filterButton
+              );
+
+            }
+          );
 
 
-            const price =
-              typeof product.prices?.effective === "number"
-                ? " • " +
-                  formatPrice(
-                    product.prices.effective
-                  )
-                : "";
+          choiceBox.appendChild(
+            filters
+          );
+
+        }
 
 
-            option.textContent =
-              product.name +
-              (
-                brand
-                  ? " — " +
-                    brand.trim()
-                  : ""
-              ) +
-              (
-                packageText
-                  ? " • " +
-                    packageText
-                  : ""
-              ) +
-              price;
+        /*
+         * FILTRERA ENDAST FÖR VISNING.
+         */
+
+        let visibleChoices =
+          choices;
 
 
-            select.appendChild(
-              option
+        if (
+          activeGroup !== "Alla"
+        ) {
+
+          visibleChoices =
+            choices.filter(
+              product =>
+                getProductGroup(product) ===
+                activeGroup
+            );
+
+        }
+
+
+        const visibleCount =
+          result.visibleCount ||
+          INITIAL_PRODUCTS_TO_SHOW;
+
+
+        const productsToRender =
+          visibleChoices.slice(
+            0,
+            visibleCount
+          );
+
+
+        const productList =
+          document.createElement("div");
+
+        productList.className =
+          "product-list";
+
+
+        productsToRender.forEach(
+          product => {
+
+            productList.appendChild(
+              createProductCard(
+                result,
+                product,
+                index,
+                result.selectedProduct
+              )
             );
 
           }
@@ -1186,8 +1640,55 @@ Bröd"
 
 
         choiceBox.appendChild(
-          select
+          productList
         );
+
+
+        /*
+         * VISA FLER
+         */
+
+        if (
+          visibleChoices.length >
+          visibleCount
+        ) {
+
+          const showMore =
+            document.createElement("button");
+
+          showMore.type = "button";
+
+          showMore.className =
+            "show-more-button";
+
+          showMore.textContent =
+            "Visa fler produkter (" +
+            (
+              visibleChoices.length -
+              visibleCount
+            ) +
+            " kvar)";
+
+
+          showMore.addEventListener(
+            "click",
+            function() {
+
+              result.visibleCount =
+                visibleCount +
+                PRODUCTS_TO_ADD;
+
+              renderProductSelections();
+
+            }
+          );
+
+
+          choiceBox.appendChild(
+            showMore
+          );
+
+        }
 
 
         const help =
@@ -1196,9 +1697,20 @@ Bröd"
         help.className =
           "choice-help";
 
-        help.textContent =
-          choices.length +
-          " produktalternativ visas. Mest exakt matchning ligger överst.";
+
+        if (
+          result.selectedProduct
+        ) {
+
+          help.textContent =
+            "✓ Produkten är vald. Du kan ändra valet ovan.";
+
+        } else {
+
+          help.textContent =
+            "Tryck på en produkt för att välja den.";
+
+        }
 
 
         choiceBox.appendChild(
@@ -1227,34 +1739,11 @@ Bröd"
 
 
     allResults.forEach(
-      (result, index) => {
-
-        const select =
-          document.getElementById(
-            "product-select-" + index
-          );
-
+      result => {
 
         if (
-          !select ||
-          !result.choices ||
-          !result.choices.length
+          !result.selectedProduct
         ) {
-          return;
-        }
-
-
-        const choiceIndex =
-          Number(select.value);
-
-
-        const selected =
-          result.choices[
-            choiceIndex
-          ];
-
-
-        if (!selected) {
           return;
         }
 
@@ -1265,7 +1754,7 @@ Bröd"
             result.item,
 
           selectedProduct:
-            selected,
+            result.selectedProduct,
 
           products:
             result.products
@@ -1740,7 +2229,7 @@ Bröd"
   /*
    * STEG 1:
    *
-   * Hämta produkter och visa rullistor.
+   * Hämta produkter.
    */
 
   findProductsButton.addEventListener(
@@ -1838,7 +2327,16 @@ Bröd"
 
             item,
 
-            products
+            products,
+
+            selectedProduct:
+              null,
+
+            visibleCount:
+              INITIAL_PRODUCTS_TO_SHOW,
+
+            activeGroup:
+              "Alla"
 
           });
 
@@ -1902,7 +2400,7 @@ Bröd"
    * STEG 2:
    *
    * Jämför exakt de produkter användaren
-   * valt i rullistorna.
+   * valt.
    */
 
   compareSelectedButton.addEventListener(
