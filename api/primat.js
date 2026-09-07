@@ -8,10 +8,7 @@ export default async function handler(req, res) {
       throw new Error("PRIMAT_API_KEY saknas i Vercel.");
     }
 
-    // ------------------------------------------------------------
-    // 1. Hitta relevanta butiker för postnumret
-    // ------------------------------------------------------------
-
+    // Hitta butiker för postnumret
     const storesResponse = await fetch(
       "https://primat.nu/api/v3/stores/resolve?postcode=" +
         encodeURIComponent(postcode),
@@ -40,27 +37,7 @@ export default async function handler(req, res) {
       storesData.stores?.default_selection ||
       [];
 
-    // ------------------------------------------------------------
-    // 2. Om katalogen uttryckligen efterfrågas
-    // ------------------------------------------------------------
-
-    if (req.query.catalog === "1") {
-      const catalog = await getFullCatalog(
-        selectedStores,
-        apiKey
-      );
-
-      return res.status(200).json({
-        postcode,
-        selected_stores: selectedStores,
-        catalog
-      });
-    }
-
-    // ------------------------------------------------------------
-    // 3. Ingen sökning = visa bara butiksinformationen
-    // ------------------------------------------------------------
-
+    // Om ingen sökning görs
     if (!q) {
       return res.status(200).json({
         postcode,
@@ -69,7 +46,7 @@ export default async function handler(req, res) {
     }
 
     // ------------------------------------------------------------
-    // 4. Hämta hela katalogen
+    // Hämta hela katalogen EN gång per API-anrop
     // ------------------------------------------------------------
 
     const catalog = await getFullCatalog(
@@ -77,10 +54,7 @@ export default async function handler(req, res) {
       apiKey
     );
 
-    // ------------------------------------------------------------
-    // 5. Sök och rangordna lokalt
-    // ------------------------------------------------------------
-
+    // Sök i hela katalogen lokalt
     const results = searchCatalog(catalog.data, q);
 
     return res.status(200).json({
@@ -103,15 +77,14 @@ export default async function handler(req, res) {
 
 
 // ================================================================
-// HÄMTA HELA PRIMAT-KATALOGEN
+// HÄMTA HELA KATALOGEN
 // ================================================================
 
 async function getFullCatalog(stores, apiKey) {
   if (!stores || stores.length === 0) {
     return {
       data: [],
-      count: 0,
-      next_cursor: null
+      count: 0
     };
   }
 
@@ -120,7 +93,14 @@ async function getFullCatalog(stores, apiKey) {
   const allRows = [];
   let cursor = null;
 
-  while (true) {
+  // Säkerhetsgräns så att ett felaktigt cursor-flöde
+  // aldrig kan skapa en oändlig loop.
+  let pageCount = 0;
+  const maxPages = 50;
+
+  while (pageCount < maxPages) {
+    pageCount++;
+
     let url =
       "https://primat.nu/api/v3/prices?stores=" +
       encodeURIComponent(storeString) +
@@ -140,7 +120,7 @@ async function getFullCatalog(stores, apiKey) {
       const errorText = await response.text();
 
       throw new Error(
-        "Primat kunde inte hämta katalogen (" +
+        "Primat kunde inte hämta prisdata (" +
           response.status +
           "): " +
           errorText
@@ -153,23 +133,24 @@ async function getFullCatalog(stores, apiKey) {
       allRows.push(...data.data);
     }
 
-    cursor = data.next_cursor || null;
+    const nextCursor = data.next_cursor || null;
 
-    if (!cursor) {
+    if (!nextCursor || nextCursor === cursor) {
       break;
     }
+
+    cursor = nextCursor;
   }
 
   return {
     data: allRows,
-    count: allRows.length,
-    next_cursor: null
+    count: allRows.length
   };
 }
 
 
 // ================================================================
-// NORMALISERING
+// TEXTNORMALISERING
 // ================================================================
 
 function normalizeText(value) {
@@ -177,14 +158,14 @@ function normalizeText(value) {
     .toLowerCase()
     .normalize("NFD")
     .replace(/[\u0300-\u036f]/g, "")
-    .replace(/[^a-z0-9åäö\s]/g, " ")
+    .replace(/[^a-z0-9\s]/g, " ")
     .replace(/\s+/g, " ")
     .trim();
 }
 
 
 // ================================================================
-// SÖKNING I HELA KATALOGEN
+// SÖK I HELA KATALOGEN
 // ================================================================
 
 function searchCatalog(rows, query) {
@@ -213,26 +194,19 @@ function searchCatalog(rows, query) {
     }
 
     let score = 0;
+    let matchedWords = 0;
 
-    // ------------------------------------------------------------
-    // Exakt namnträff
-    // ------------------------------------------------------------
-
+    // Exakt produktnamn
     if (name === q) {
       score += 1000;
     }
 
-    // Hela sökfrasen finns i produktnamnet
+    // Hela sökningen finns i namnet
     if (name.includes(q)) {
       score += 500;
     }
 
-    // ------------------------------------------------------------
-    // Varje sökord
-    // ------------------------------------------------------------
-
-    let matchedWords = 0;
-
+    // Sökorden
     for (const word of queryWords) {
       if (name.includes(word)) {
         matchedWords++;
@@ -246,13 +220,13 @@ function searchCatalog(rows, query) {
       }
     }
 
-    // Alla ord måste helst finnas
+    // Alla ord måste finnas
     if (matchedWords < queryWords.length) {
       continue;
     }
 
     // ------------------------------------------------------------
-    // Specialhantering för kaffe
+    // KAFFE
     // ------------------------------------------------------------
 
     if (q.includes("kaffe")) {
@@ -275,15 +249,17 @@ function searchCatalog(rows, query) {
         name.includes("kaffe bon") ||
         name.includes("espressobon") ||
         name.includes("espresso bon") ||
-        name.includes("coffee beans")
+        name.includes("coffee beans") ||
+        name.includes("coffee bean")
       ) {
-        score += 250;
+        score += 300;
       }
 
       if (
         name.includes("kaffekaps") ||
         name.includes("kaffe kaps") ||
-        name.includes("kapsel")
+        name.includes("kapsel") ||
+        name.includes("capsule")
       ) {
         score += 100;
       }
@@ -294,30 +270,20 @@ function searchCatalog(rows, query) {
       ) {
         score += 80;
       }
-
-      // Produkter som bara råkar innehålla "kaffe"
-      // får lägre prioritet än riktiga kaffeprodukter.
-      if (
-        !name.includes("kaffe") &&
-        !brand.includes("kaffe")
-      ) {
-        score -= 100;
-      }
     }
 
     // ------------------------------------------------------------
-    // Specialhantering för smör
+    // SMÖR
     // ------------------------------------------------------------
 
     if (q.includes("smor")) {
       if (
         name.includes("smorgasmargarin") ||
-        name.includes("smorgasmargarin") ||
         name.includes("smordeg") ||
         name.includes("jordnotssmor") ||
         name.includes("persiljesmor") ||
         name.includes("kryddsmor") ||
-        name.includes("smorkn") ||
+        name.includes("smorkniv") ||
         name.includes("smorgas")
       ) {
         score -= 300;
@@ -332,15 +298,11 @@ function searchCatalog(rows, query) {
       }
     }
 
-    // ------------------------------------------------------------
-    // Produkter utan pris hamnar sist
-    // ------------------------------------------------------------
-
+    // Produkter med pris prioriteras
     if (product.effective_price != null) {
       score += 15;
     }
 
-    // Lite extra vikt åt produkter med GTIN
     if (product.gtin) {
       score += 5;
     }
@@ -351,10 +313,7 @@ function searchCatalog(rows, query) {
     });
   }
 
-  // ------------------------------------------------------------
-  // Sortera bästa träffarna först
-  // ------------------------------------------------------------
-
+  // Bästa träffarna först
   scored.sort((a, b) => {
     if (b.score !== a.score) {
       return b.score - a.score;
@@ -366,10 +325,7 @@ function searchCatalog(rows, query) {
     return aName.localeCompare(bName);
   });
 
-  // ------------------------------------------------------------
-  // Ta bort exakta dubbletter
-  // ------------------------------------------------------------
-
+  // Ta bort dubbletter
   const seen = new Set();
   const results = [];
 
@@ -393,10 +349,8 @@ function searchCatalog(rows, query) {
     }
 
     seen.add(key);
-
     results.push(product);
 
-    // Frontendens nuvarande gräns är 100.
     if (results.length >= 100) {
       break;
     }
