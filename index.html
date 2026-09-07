@@ -1,233 +1,234 @@
-<!DOCTYPE html><html lang="sv">
-<head>
+<!DOCTYPE html><html lang="sv"><head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">  <title>Priskorgen</title>  <style>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Priskorgen</title>
+  <style>
     * {
       box-sizing: border-box;
-    }
+    }body {
+  margin: 0;
+  font-family: Arial, sans-serif;
+  background: #f5f6f8;
+  color: #222;
+}
 
-    body {
-      margin: 0;
-      font-family: Arial, sans-serif;
-      background: #f5f6f8;
-      color: #222;
-    }
+.container {
+  max-width: 760px;
+  margin: 0 auto;
+  padding: 20px 14px 50px;
+}
 
-    .container {
-      max-width: 760px;
-      margin: 0 auto;
-      padding: 20px 14px 50px;
-    }
+h1 {
+  margin: 0 0 5px;
+  font-size: 32px;
+}
 
-    h1 {
-      margin: 0 0 5px;
-      font-size: 32px;
-    }
+.subtitle {
+  margin: 0 0 20px;
+  color: #666;
+}
 
-    .subtitle {
-      margin: 0 0 20px;
-      color: #666;
-    }
+.box {
+  background: white;
+  border-radius: 16px;
+  padding: 18px;
+  margin-bottom: 16px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+}
 
-    .box {
-      background: white;
-      border-radius: 16px;
-      padding: 18px;
-      margin-bottom: 16px;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.06);
-    }
+label {
+  display: block;
+  font-weight: bold;
+  margin-bottom: 7px;
+}
 
-    label {
-      display: block;
-      font-weight: bold;
-      margin-bottom: 7px;
-    }
+input,
+textarea {
+  width: 100%;
+  border: 1px solid #ccc;
+  border-radius: 10px;
+  padding: 12px;
+  font-size: 16px;
+  font-family: inherit;
+}
 
-    input,
-    textarea {
-      width: 100%;
-      border: 1px solid #ccc;
-      border-radius: 10px;
-      padding: 12px;
-      font-size: 16px;
-      font-family: inherit;
-    }
+textarea {
+  min-height: 130px;
+  resize: vertical;
+}
 
-    textarea {
-      min-height: 130px;
-      resize: vertical;
-    }
+button {
+  width: 100%;
+  border: 0;
+  border-radius: 12px;
+  padding: 14px;
+  font-size: 17px;
+  font-weight: bold;
+  cursor: pointer;
+  margin-top: 12px;
+  background: #111;
+  color: white;
+}
 
-    button {
-      width: 100%;
-      border: 0;
-      border-radius: 12px;
-      padding: 14px;
-      font-size: 17px;
-      font-weight: bold;
-      cursor: pointer;
-      margin-top: 12px;
-      background: #111;
-      color: white;
-    }
+button:disabled {
+  opacity: 0.6;
+  cursor: wait;
+}
 
-    button:disabled {
-      opacity: 0.6;
-      cursor: wait;
-    }
+h2 {
+  font-size: 22px;
+  margin: 0 0 14px;
+}
 
-    h2 {
-      font-size: 22px;
-      margin: 0 0 14px;
-    }
+h3 {
+  font-size: 18px;
+  margin: 0;
+}
 
-    h3 {
-      font-size: 18px;
-      margin: 0;
-    }
+.item {
+  border-top: 1px solid #eee;
+  padding: 15px 0;
+}
 
-    .item {
-      border-top: 1px solid #eee;
-      padding: 15px 0;
-    }
+.item:first-child {
+  border-top: 0;
+  padding-top: 0;
+}
 
-    .item:first-child {
-      border-top: 0;
-      padding-top: 0;
-    }
+.item-name {
+  font-weight: bold;
+  font-size: 18px;
+  margin-bottom: 10px;
+}
 
-    .item-name {
-      font-weight: bold;
-      font-size: 18px;
-      margin-bottom: 10px;
-    }
+.item-meta {
+  color: #777;
+  font-size: 14px;
+  margin-bottom: 12px;
+}
 
-    .item-meta {
-      color: #777;
-      font-size: 14px;
-      margin-bottom: 12px;
-    }
+.store-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 0;
+}
 
-    .store-row {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      gap: 10px;
-      padding: 8px 0;
-    }
+.store-name {
+  font-weight: 500;
+}
 
-    .store-name {
-      font-weight: 500;
-    }
+.price {
+  font-weight: bold;
+  white-space: nowrap;
+}
 
-    .price {
-      font-weight: bold;
-      white-space: nowrap;
-    }
+.cheapest {
+  background: #eef8ef;
+  border-radius: 10px;
+  padding: 10px;
+  margin-top: 8px;
+}
 
-    .cheapest {
-      background: #eef8ef;
-      border-radius: 10px;
-      padding: 10px;
-      margin-top: 8px;
-    }
+.best-label {
+  font-size: 13px;
+  color: #287a35;
+  font-weight: bold;
+  margin-bottom: 3px;
+}
 
-    .best-label {
-      font-size: 13px;
-      color: #287a35;
-      font-weight: bold;
-      margin-bottom: 3px;
-    }
+.smart {
+  background: #f1f5ff;
+  border-radius: 12px;
+  padding: 14px;
+  margin-top: 10px;
+}
 
-    .smart {
-      background: #f1f5ff;
-      border-radius: 12px;
-      padding: 14px;
-      margin-top: 10px;
-    }
+.smart-title {
+  font-weight: bold;
+  margin-bottom: 5px;
+}
 
-    .smart-title {
-      font-weight: bold;
-      margin-bottom: 5px;
-    }
+.loading {
+  text-align: center;
+  color: #666;
+  padding: 20px 0;
+}
 
-    .loading {
-      text-align: center;
-      color: #666;
-      padding: 20px 0;
-    }
+.error {
+  background: #fff0f0;
+  color: #a40000;
+  border-radius: 10px;
+  padding: 12px;
+  margin-top: 12px;
+}
 
-    .error {
-      background: #fff0f0;
-      color: #a40000;
-      border-radius: 10px;
-      padding: 12px;
-      margin-top: 12px;
-    }
+.empty {
+  color: #777;
+  text-align: center;
+  padding: 15px;
+}
 
-    .empty {
-      color: #777;
-      text-align: center;
-      padding: 15px;
-    }
+.attribution {
+  text-align: center;
+  font-size: 12px;
+  color: #777;
+  margin-top: 20px;
+}
 
-    .attribution {
-      text-align: center;
-      font-size: 12px;
-      color: #777;
-      margin-top: 20px;
-    }
+.attribution a {
+  color: inherit;
+}
 
-    .attribution a {
-      color: inherit;
-    }
+.hidden {
+  display: none;
+}
 
-    .hidden {
-      display: none;
-    }
+.summary {
+  background: #111;
+  color: white;
+  border-radius: 14px;
+  padding: 16px;
+  margin-bottom: 18px;
+}
 
-    .summary {
-      background: #111;
-      color: white;
-      border-radius: 14px;
-      padding: 16px;
-      margin-bottom: 18px;
-    }
+.summary-title {
+  font-size: 14px;
+  opacity: 0.8;
+  margin-bottom: 5px;
+}
 
-    .summary-title {
-      font-size: 14px;
-      opacity: 0.8;
-      margin-bottom: 5px;
-    }
+.summary-price {
+  font-size: 28px;
+  font-weight: bold;
+}
 
-    .summary-price {
-      font-size: 28px;
-      font-weight: bold;
-    }
+.store-badge {
+  display: inline-block;
+  background: #eee;
+  border-radius: 8px;
+  padding: 5px 8px;
+  font-size: 12px;
+  margin-top: 5px;
+}
 
-    .store-badge {
-      display: inline-block;
-      background: #eee;
-      border-radius: 8px;
-      padding: 5px 8px;
-      font-size: 12px;
-      margin-top: 5px;
-    }
+@media (max-width: 500px) {
+  h1 {
+    font-size: 28px;
+  }
 
-    @media (max-width: 500px) {
-      h1 {
-        font-size: 28px;
-      }
+  .container {
+    padding: 16px 10px 40px;
+  }
 
-      .container {
-        padding: 16px 10px 40px;
-      }
+  .box {
+    padding: 15px;
+  }
+}
 
-      .box {
-        padding: 15px;
-      }
-    }
-  </style></head><body>  <div class="container"><h1>🛒 Priskorgen</h1>
+  </style>
+</head><body>  <div class="container"><h1>🛒 Priskorgen</h1>
 
 <p class="subtitle">
   Hitta billigaste sättet att handla din korg.
@@ -286,6 +287,7 @@ Bröd"
     <h2>🚗 Smartast</h2>
 
     <div class="smart">
+
       <div class="smart-title">
         Smartaste alternativet
       </div>
@@ -293,6 +295,7 @@ Bröd"
       <div id="smartResults">
         Vi räknar på pris och antal butiker.
       </div>
+
     </div>
   </div>
 
@@ -307,16 +310,32 @@ Bröd"
 
   </div>  <script>
 
-    const compareButton = document.getElementById("compareButton");
-    const postcodeInput = document.getElementById("postcode");
-    const shoppingList = document.getElementById("shoppingList");
+    const compareButton =
+      document.getElementById("compareButton");
 
-    const results = document.getElementById("results");
-    const summary = document.getElementById("summary");
-    const cheapestResults = document.getElementById("cheapestResults");
-    const oneStoreResults = document.getElementById("oneStoreResults");
-    const smartResults = document.getElementById("smartResults");
-    const message = document.getElementById("message");
+    const postcodeInput =
+      document.getElementById("postcode");
+
+    const shoppingList =
+      document.getElementById("shoppingList");
+
+    const results =
+      document.getElementById("results");
+
+    const summary =
+      document.getElementById("summary");
+
+    const cheapestResults =
+      document.getElementById("cheapestResults");
+
+    const oneStoreResults =
+      document.getElementById("oneStoreResults");
+
+    const smartResults =
+      document.getElementById("smartResults");
+
+    const message =
+      document.getElementById("message");
 
 
     const storeNames = {
@@ -330,7 +349,10 @@ Bröd"
 
     function formatPrice(price) {
 
-      if (price === null || price === undefined) {
+      if (
+        price === null ||
+        price === undefined
+      ) {
         return "–";
       }
 
@@ -353,7 +375,8 @@ Bröd"
 
     function getStoreName(product) {
 
-      return storeNames[product.chain] || product.chain;
+      return storeNames[product.chain] ||
+        product.chain;
     }
 
 
@@ -375,23 +398,38 @@ Bröd"
 
     function singularizeWord(word) {
 
-      if (word.length > 5 && word.endsWith("or")) {
+      if (
+        word.length > 5 &&
+        word.endsWith("or")
+      ) {
         return word.slice(0, -2);
       }
 
-      if (word.length > 5 && word.endsWith("ar")) {
+      if (
+        word.length > 5 &&
+        word.endsWith("ar")
+      ) {
         return word.slice(0, -2);
       }
 
-      if (word.length > 5 && word.endsWith("er")) {
+      if (
+        word.length > 5 &&
+        word.endsWith("er")
+      ) {
         return word.slice(0, -2);
       }
 
-      if (word.length > 5 && word.endsWith("en")) {
+      if (
+        word.length > 5 &&
+        word.endsWith("en")
+      ) {
         return word.slice(0, -2);
       }
 
-      if (word.length > 5 && word.endsWith("et")) {
+      if (
+        word.length > 5 &&
+        word.endsWith("et")
+      ) {
         return word.slice(0, -2);
       }
 
@@ -400,12 +438,7 @@ Bröd"
 
 
     /*
-     * ORD SOM ÄR TYDLIGA TECKEN PÅ FEL PRODUKT.
-     *
-     * Viktigt:
-     * Vi använder hela ord här, inte bara "contains".
-     * Det gör exempelvis att "brödpinnar" kan stoppas
-     * utan att vanliga brödprodukter stoppas.
+     * ORD SOM TYDLIGT PEKAR PÅ FEL PRODUKT.
      */
 
     const excludedWords = {
@@ -429,7 +462,28 @@ Bröd"
         "smorgas",
         "smorgasfett",
         "smorj",
-        "margarin"
+        "margarin",
+        "bregott",
+        "rapsolja",
+        "raps",
+        "jordnotssmor",
+        "jordnot",
+        "mandelsmor",
+        "kryddsmor",
+        "vitlokssmor",
+        "persiljesmor",
+        "vitlok",
+        "smorkn",
+        "smorkniv",
+        "smorkringla",
+        "smorgasgurka",
+        "smorgaspapper",
+        "smorgasgrill",
+        "smorgaskex",
+        "smorgasran",
+        "smorgasr",
+        "smordejsplattor",
+        "smordejsplatta"
       ],
 
       kaffe: [
@@ -456,9 +510,7 @@ Bröd"
 
     function getSearchTerms(item) {
 
-      const normalized = normalizeText(item);
-
-      return normalized
+      return normalizeText(item)
         .split(" ")
         .filter(Boolean)
         .map(singularizeWord);
@@ -495,33 +547,21 @@ Bröd"
     }
 
 
-    /*
-     * Kontrollerar om ett ord faktiskt finns
-     * som ett eget ord i produkten.
-     *
-     * "bröd" finns i "bröd limpa"
-     * men inte i "brödpinnar".
-     */
-
     function hasWholeWord(product, word) {
 
       if (!word) {
         return false;
       }
 
-      const words = getProductWords(product);
-
-      return words.includes(word);
+      return getProductWords(product)
+        .includes(word);
     }
 
 
-    /*
-     * SPECIALFALL
-     */
-
     function getConcept(item) {
 
-      const text = normalizeText(item);
+      const text =
+        normalizeText(item);
 
       if (
         text === "mjolk" ||
@@ -537,9 +577,7 @@ Bröd"
         return "smor";
       }
 
-      if (
-        text === "kaffe"
-      ) {
+      if (text === "kaffe") {
         return "kaffe";
       }
 
@@ -561,19 +599,141 @@ Bröd"
     }
 
 
+    function containsExcludedWord(
+      product,
+      exclusions
+    ) {
+
+      const words =
+        getProductWords(product);
+
+      return exclusions.some(
+        excluded => words.includes(excluded)
+      );
+    }
+
+
     /*
-     * Kontrollerar hårda felord.
+     * SMÖR-SPECIFIKA KONTROLLER
      */
 
-    function containsExcludedWord(product, exclusions) {
+    function isOrdinaryButter(product) {
 
-      const words = getProductWords(product);
+      const name =
+        normalizeText(product.name || "");
 
-      return exclusions.some(excluded => {
+      const category =
+        categoryText(product);
 
-        return words.includes(excluded);
+      const brand =
+        normalizeText(product.brand || "");
 
-      });
+      const combined =
+        productText(product);
+
+
+      /*
+       * Dessa är inte vanligt smör.
+       */
+
+      const badTerms = [
+        "bregott",
+        "smor raps",
+        "smor rapsolja",
+        "rapsolja",
+        "raps",
+        "margarin",
+        "smorgas",
+        "smordeg",
+        "jordnotssmor",
+        "jordnot",
+        "mandelsmor",
+        "kryddsmor",
+        "vitlokssmor",
+        "persiljesmor",
+        "smorkniv",
+        "smorkringla",
+        "smorgasgurka",
+        "smorgaspapper",
+        "smorgasgrill",
+        "smorgaskex"
+      ];
+
+
+      for (const term of badTerms) {
+
+        if (
+          name.includes(term) ||
+          brand.includes(term)
+        ) {
+          return false;
+        }
+      }
+
+
+      /*
+       * Rätt kategori är den starkaste signalen.
+       *
+       * Exempel:
+       * "Mejeri & Ost > Smör & Margarin > Matfett smör"
+       */
+
+      if (
+        category.includes("matfett smor")
+      ) {
+        return true;
+      }
+
+
+      /*
+       * Även andra kategorier under smör
+       * kan innehålla riktiga smörprodukter.
+       */
+
+      if (
+        category.includes("smor & margarin") &&
+        (
+          name.includes("smor") ||
+          name.includes("smorstav")
+        ) &&
+        !name.includes("bregott")
+      ) {
+        return true;
+      }
+
+
+      /*
+       * Namnet måste då tydligt säga smör.
+       */
+
+      if (
+        hasWholeWord(product, "smor") &&
+        (
+          name.includes("normalsaltat") ||
+          name.includes("osaltat") ||
+          name.includes("extrasaltat") ||
+          name.includes("80%") ||
+          name.includes("81%") ||
+          name.includes("82%")
+        )
+      ) {
+        return true;
+      }
+
+
+      /*
+       * "Smörstav" är fortfarande riktigt smör.
+       */
+
+      if (
+        name.includes("smorstav") &&
+        !name.includes("smorgas")
+      ) {
+        return true;
+      }
+
+
+      return false;
     }
 
 
@@ -608,9 +768,6 @@ Bröd"
       const brand =
         normalizeText(product.brand || "");
 
-      const combined =
-        productText(product);
-
       const productWords =
         getProductWords(product);
 
@@ -628,7 +785,7 @@ Bröd"
 
 
       /*
-       * EXAKT SÖKORD SOM EGET ORD
+       * ORDTRÄFFAR
        */
 
       for (const word of queryWords) {
@@ -637,12 +794,14 @@ Bröd"
           continue;
         }
 
-        if (productWords.includes(word)) {
+        if (
+          productWords.includes(word)
+        ) {
           score += 40;
         }
 
         if (
-          normalizeText(category)
+          category
             .split(" ")
             .map(singularizeWord)
             .includes(word)
@@ -657,29 +816,22 @@ Bröd"
 
 
       /*
-       * HELA SÖKNINGEN I NAMNET.
-       *
-       * Används fortfarande, men med lägre
-       * betydelse än riktiga ordträffar.
+       * NAMNET INNEHÅLLER SÖKNINGEN
        */
 
-      if (name.includes(query)) {
+      if (
+        name.includes(query)
+      ) {
         score += 15;
       }
 
 
-      /*
-       * Produktnamnet börjar med sökningen.
-       */
-
-      if (name.startsWith(query)) {
+      if (
+        name.startsWith(query)
+      ) {
         score += 10;
       }
 
-
-      /*
-       * SPECIALMATCHNING
-       */
 
       const concept =
         getConcept(item);
@@ -694,12 +846,15 @@ Bröd"
         const hasMilkWord =
           hasWholeWord(product, "mjolk");
 
-        if (
-          hasMilkWord &&
-          !containsExcludedWord(
+        const excluded =
+          containsExcludedWord(
             product,
             excludedWords.mjolk
-          )
+          );
+
+        if (
+          hasMilkWord &&
+          !excluded
         ) {
           score += 100;
         }
@@ -717,35 +872,98 @@ Bröd"
         ) {
           score += 25;
         }
-
       }
 
 
       /*
        * SMÖR
+       *
+       * Här använder vi produktkategori
+       * mycket hårdare än tidigare.
        */
 
       if (concept === "smor") {
 
-        const hasButterWord =
-          hasWholeWord(product, "smor");
+        const ordinaryButter =
+          isOrdinaryButter(product);
 
-        if (
-          hasButterWord &&
-          !containsExcludedWord(
+        const excluded =
+          containsExcludedWord(
             product,
             excludedWords.smor
-          )
-        ) {
-          score += 110;
-        }
+          );
+
+
+        /*
+         * Om det uttryckligen är en
+         * blandning/margarinprodukt
+         * ska den inte kunna vinna på pris.
+         */
 
         if (
-          category.includes("smor")
+          excluded ||
+          !ordinaryButter
         ) {
-          score += 40;
+          score -= 500;
         }
 
+
+        if (ordinaryButter) {
+
+          /*
+           * Mycket stark signal:
+           * kategori = Matfett smör
+           */
+
+          if (
+            category.includes("matfett smor")
+          ) {
+            score += 180;
+          }
+
+
+          /*
+           * Vanliga smörvarianter.
+           */
+
+          if (
+            name.includes("normalsaltat")
+          ) {
+            score += 50;
+          }
+
+          if (
+            name.includes("osaltat")
+          ) {
+            score += 45;
+          }
+
+          if (
+            name.includes("extrasaltat")
+          ) {
+            score += 45;
+          }
+
+
+          /*
+           * Typiska fetthalter för smör.
+           */
+
+          if (
+            name.includes("82%") ||
+            name.includes("81%") ||
+            name.includes("80%")
+          ) {
+            score += 35;
+          }
+
+
+          if (
+            hasWholeWord(product, "smor")
+          ) {
+            score += 100;
+          }
+        }
       }
 
 
@@ -767,15 +985,11 @@ Bröd"
         ) {
           score += 30;
         }
-
       }
 
 
       /*
        * KAFFE
-       *
-       * Kaffe kan vara malet eller bönor.
-       * Båda är därför tillåtna.
        */
 
       if (concept === "kaffe") {
@@ -783,12 +997,15 @@ Bröd"
         const hasCoffeeWord =
           hasWholeWord(product, "kaffe");
 
-        if (
-          hasCoffeeWord &&
-          !containsExcludedWord(
+        const excluded =
+          containsExcludedWord(
             product,
             excludedWords.kaffe
-          )
+          );
+
+        if (
+          hasCoffeeWord &&
+          !excluded
         ) {
           score += 100;
         }
@@ -809,16 +1026,11 @@ Bröd"
         ) {
           score += 20;
         }
-
       }
 
 
       /*
        * BRÖD
-       *
-       * Här är vi betydligt striktare.
-       * "Brödpinnar" får inte vinna bara för
-       * att ordet "bröd" råkar finnas i namnet.
        */
 
       if (concept === "brod") {
@@ -849,7 +1061,6 @@ Bröd"
         if (excluded) {
           score -= 300;
         }
-
       }
 
 
@@ -872,11 +1083,7 @@ Bröd"
 
 
       /*
-       * ENSAMT SÖKORD:
-       *
-       * Om användaren skrev "bröd" och produkten
-       * inte ens innehåller bröd som eget ord,
-       * ska den normalt inte få vinna.
+       * ENSAMT SÖKORD
        */
 
       if (
@@ -902,12 +1109,11 @@ Bröd"
         ) {
           score -= 100;
         }
-
       }
 
 
       /*
-       * EXTREMT LITEN FÖRPACKNING
+       * SMÅ FÖRPACKNINGAR
        */
 
       if (
@@ -927,7 +1133,10 @@ Bröd"
     }
 
 
-    async function getProducts(query, postcode) {
+    async function getProducts(
+      query,
+      postcode
+    ) {
 
       const url =
         "/api/primat?q=" +
@@ -935,19 +1144,23 @@ Bröd"
         "&postcode=" +
         encodeURIComponent(postcode);
 
+
       const response =
         await fetch(url);
+
 
       if (!response.ok) {
 
         throw new Error(
-          "Kunde inte hämta prisdata för " + query
+          "Kunde inte hämta prisdata för " +
+          query
         );
-
       }
+
 
       const data =
         await response.json();
+
 
       if (
         !data.products ||
@@ -956,17 +1169,19 @@ Bröd"
         return [];
       }
 
+
       return data.products.data;
     }
 
 
     /*
      * VÄLJ BÄSTA PRODUKT
-     *
-     * Pris får inte rädda en dålig match.
      */
 
-    function chooseBestProduct(item, products) {
+    function chooseBestProduct(
+      item,
+      products
+    ) {
 
       const valid =
         products.filter(product => {
@@ -989,10 +1204,13 @@ Bröd"
 
           return {
             product,
-            score: scoreProduct(
-              item,
-              product
-            )
+
+            score:
+              scoreProduct(
+                item,
+                product
+              )
+
           };
 
         });
@@ -1000,9 +1218,12 @@ Bröd"
 
       scored.sort((a, b) => {
 
-        if (b.score !== a.score) {
+        if (
+          b.score !== a.score
+        ) {
           return b.score - a.score;
         }
+
 
         return (
           a.product.prices.effective -
@@ -1018,9 +1239,6 @@ Bröd"
 
       /*
        * Säkerhetsgräns.
-       *
-       * Om den bästa träffen ändå är för svag
-       * visar vi inte en påhittad matchning.
        */
 
       if (
@@ -1035,7 +1253,10 @@ Bröd"
     }
 
 
-    function createItemHtml(item, products) {
+    function createItemHtml(
+      item,
+      products
+    ) {
 
       const best =
         chooseBestProduct(
@@ -1059,12 +1280,12 @@ Bröd"
 
           </div>
         `;
-
       }
 
 
       const price =
         best.prices.effective;
+
 
       const store =
         getStoreName(best);
@@ -1074,7 +1295,8 @@ Bröd"
         best.package ||
         (
           best.amount
-            ? best.amount + " " + (best.unit || "")
+            ? best.amount + " " +
+              (best.unit || "")
             : ""
         );
 
@@ -1088,7 +1310,12 @@ Bröd"
 
           <div class="item-meta">
             ${escapeHtml(best.brand || "")}
-            ${packageText ? " • " + escapeHtml(packageText) : ""}
+            ${
+              packageText
+                ? " • " +
+                  escapeHtml(packageText)
+                : ""
+            }
           </div>
 
           <div class="cheapest">
@@ -1116,7 +1343,9 @@ Bröd"
     }
 
 
-    function calculateStoreTotals(allResults) {
+    function calculateStoreTotals(
+      allResults
+    ) {
 
       const totals = {};
 
@@ -1140,14 +1369,17 @@ Bröd"
 
 
         const storeKey =
-          product.chain + ":" + product.store_id;
+          product.chain +
+          ":" +
+          product.store_id;
 
 
         if (!totals[storeKey]) {
 
           totals[storeKey] = {
 
-            chain: product.chain,
+            chain:
+              product.chain,
 
             store_id:
               product.store_id,
@@ -1160,15 +1392,14 @@ Bröd"
             items: 0
 
           };
-
         }
 
 
         totals[storeKey].total +=
           product.prices.effective;
 
-        totals[storeKey].items += 1;
-
+        totals[storeKey].items +=
+          1;
       }
 
 
@@ -1176,10 +1407,14 @@ Bröd"
     }
 
 
-    function renderOneStore(allResults) {
+    function renderOneStore(
+      allResults
+    ) {
 
       const totals =
-        calculateStoreTotals(allResults);
+        calculateStoreTotals(
+          allResults
+        );
 
 
       if (!totals.length) {
@@ -1188,12 +1423,12 @@ Bröd"
           '<div class="empty">Ingen butik kunde räknas fram.</div>';
 
         return;
-
       }
 
 
       totals.sort(
-        (a, b) => a.total - b.total
+        (a, b) =>
+          a.total - b.total
       );
 
 
@@ -1210,7 +1445,8 @@ Bröd"
           </div>
 
           <div class="item-meta">
-            ${best.items} av ${allResults.length}
+            ${best.items} av
+            ${allResults.length}
             varor kunde matchas i denna butik.
           </div>
 
@@ -1239,10 +1475,14 @@ Bröd"
     }
 
 
-    function renderSmart(allResults) {
+    function renderSmart(
+      allResults
+    ) {
 
       const totals =
-        calculateStoreTotals(allResults);
+        calculateStoreTotals(
+          allResults
+        );
 
 
       if (!totals.length) {
@@ -1251,12 +1491,12 @@ Bröd"
           "Vi hittade inte tillräckligt med data ännu.";
 
         return;
-
       }
 
 
       totals.sort(
-        (a, b) => a.total - b.total
+        (a, b) =>
+          a.total - b.total
       );
 
 
@@ -1275,7 +1515,9 @@ Bröd"
         <br><br>
 
         Total för matchade varor:
-        <strong>${formatPrice(cheapest.total)}</strong>
+        <strong>
+          ${formatPrice(cheapest.total)}
+        </strong>
 
         <br><br>
 
@@ -1299,12 +1541,17 @@ Bröd"
           shoppingList.value
             .split("\n")
             .map(item => item.trim())
-            .filter(item => item.length > 0);
+            .filter(
+              item =>
+                item.length > 0
+            );
 
 
         message.innerHTML = "";
 
-        results.classList.add("hidden");
+        results.classList.add(
+          "hidden"
+        );
 
 
         if (!postcode) {
@@ -1334,7 +1581,9 @@ Bröd"
         }
 
 
-        compareButton.disabled = true;
+        compareButton.disabled =
+          true;
+
 
         compareButton.textContent =
           "⏳ Jämför priser...";
@@ -1349,7 +1598,9 @@ Bröd"
           const allResults = [];
 
 
-          for (const item of items) {
+          for (
+            const item of items
+          ) {
 
             const products =
               await getProducts(
@@ -1365,19 +1616,17 @@ Bröd"
               products
 
             });
-
           }
 
 
           const matchedCount =
-            allResults.filter(result => {
-
-              return chooseBestProduct(
-                result.item,
-                result.products
-              );
-
-            }).length;
+            allResults.filter(
+              result =>
+                chooseBestProduct(
+                  result.item,
+                  result.products
+                )
+            ).length;
 
 
           summary.innerHTML = `
@@ -1389,7 +1638,9 @@ Bröd"
               </div>
 
               <div class="summary-price">
-                ${matchedCount} av ${items.length}
+                ${matchedCount}
+                av
+                ${items.length}
               </div>
 
               <div>
@@ -1403,14 +1654,13 @@ Bröd"
 
           cheapestResults.innerHTML =
             allResults
-              .map(result => {
-
-                return createItemHtml(
-                  result.item,
-                  result.products
-                );
-
-              })
+              .map(
+                result =>
+                  createItemHtml(
+                    result.item,
+                    result.products
+                  )
+              )
               .join("");
 
 
@@ -1445,7 +1695,9 @@ Bröd"
 
               <br><br>
 
-              ${escapeHtml(error.message)}
+              ${escapeHtml(
+                error.message
+              )}
 
             </div>
 
@@ -1453,11 +1705,11 @@ Bröd"
 
         } finally {
 
-          compareButton.disabled = false;
+          compareButton.disabled =
+            false;
 
           compareButton.textContent =
             "🔎 Jämför min korg";
-
         }
 
       }
