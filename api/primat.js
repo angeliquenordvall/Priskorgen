@@ -37,6 +37,42 @@ export default async function handler(req, res) {
       storesData.stores?.default_selection ||
       [];
 
+    // TESTLÄGE:
+    // ?catalog=1 hämtar första sidan från Primats fullständiga katalog.
+    if (req.query.catalog === "1") {
+      const stores = selectedStores.join(",");
+
+      const pricesUrl =
+        "https://primat.nu/api/v3/prices?stores=" +
+        encodeURIComponent(stores) +
+        "&limit=1000";
+
+      const pricesResponse = await fetch(pricesUrl, {
+        headers: {
+          Authorization: "Bearer " + apiKey
+        }
+      });
+
+      if (!pricesResponse.ok) {
+        const errorText = await pricesResponse.text();
+
+        throw new Error(
+          "Primat kunde inte hämta katalogen (" +
+            pricesResponse.status +
+            "): " +
+            errorText
+        );
+      }
+
+      const pricesData = await pricesResponse.json();
+
+      return res.status(200).json({
+        postcode,
+        selected_stores: selectedStores,
+        catalog: pricesData
+      });
+    }
+
     if (!q) {
       return res.status(200).json({
         postcode,
